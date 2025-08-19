@@ -6,9 +6,9 @@ Our mission: to deeply understand how web servers work — from sockets to HTTP 
 ---
 
 ## ✨ Features
-- [x] Multiple client connections  
-- [x] Basic HTTP methods (`GET`, `POST`, `DELETE`)  
-- [x] Custom configuration files  
+- [ ] Multiple client connections  
+- [ ] Basic HTTP methods (`GET`, `POST`, `DELETE`)  
+- [ ] Custom configuration files  
 - [ ] CGI execution (planned)  
 - [ ] Chunked transfer encoding (planned)  
 
