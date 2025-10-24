@@ -49,7 +49,7 @@ struct Conn
 	Buffer in;
 	Buffer out;
 
-	std::string nice;
+	std::string nick;
 	std::string user;
 };
 

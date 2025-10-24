@@ -131,7 +131,7 @@ SYNOPSIS         top
 
        int poll(struct pollfd *fds, nfds_t nfds, int timeout);
 
-       #define _GNU_SOURCE         /* See feature_test_macros(7) 
+       #define _GNU_SOURCE          See feature_test_macros(7) 
        #include <poll.h>
 DESCRIPTION         top
        poll() performs a similar task to select(2): it waits for one of a
@@ -144,9 +144,9 @@ DESCRIPTION         top
        form:
 
            struct pollfd {
-               int   fd;         /* file descriptor 
-               short events;     /* requested events 
-               short revents;    /* returned events 
+               int   fd;          file descriptor 
+               short events;      requested events 
+               short revents;     returned events 
            };
 		   On success, poll() returns a nonnegative value
 		   which is the number
@@ -261,7 +261,7 @@ void Server::_runLoop()
 				dropClient(index, "Connection closed");
 				continue;
 			}
-			if (_retEvent & POLLIN) //Reabale
+			if (_retEvent & POLLIN) //Readale
 			{
 				serviceClientRead(index);
 			}

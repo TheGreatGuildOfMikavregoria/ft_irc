@@ -29,5 +29,5 @@
 		bool empty();
 		char *data();
 		size_t size();
-		void disgard(size_t len);
+		void discard(size_t len);
 };

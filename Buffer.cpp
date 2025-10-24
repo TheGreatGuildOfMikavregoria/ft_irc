@@ -26,7 +26,7 @@ size_t Buffer::size()
 	return _buffer.size();
 }
 
-void Buffer::disgard(size_t len)
+void Buffer::discard(size_t len)
 {
 	if (len == 0)
 		return;
