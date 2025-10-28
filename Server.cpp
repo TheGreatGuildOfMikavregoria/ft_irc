@@ -16,7 +16,15 @@ Server::~Server() {}
 // 10:46 -!- Irssi: Looking up localhost
 // 10:46 -!- Irssi: Connecting to localhost [127.0.0.1] port   
 //           6667
-// 10:46 Waiting for CAP LS response...
+// // 10:46 Waiting for CAP LS response...
+
+
+// Advertisement of sasl capability when authentication is unavailable
+// Servers MUST NOT advertise the sasl capability if the authentication layer is unavailable.
+// Servers MUST NAK any sasl capability request if the authentication layer is unavailable.
+// If a client requires pre-authentication and is unable to obtain the sasl capability, then the client MUST disconnect and MAY retry the connection.
+
+
 // 10:46 -!- Irssi: Connection to localhost established        
 // 10:46 -!- Irssi: (default) warning Unhandled CAP subcommand           302
 // 10:46 -!- Irssi: (GLib) critical g_ascii_strcasecmp:        
@@ -59,6 +67,7 @@ Server::~Server() {}
 // Utility Modules
 // Small helpers for logging, error propagation, configuration (port, backlog, timeout).
 
+
 void Server::dropClient(std::size_t index, const std::string &reason)
 {
 	if (index >= _clients.size())
@@ -73,6 +82,24 @@ void Server::dropClient(std::size_t index, const std::string &reason)
 
 	_clients.erase(_clients.begin() + index);
 }
+
+void Server::processInput(std::string &buff, Conn &conn)
+{
+	size_t pos = std::find(buffer," :");
+	std::string pre = buff.substr(0, pos);
+	std::string post = buff.substr(pos + 1);
+	if (pre == "CAP")
+		return;
+	else if (pre == "JOIN")
+		return;
+	else if (pre == "NICK")
+		return;
+	else if (pre == "USER")
+		return;
+
+}
+
+
 
 void Server::serviceClientRead(std::size_t index)
 {
@@ -90,8 +117,9 @@ void Server::serviceClientRead(std::size_t index)
 	}
 
 	conn.in.append(buffer, static_cast<std::size_t>(received));
-	conn.out.append(buffer, static_cast<std::size_t>(received));// for debugging
-	//processInput();
+	//conn.out.append(buffer, static_cast<std::size_t>(received));// for debugging
+	//std::string buff(buffer, strlen(buffer));
+	//processInput(buff, conn);
 
 	//
 }
@@ -112,7 +140,7 @@ void Server::serviceClientWrite(std::size_t index)
 		return;
 	}
 
-	conn.out.disgard(static_cast<std::size_t>(sent));
+	conn.out.discard(static_cast<std::size_t>(sent));
 }
 
 //fsf=file status flags, of the file, adds nonblocking into list
