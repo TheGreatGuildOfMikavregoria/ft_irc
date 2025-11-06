@@ -1,3 +1,5 @@
+# DISCLAIMER: This is a work in progress, set public to test Github Organization features.
+
 # 💬 ft_irc
 
 A fully functional Internet Relay Chat (IRC) server written in **C++**, compliant with the **RFC 1459** standard.  
@@ -82,15 +84,6 @@ PART #channel
 QUIT :Goodbye
 
 ⚡ Signals
-Signal	Action
-Ctrl + C	Gracefully shut down server and close all connections
-
-
-👥 Team
-Developed by:
-
-ChatGPT
-Claude
-Gemini
-Bing
-
+Signals to close down server:
+Ctrl + C
+Ctrl + D
