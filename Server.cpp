@@ -490,8 +490,7 @@ void Server::start_server()
 
 		for (ssize_t x = _clients.size() -1; x >= 0 ; --x)
 		{
-			Conn &conn = _clients[x];
-			sendToClient(conn.fd, "ERROR :Server is closing down");
+			sendToClient(_clients[x].fd, "ERROR :Server is closing down");
 			dropClient(x, "Server closing");
 		}
 		close(_listenFd);
