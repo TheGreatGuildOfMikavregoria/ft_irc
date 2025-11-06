@@ -83,21 +83,21 @@ void Server::dropClient(std::size_t index, const std::string &reason)
 	_clients.erase(_clients.begin() + index);
 }
 
-void Server::processInput(std::string &buff, Conn &conn)
-{
-	size_t pos = std::find(buffer," :");
-	std::string pre = buff.substr(0, pos);
-	std::string post = buff.substr(pos + 1);
-	if (pre == "CAP")
-		return;
-	else if (pre == "JOIN")
-		return;
-	else if (pre == "NICK")
-		return;
-	else if (pre == "USER")
-		return;
+// void Server::processInput(std::string &buff, Conn &conn)
+// {
+// 	size_t pos = std::find(buffer," :");
+// 	std::string pre = buff.substr(0, pos);
+// 	std::string post = buff.substr(pos + 1);
+// 	if (pre == "CAP")
+// 		return;
+// 	else if (pre == "JOIN")
+// 		return;
+// 	else if (pre == "NICK")
+// 		return;
+// 	else if (pre == "USER")
+// 		return;
 
-}
+// }
 
 
 
