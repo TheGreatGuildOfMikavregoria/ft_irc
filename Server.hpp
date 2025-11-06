@@ -10,6 +10,8 @@
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
+#include <stdint.h>
+
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -19,7 +21,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "Buffer.hpp"
-
+#include <csignal>
 
 
 
@@ -58,9 +60,9 @@ class Server
 private:
 	int status; //I believed i needed at somepoint now i dont remember
 	//TO be implemented:
-	// std::string password; 
-	// std::string port;
-
+	std::string password; 
+	std::string port;
+	static bool _signal;
 	std::vector<Conn> _clients;
 	//std::vector<Channel> _channels;
 	int _listenFd;
@@ -70,11 +72,13 @@ private:
 	void dropClient(std::size_t index, const std::string &reason);
 	void serviceClientRead(std::size_t index);
 	void serviceClientWrite(std::size_t index);
+	void processInput(std::string &buff, Conn &conn);
+	void sendToClient(int fd, const std::string &msg);
 
 public:
-	Server();
+	Server(std::string port, std::string pw);
 	~Server();
-
+	static void SignalHandler(int signum);
 	void start_server();
 	bool set_nonblock(int fd);
 };
