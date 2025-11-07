@@ -498,7 +498,6 @@ void Server::start_server()
 	catch (std::exception &e)
 	{
 		std::cout << "Server error: " << e.what() << std::endl;
-		std::exit(1);
 	}
 }
 
