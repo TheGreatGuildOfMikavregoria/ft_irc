@@ -10,8 +10,8 @@ CXXFLAGS = -g $(INCLUDES) -std=c++17
 
 DEBUG ?= 0
 ifeq ($(DEBUG),1)
-	CXXFLAGS += -O0 -DDEBUG=1 -fsanitize=address,undefined -fno-omit-frame-pointer
-	LDFLAGS += -fsanitize=address,undefined
+	CXXFLAGS += -O0 -DDEBUG=1 
+
 else
 	CXXFLAGS += -O2 -DNDEBUG #-Wall -Wextra -Werror
 endif
