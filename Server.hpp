@@ -23,7 +23,7 @@
 #include "Buffer.hpp"
 #include <csignal>
 
-
+#define MAX_CLIENTS 512
 
 ///////////////////////
 #if defined(DEBUG) && DEBUG
@@ -66,6 +66,7 @@ private:
 	std::vector<Conn> _clients;
 	//std::vector<Channel> _channels;
 	int _listenFd;
+	int _spareFd;
 
 	void _startServerListener();
 	void _runLoop();
@@ -74,6 +75,9 @@ private:
 	void serviceClientWrite(std::size_t index);
 	void processInput(std::string &buff, Conn &conn);
 	void sendToClient(int fd, const std::string &msg);
+	void buildPollList(std::vector<pollfd> &pfds);
+	void serverAcceptClients();
+	void handleClientEvents(std::vector<pollfd> &pfds);
 
 public:
 	Server(std::string port, std::string pw);
