@@ -23,7 +23,6 @@ class Command {
 		size_t _identifyNlCr(std::string &tempStr);
 		void _removeParsedFromBuffer(size_t, std::string &);
 	public:
-		Command(std::string &buff);
 		Command(Buffer &buff);
 		std::vector<std::string> getTokens();
 		unsigned int getStatus();
