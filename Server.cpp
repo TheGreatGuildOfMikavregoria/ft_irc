@@ -1,7 +1,31 @@
 #include "Server.hpp"
 
+bool Server::_signal = false;
 
-Server::Server() : status(0), _clients(), _listenFd(-1) {}
+void Server::SignalHandler(int signum)
+{
+	(void)signum;
+	Server::_signal = true;
+	#if DEBUG
+	std::cout << "Signal was clickered" << std::endl;
+	#endif 
+}
+
+Server::Server(std::string port, std::string pw) : status(0), password(pw), port(port), _clients(), _listenFd(-1)
+{
+	try
+	{
+		if (std::stoi(port) < 0 || std::stoi(port) > 65535)
+			throw std::runtime_error("Port out of range");
+		_spareFd = open("/dev/null", O_RDONLY);
+		if (_spareFd < 0)
+			throw std::runtime_error("SpareFd opening failed");
+	}
+	catch(...) //Stoi throws here
+	{
+		throw std::runtime_error("Invalid port format");
+	}
+}
 
 Server::~Server() {}
 
@@ -83,15 +107,36 @@ void Server::dropClient(std::size_t index, const std::string &reason)
 	_clients.erase(_clients.begin() + index);
 }
 
+void Server::sendToClient(int fd,const  std::string &msg)
+{
+	std::string payload = msg;
+	if (payload.size() < 2 || payload.substr(payload.size() - 2) != "\r\n")
+		payload += "\r\n";
+	ssize_t sent = send(fd, payload.c_str(), payload.size(), 0);
+	if (sent < 0)  // SEND check please remember me 
+		throw std::runtime_error("send() failed");
+}
+
 // void Server::processInput(std::string &buff, Conn &conn)
 // {
-// 	size_t pos = std::find(buffer," :");
-// 	std::string pre = buff.substr(0, pos);
+// 	if (buff.empty())
+// 		return;
+
+// 	const std::string::size_type pos = buff.find(' ');
+// 	if (pos == std::string::npos)
+// 		return ;
+	
+// 	std::string pre = buff.substr(0, pos - 1);
 // 	std::string post = buff.substr(pos + 1);
+// 	std::cout << "To make sense of this : "<< buff << " " << pre << " " << post << std::endl;
 // 	if (pre == "CAP")
 // 		return;
 // 	else if (pre == "JOIN")
+// 	{
+// 		std::cout << "FML";
+// 		sendToClient(conn.fd, "Join test");
 // 		return;
+// 	}
 // 	else if (pre == "NICK")
 // 		return;
 // 	else if (pre == "USER")
@@ -116,10 +161,31 @@ void Server::serviceClientRead(std::size_t index)
 		return;
 	}
 
-	conn.in.append(buffer, static_cast<std::size_t>(received));
 	//conn.out.append(buffer, static_cast<std::size_t>(received));// for debugging
-	//std::string buff(buffer, strlen(buffer));
-	//processInput(buff, conn);
+	conn.in.append(buffer, static_cast<std::size_t>(received));
+	while (1)
+	{
+		Command message(conn.in);
+		if (message.getStatus() == MESSAGE_INCOMPLETE)
+			return;
+	}
+		
+	// while (!conn.in.empty())
+	// {
+	// 	std::string data = conn.in.str();
+	// 	std::size_t pos = data.find('\n');
+	// 	if (pos == std::string::npos)
+	// 		break ;
+
+	// 	std::string line = data.substr(0, pos);
+	// 	if (!line.empty() && line.back() == '\r')
+	// 		line.pop_back();
+
+	// 	conn.in.discard(pos + 1); 
+
+	// 	if (!line.empty())
+	// 		processInput(line, conn);
+	// }
 
 	//
 }
@@ -183,69 +249,6 @@ DESCRIPTION         top
        of zero indicates that the system call timed out before any file
        descriptors became ready.
 */
-
-void Server::_runLoop()
-{
-	std::vector<pollfd> pfds;
-	//std::vector<int> clients;
-	//const int listen_fd = _ListenFd;
-
-	for (;;)
-	{
-		//Building poll list
-		pfds.clear();
-		pfds.push_back(pollfd{_listenFd, POLLIN, 0}); // Adds server listener to the list
-
-		for (size_t i = 0; i < _clients.size(); ++i) //Iter through clients
-		{
-			//tldr, part that checks if (in) from server perspctive, 
-			//do we have data to read from client and out do we have data to send to
-			//client e.g. in = client prompt, out = channel msgs
-			short event = POLLIN; //Requested event set, so if data is written we will read/bewoken up to read, so we call recv maybe?
-			if (!_clients[i].out.empty()) 
-				event |= POLLOUT; // If out has queued data, so when there is smth to write, it will exist for that moment
-			pfds.push_back(pollfd{ _clients[i].fd, event, 0}); //pushes to pfds so poll can handle client appropriatelty
-		}
-
-		DBG("pfds=" << pfds.size()
-			<< " clients=" << _clients.size());
-		
-		int pRes = poll(pfds.data(), pfds.size(), 10000);
-		if (pRes < 0)
-		{
-			if (errno == EINTR)
-				continue;
-			throw std::runtime_error("poll() failure");
-		}
-		//if (pRes == 0) // noevents = goes straight to timeout 
-		//	continue;  
-
-		DBG("poll() ready=" << pRes
-			<< " listen.revents=" << pollMaskStr(pfds[0].revents));
-
-		//Accepting new clientss, building Conn for them and adding to the list to check in next run
-		if (pfds[0].revents & POLLIN)
-		{
-			sockaddr_in c_addr;
-			socklen_t c_len = sizeof(c_addr);
-			std::memset(&c_addr, 0, sizeof(c_addr));
-			int sock_fd = accept(_listenFd, reinterpret_cast<sockaddr *>(&c_addr), &c_len);
-			if (sock_fd >= 0)
-			{
-				if (!set_nonblock(sock_fd))
-					close(sock_fd);
-				else
-				{
-					Conn c;
-					c.fd = sock_fd;
-					_clients.push_back(c);
-					std::cout << "Accepted new client: " << sock_fd << std::endl;
-				}
-			}
-			 for (size_t i = 1; i < pfds.size(); ++i) {
-			 DBG("fd=" << pfds[i].fd << " revents=" << pollMaskStr(pfds[i].revents));}
-		}
-
 		// POLLIN
 
 		// listener: at least one pending connection → call accept().
@@ -277,27 +280,145 @@ void Server::_runLoop()
 		// linux has POLLRDHUP (peer closed its write end). handy if you want to detect half-closes; not strictly required.
 
 		// Checks the revents of clients and acts according to the returned event.
-		for (ssize_t i = pfds.size() - 1; i >=1; --i)
-		{
-			size_t index = i - 1;
-			if (index >= _clients.size())
-				continue ;
+void Server::handleClientEvents(std::vector<pollfd> &pfds)
+{
+	for (ssize_t i = pfds.size() - 1; i >=1; --i)
+	{
+		size_t index = i - 1;
+		if (index >= _clients.size())
+			continue ;
 
-			short _retEvent = pfds[i].revents;
-			if (_retEvent & (POLLERR | POLLHUP | POLLNVAL)) //Error, Hangup, Invalid req.
-			{
-				dropClient(index, "Connection closed");
-				continue;
-			}
-			if (_retEvent & POLLIN) //Readale
-			{
-				serviceClientRead(index);
-			}
-			if (_retEvent & POLLOUT) //Writable
-			{
-				serviceClientWrite(index);
-			}
+		short _retEvent = pfds[i].revents;
+		if (_retEvent & (POLLERR | POLLHUP | POLLNVAL)) //Error, Hangup, Invalid req.
+		{
+			dropClient(index, "Connection closed");
+			continue;
 		}
+		if (_retEvent & POLLIN) //Readale
+		{
+			serviceClientRead(index);
+		}
+		if (_retEvent & POLLOUT) //Writable
+		{
+			serviceClientWrite(index);
+		}
+	}
+}
+#include <string.h>
+void Server::serverAcceptClients()
+{
+	for (;;)
+	{
+		sockaddr_in c_addr;
+		socklen_t c_len = sizeof(c_addr);
+		std::memset(&c_addr, 0, sizeof(c_addr));
+
+		int sock_fd = accept(_listenFd, reinterpret_cast<sockaddr *>(&c_addr), &c_len);
+		if (sock_fd < 0)
+		{
+			#if DEBUG
+			std::cout << std::strerror(errno);
+			std::cout << " ;;;too much bs\n";
+			#endif
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				break ;
+			if (errno == ECONNABORTED)
+				continue ;
+			if (errno == EMFILE || errno == ENFILE) //Testing some failsafes in case running out of fd's tldr should just keep under os ulimit
+			{
+
+				//usleep(10);
+				if (_spareFd >= 0)
+				{
+					close(_spareFd);
+					_spareFd = -1;
+					int temp = accept(_listenFd, reinterpret_cast<sockaddr *>(&c_addr), &c_len);
+					if (temp >= 0)
+						close(temp);
+					_spareFd = open("/dev/null", O_RDONLY);
+					if (_spareFd < 0)
+						std::cout << "WARNING: spareFd failed to open\n";
+					continue;
+				}
+				else if (!_clients.empty())
+				{
+					dropClient(0, "Emergency fd failsafe 2?");
+					continue;
+				}
+				
+
+			}
+			perror("accept");
+			break;
+		}
+		if (_clients.size() == MAX_CLIENTS)
+		{
+			sendToClient(sock_fd, "ERROR :Server full");
+			close(sock_fd);
+			continue ;
+		}
+		if (!set_nonblock(sock_fd))
+		{
+			close(sock_fd);
+			continue ;
+		}
+		Conn c;
+		c.fd = sock_fd;
+		_clients.push_back(c);
+
+		std::cout << "Accepted new client: " << sock_fd << std::endl;
+	}
+}
+
+//tldr, part that checks if (in) from server perspctive, 
+//do we have data to read from client and out do we have data to send to
+//client e.g. in = client prompt, out = channel msgs
+void Server::buildPollList(std::vector<pollfd> &pfds)
+{
+	pfds.clear();
+	pfds.reserve(_clients.size() + 1);
+
+	pfds.push_back(pollfd{_listenFd, POLLIN, 0});
+
+	for (size_t i = 0; i < _clients.size(); ++i)
+	{
+
+		short event = POLLIN;
+		if (!_clients[i].out.empty()) 
+			event |= POLLOUT;
+		pfds.push_back(pollfd{ _clients[i].fd, event, 0});
+	}
+}
+
+void Server::_runLoop()
+{
+	std::vector<pollfd> pfds;
+
+	for (;;)
+	{
+		buildPollList(pfds);
+
+		DBG("pfds=" << pfds.size()
+			<< " clients=" << _clients.size());
+		
+		int pRes = poll(pfds.data(), pfds.size(), 0);
+		if (pRes < 0)
+		{
+			if (errno == EINTR)
+				continue;
+			throw std::runtime_error("poll() failure");
+		}
+		//if (pRes == 0) // noevents = goes straight to timeout 
+		//	continue;  
+
+		DBG("poll() ready=" << pRes
+			<< " listen.revents=" << pollMaskStr(pfds[0].revents));
+
+		if (pfds[0].revents & POLLIN)
+			serverAcceptClients();
+
+		handleClientEvents(pfds);
+
 		#if DEBUG
 		for(int i = 0; i < _clients.size(); i++)
 		{
@@ -320,23 +441,28 @@ void Server::_runLoop()
 			std::cout <<std::endl;
 		}
 		#endif
+
+		if (Server::_signal == true)
+			break;
 	}
+
 }
 
-
-void Server::_startServerListener()
-{
 	// socket() creates an endpoint for communication and returns a file
 	//    descriptor that refers to that endpoint.        int socket(int domain, int type, int protocol);
 
-	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (socket_fd == -1)
-		throw std::runtime_error("socket() failed");
-	//setsockopt ?
-	#if DEBUG
-	std::cout << "Socket id:"<< socket_fd << std::endl;
-	#endif
-	
+
+// 	int setsockopt(int socket, int level, int option_name,
+//        const void *option_value, socklen_t option_len);
+// 		The setsockopt() function shall set the option specified by the option_name argument, at the protocol level specified by the level argument, to the value pointed to by the option_value argument for the socket associated with the file descriptor specified by the socket argument.
+
+// The level argument specifies the protocol level at which the option resides.
+//  To set options at the socket level, specify the level argument as SOL_SOCKET.
+//   To set options at other levels, supply the appropriate level identifier for 
+//   the protocol controlling the option. For example, to indicate that an option
+//    is interpreted by the TCP (Transport Control Protocol), set level to 
+//    IPPROTO_TCP as defined in the <netinet/in.h> header.
+
 	// struct sockaddr_in {
 	// 	sa_family_t     sin_family;     /* AF_INET */
 	// 	in_port_t       sin_port;       /* Port number */
@@ -346,12 +472,6 @@ void Server::_startServerListener()
 	// struct in_addr {
 	// 	in_addr_t s_addr;
 	// };
-
-	sockaddr_in addr;	// Holds the IPv4 address/port configuration for this socket.
-	std::memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;	// Use the IPv4 protocol family.
-	addr.sin_port = htons(6667);	// Listen on port 6667 (default IRC port), convert to network byte order.
-	addr.sin_addr.s_addr = INADDR_ANY;	// Accept connections on any local network interface.
 
 	//        bind - bind a name to a socket
 	//  When a socket is created with socket(2), it exists in a name space
@@ -363,11 +483,12 @@ void Server::_startServerListener()
 	//        int bind(int sockfd, const struct sockaddr *addr,
 	//                 socklen_t addrlen);
 
-	if (bind(socket_fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) < 0)
-	{
-		close(socket_fd);
-		throw std::runtime_error("bind() failed");
-	}
+// SO_REUSEADDR
+// Specifies that the rules used in validating 
+// addresses supplied to bind() should allow reuse of 
+// local addresses, if this is supported by the protocol. 
+// This option takes an int value. This is a Boolean option.
+
 
 	//    listen - listen for connections on a socket
 	//    int listen(int sockfd, int backlog);
@@ -375,7 +496,39 @@ void Server::_startServerListener()
 	//    socket, that is, as a socket that will be used to accept incoming
 	//    connection requests using accept(2).
 
-	if (listen(socket_fd, 42) < 0)
+void Server::_startServerListener()
+{
+
+	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (socket_fd == -1)
+		throw std::runtime_error("socket() failed");
+
+	int opt = 1;
+	if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+		throw std::runtime_error("setsockopt(SO_REUSEADDR) failed");
+
+
+	#if DEBUG
+	std::cout << "Socket id:"<< socket_fd << std::endl;
+	#endif
+	
+
+	sockaddr_in addr;
+	std::memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(std::stoi(port));
+	addr.sin_addr.s_addr = INADDR_ANY;
+
+
+
+	if (bind(socket_fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) < 0)
+	{
+		close(socket_fd);
+		throw std::runtime_error("bind() failed");
+	}
+
+
+	if (listen(socket_fd, 32000) < 0)
 	{
 		close(socket_fd);
 		throw std::runtime_error("listen() failed");
@@ -398,13 +551,25 @@ void Server::start_server()
 		#if DEBUG
 		std::cout << "Trying to start Server\n";
 		#endif
+
 		_startServerListener();
 		_runLoop();
+
+		#if DEBUG
+		std::cout << "Serever is closing down" << std::endl;
+		#endif
+
+		for (ssize_t x = _clients.size() -1; x >= 0 ; --x)
+		{
+			sendToClient(_clients[x].fd, "ERROR :Server is closing down");
+			dropClient(x, "Server closing");
+		}
+		close(_spareFd);
+		close(_listenFd);
 	}
 	catch (std::exception &e)
 	{
 		std::cout << "Server error: " << e.what() << std::endl;
-		std::exit(1);
 	}
 }
 
