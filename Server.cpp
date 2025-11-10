@@ -163,6 +163,13 @@ void Server::serviceClientRead(std::size_t index)
 
 	//conn.out.append(buffer, static_cast<std::size_t>(received));// for debugging
 	conn.in.append(buffer, static_cast<std::size_t>(received));
+	while (1)
+	{
+		Command message(conn.in);
+		if (message.getStatus() == MESSAGE_INCOMPLETE)
+			return;
+	}
+		
 	// while (!conn.in.empty())
 	// {
 	// 	std::string data = conn.in.str();

@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "Buffer.hpp"
+#include "Command.hpp"
 #include <csignal>
 
 #define MAX_CLIENTS 512
