@@ -5,10 +5,19 @@
 
 class Client{
 	private:
-        int fd;
-	    Buffer in;
-	    Buffer out;
-        std::string nick;
-        std::string user;
-        
+		int			_fd;
+		Buffer		_in;
+		Buffer		_out;
+		std::string	_userName;
+		std::string	_nickName;
+		std::string	_realName;
+		std::string	_hostName;
+		bool		_authSuccess;
+		bool		_nickNameSet;
+		bool		_userNameSet;
+		bool		_passwordSet;
+		bool		_userModeSet;
+	
+	public:
+		
 };
