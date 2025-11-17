@@ -5,19 +5,45 @@
 
 class Client{
 	private:
-		int			_fd;
+		const int			_fd;
 		Buffer		_in;
 		Buffer		_out;
 		std::string	_userName;
 		std::string	_nickName;
 		std::string	_realName;
 		std::string	_hostName;
-		bool		_authSuccess;
+		bool		_authStatus;
 		bool		_nickNameSet;
 		bool		_userNameSet;
 		bool		_passwordSet;
 		bool		_userModeSet;
 	
 	public:
-		
+		Client(int fd);
+		~Client();
+
+		const int		getFd() const;
+		Buffer	getInBuffer() const;
+		Buffer	getOutBuffer() const;
+		const std::string&	getUserName() const;
+		const std::string&	getNickName() const;
+		const std::string&	getRealName() const;
+		const std::string&	getHostName() const;
+		bool	getAuthStatus() const;
+		bool	getNickNameStatus() const;
+		bool	getUserNameStatus() const;
+		bool	getPasswordStatus() const;
+		bool	getUserModeStatus() const;
+
+		void	setIn(Buffer in);
+		void	setOut(Buffer out);
+		void	setUserName(std::string& userName);
+		void	setNickName(std::string& nickName);
+		void	setRealName(std::string& realName);
+		void	setHostName(std::string& hostName);
+		void	setAuthStatus(bool authStatus);
+		void	setNickNameStatus(bool nickNameSet);
+		void	setUserNameStatus(bool userNameSet);
+		void	setPasswordStatus(bool passwordSet);
+		void	setUserModeStatus(bool userModeSet);
 };

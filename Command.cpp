@@ -82,7 +82,7 @@ void Command::_processVector()
 	{
 		std::cout << asd << std::endl;
 	}
-	
+
 }
 
 void Command::_commandStringToVector(std::string &buffer)
