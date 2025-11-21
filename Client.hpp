@@ -5,7 +5,7 @@
 
 class Client{
 	private:
-		const int			_fd;
+		int			_fd;
 		Buffer		_in;
 		Buffer		_out;
 		std::string	_userName;
@@ -23,8 +23,8 @@ class Client{
 		~Client();
 
 		const int		getFd() const;
-		Buffer	getInBuffer() const;
-		Buffer	getOutBuffer() const;
+		Buffer&	getInBuf();
+		Buffer&	getOutBuf();
 		const std::string&	getUserName() const;
 		const std::string&	getNickName() const;
 		const std::string&	getRealName() const;
@@ -35,8 +35,8 @@ class Client{
 		bool	getPasswordStatus() const;
 		bool	getUserModeStatus() const;
 
-		void	setIn(Buffer in);
-		void	setOut(Buffer out);
+		void	setInBuf(Buffer in);
+		void	setOutBuf(Buffer out);
 		void	setUserName(std::string& userName);
 		void	setNickName(std::string& nickName);
 		void	setRealName(std::string& realName);

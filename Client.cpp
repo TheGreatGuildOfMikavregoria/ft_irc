@@ -11,8 +11,8 @@ Client::Client(int fd) : _fd(fd) {
 Client::~Client() {}
 
 const int		Client::getFd() const {return _fd;}
-Buffer	Client::getInBuffer() const {return _in;}
-Buffer	Client::getOutBuffer() const {return _out;}
+Buffer&	Client::getInBuf() {return _in;}
+Buffer&	Client::getOutBuf() {return _out;}
 const std::string&	Client::getUserName() const {return _userName;}
 const std::string&	Client::getNickName() const {return _nickName;}
 const std::string&	Client::getRealName() const {return _realName;}
@@ -23,8 +23,8 @@ bool	Client::getUserNameStatus() const {return _nickNameSet;}
 bool	Client::getPasswordStatus() const {return _passwordSet;}
 bool	Client::getUserModeStatus() const {return _userModeSet;}
 
-void	Client::setIn(Buffer in) {_in = in;}
-void	Client::setOut(Buffer out) {_out = out;}
+void	Client::setInBuf(Buffer in) {_in = in;}
+void	Client::setOutBuf(Buffer out) {_out = out;}
 void	Client::setUserName(std::string& userName) {_userName = userName;}
 void	Client::setNickName(std::string& nickName) {_nickName = nickName;}
 void	Client::setRealName(std::string& realName) {_realName = realName;}
