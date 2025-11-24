@@ -2,8 +2,6 @@ name: irc-ci
 
 on:
   push:
-	branches:
-		- feat/parsing
   pull_request:
 
 jobs:
