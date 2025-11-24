@@ -1,3 +1,5 @@
+#include "Utils.hpp"
+
 std::string stringToLowercase(std::string text)
 {
 	int i = 0;
