@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include "Buffer.hpp"
 #include "Command.hpp"
+#include "Client.hpp"
 #include <csignal>
 
 #define MAX_CLIENTS 512
@@ -46,15 +47,16 @@ static inline const char* pollMaskStr(short ev) {
 }
 //////////////////////////
 
-struct Conn
-{
-	int fd;
-	Buffer in;
-	Buffer out;
+// struct Conn
+// {
+// 	int fd;
+// 	Buffer in;
+// 	Buffer out;
 
-	std::string nick;
-	std::string user;
-};
+// 	std::string nick;
+// 	std::string user;
+// };
+class Client;
 
 class Server
 {
@@ -64,7 +66,7 @@ private:
 	std::string password; 
 	std::string port;
 	static bool _signal;
-	std::vector<Conn> _clients;
+	std::vector<Client> _clients;
 	//std::vector<Channel> _channels;
 	int _listenFd;
 	int _spareFd;
@@ -74,7 +76,7 @@ private:
 	void dropClient(std::size_t index, const std::string &reason);
 	void serviceClientRead(std::size_t index);
 	void serviceClientWrite(std::size_t index);
-	void processInput(std::string &buff, Conn &conn);
+	// void processInput(std::string &buff, Client &conn);
 	void sendToClient(int fd, const std::string &msg);
 	void buildPollList(std::vector<pollfd> &pfds);
 	void serverAcceptClients();
