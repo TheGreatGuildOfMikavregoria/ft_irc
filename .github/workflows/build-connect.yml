@@ -37,7 +37,7 @@ jobs:
           # Try to connect for up to 10 seconds
           var=0
           for i in {1..10}; do
-            nc -z -w 1 localhost 6666 && var=1 && break
+            nc -z -w 1 localhost 6667 && var=1 && break
             echo "Waiting for IRC server..."
             sleep 1
           done
