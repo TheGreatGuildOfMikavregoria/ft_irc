@@ -1,0 +1,52 @@
+name: build-n-netcat-connect
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y netcat-openbsd
+
+      - name: Build IRC server
+        run: |
+          # Adapt this to your build system: make, cargo, go build, etc.
+          make re
+          if [ $? -ne 0 ]; then
+            echo "Build fail"
+            exit 1
+          fi
+
+      - name: Start IRC server
+        run: |
+          # Run your server in the background
+          ./ircserv 6667 pass &
+          echo $! > server.pid
+
+      - name: Wait for server to start
+        run: |
+          # Try to connect for up to 10 seconds
+          var=0
+          for i in {1..10}; do
+            nc -z -w 1 localhost 6667 && var=1 && break
+            echo "Waiting for IRC server..."
+            sleep 1
+          done
+          if [ $var -eq 0 ]; then
+            echo "Connection failed"
+            exit 1
+          fi
+
+      - name: Stop IRC server
+        if: always()
+        run: |
+          kill $(cat server.pid) || true

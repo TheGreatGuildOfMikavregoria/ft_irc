@@ -166,6 +166,7 @@ void Server::serviceClientRead(std::size_t index)
 	while (1)
 	{
 		Command message(c.getInBuf());//underlined text**************************************************************************
+
 		if (message.getStatus() == MESSAGE_INCOMPLETE)
 			return;
 	}

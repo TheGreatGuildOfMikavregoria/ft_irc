@@ -88,4 +88,6 @@ public:
 	static void SignalHandler(int signum);
 	void start_server();
 	bool set_nonblock(int fd);
+
+	void	pass(Client& c, Command& cmd);
 };
