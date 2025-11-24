@@ -10,9 +10,9 @@ Client::Client(int fd) : _fd(fd) {
 
 Client::~Client() {}
 
-const int		Client::getFd() const {return _fd;}
-Buffer&	Client::getInBuf() {return _in;}
-Buffer&	Client::getOutBuf() {return _out;}
+const int	Client::getFd() const {return _fd;}
+Buffer&		Client::getInBuf() {return _in;}
+Buffer&		Client::getOutBuf() {return _out;}
 const std::string&	Client::getUserName() const {return _userName;}
 const std::string&	Client::getNickName() const {return _nickName;}
 const std::string&	Client::getRealName() const {return _realName;}
