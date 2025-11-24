@@ -20,12 +20,14 @@ jobs:
       - name: Build IRC server
         run: |
           # Adapt this to your build system: make, cargo, go build, etc.
-          make
+          make re
+	  ls ircservo
+	  
 
       - name: Start IRC server
         run: |
           # Run your server in the background
-          ./your_irc_binary --port 6667 &
+          ./ircserv 6667 pass &
           echo $! > server.pid
 
       - name: Wait for server to start
