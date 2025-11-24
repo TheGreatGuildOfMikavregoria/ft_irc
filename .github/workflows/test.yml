@@ -1,0 +1,56 @@
+name: irc-ci
+
+on:
+  push:
+	branches: [feat/parsing]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y netcat
+
+      - name: Build IRC server
+        run: |
+          # Adapt this to your build system: make, cargo, go build, etc.
+          make
+
+      - name: Start IRC server
+        run: |
+          # Run your server in the background
+          ./your_irc_binary --port 6667 &
+          echo $! > server.pid
+
+      - name: Wait for server to start
+        run: |
+          # Try to connect for up to 10 seconds
+          for i in {1..10}; do
+            nc -z localhost 6667 && break
+            echo "Waiting for IRC server..."
+            sleep 1
+          done
+
+      - name: Test IRC server using netcat
+        run: |
+          echo -e "NICK testuser\r\nUSER testuser 0 * :Real Name\r\n" | nc localhost 6667 | tee output.log
+
+          # Basic assertion: Did we get a server welcome message?
+          if ! grep -q "001 testuser" output.log; then
+            echo "❌ IRC server did not respond with expected welcome message"
+            exit 1
+          fi
+          echo "✅ IRC server test passed"
+
+      - name: Stop IRC server
+        if: always()
+        run: |
+          kill $(cat server.pid) || true
+
