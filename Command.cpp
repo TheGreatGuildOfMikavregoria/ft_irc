@@ -158,7 +158,7 @@ bool Command::validateParamNum()
 	{
 		return (_tokens.size() == 2);
 	}
-	if (stringToLowercase(this->getCommand()) == "PING")
+	if (stringToLowercase(this->getCommand()) == "ping")
 	{
 		return (_tokens.size() == 2);
 	}
