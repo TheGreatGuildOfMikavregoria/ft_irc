@@ -97,12 +97,12 @@ void Server::dropClient(std::size_t index, const std::string &reason)
 	if (index >= _clients.size())
 		return;
 
-	Conn &conn = _clients[index];
+	Client &c = _clients[index];
 	if (!reason.empty())
-		std::cout << "Dropping client (fd " << conn.fd << "): " << reason << std::endl;
+		std::cout << "Dropping client (fd " << c.getFd() << "): " << reason << std::endl;
 
-	if (conn.fd >= 0)
-		close(conn.fd);
+	if (c.getFd() >= 0)
+		close(c.getFd());
 
 	_clients.erase(_clients.begin() + index);
 }
@@ -151,9 +151,9 @@ void Server::serviceClientRead(std::size_t index)
 	if (index >= _clients.size())
 		return;
 
-	Conn &conn = _clients[index];
+	Client &c = _clients[index];
 	char buffer[4096];
-	ssize_t received = recv(conn.fd, buffer, sizeof(buffer), 0);
+	ssize_t received = recv(c.getFd(), buffer, sizeof(buffer), 0);
 
 	if (received <= 0)
 	{
@@ -162,10 +162,10 @@ void Server::serviceClientRead(std::size_t index)
 	}
 
 	//conn.out.append(buffer, static_cast<std::size_t>(received));// for debugging
-	conn.in.append(buffer, static_cast<std::size_t>(received));
+	c.getInBuf().append(buffer, static_cast<std::size_t>(received));
 	while (1)
 	{
-		Command message(conn.in);
+		Command message(c.getInBuf());//underlined text**************************************************************************
 		if (message.getStatus() == MESSAGE_INCOMPLETE)
 			return;
 	}
@@ -195,18 +195,18 @@ void Server::serviceClientWrite(std::size_t index)
 	if (index >= _clients.size())
 		return;
 
-	Conn &conn = _clients[index];
-	if (conn.out.empty())
+	Client &c = _clients[index];
+	if (c.getOutBuf().empty())
 		return;
 
-	ssize_t sent = send(conn.fd, conn.out.data(), conn.out.size(), 0);
+	ssize_t sent = send(c.getFd(), c.getOutBuf().data(), c.getOutBuf().size(), 0);
 	if (sent <= 0)
 	{
 		dropClient(index, "Write error");
 		return;
 	}
 
-	conn.out.discard(static_cast<std::size_t>(sent));
+	c.getOutBuf().discard(static_cast<std::size_t>(sent));
 }
 
 //fsf=file status flags, of the file, adds nonblocking into list
@@ -362,8 +362,7 @@ void Server::serverAcceptClients()
 			close(sock_fd);
 			continue ;
 		}
-		Conn c;
-		c.fd = sock_fd;
+		Client c(sock_fd);
 		_clients.push_back(c);
 
 		std::cout << "Accepted new client: " << sock_fd << std::endl;
@@ -384,9 +383,9 @@ void Server::buildPollList(std::vector<pollfd> &pfds)
 	{
 
 		short event = POLLIN;
-		if (!_clients[i].out.empty()) 
+		if (!_clients[i].getOutBuf().empty()) 
 			event |= POLLOUT;
-		pfds.push_back(pollfd{ _clients[i].fd, event, 0});
+		pfds.push_back(pollfd{ _clients[i].getFd(), event, 0});
 	}
 }
 
@@ -561,7 +560,7 @@ void Server::start_server()
 
 		for (ssize_t x = _clients.size() -1; x >= 0 ; --x)
 		{
-			sendToClient(_clients[x].fd, "ERROR :Server is closing down");
+			sendToClient(_clients[x].getFd(), "ERROR :Server is closing down");
 			dropClient(x, "Server closing");
 		}
 		close(_spareFd);

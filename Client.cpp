@@ -1,0 +1,36 @@
+#include "Client.hpp"
+
+Client::Client(int fd) : _fd(fd) {
+	_authStatus = false;
+	_nickNameSet = false;
+	_userNameSet = false;
+	_passwordSet = false;
+	_userModeSet = false;
+}
+
+Client::~Client() {}
+
+const int		Client::getFd() const {return _fd;}
+Buffer&	Client::getInBuf() {return _in;}
+Buffer&	Client::getOutBuf() {return _out;}
+const std::string&	Client::getUserName() const {return _userName;}
+const std::string&	Client::getNickName() const {return _nickName;}
+const std::string&	Client::getRealName() const {return _realName;}
+const std::string&	Client::getHostName() const {return _hostName;}
+bool	Client::getAuthStatus() const {return _authStatus;}
+bool	Client::getNickNameStatus() const {return _nickNameSet;}
+bool	Client::getUserNameStatus() const {return _nickNameSet;}
+bool	Client::getPasswordStatus() const {return _passwordSet;}
+bool	Client::getUserModeStatus() const {return _userModeSet;}
+
+void	Client::setInBuf(Buffer in) {_in = in;}
+void	Client::setOutBuf(Buffer out) {_out = out;}
+void	Client::setUserName(std::string& userName) {_userName = userName;}
+void	Client::setNickName(std::string& nickName) {_nickName = nickName;}
+void	Client::setRealName(std::string& realName) {_realName = realName;}
+void	Client::setHostName(std::string& hostName) {_hostName = hostName;}
+void	Client::setAuthStatus(bool authStatus) {_authStatus = authStatus;}
+void	Client::setNickNameStatus(bool nickNameSet) {_nickNameSet = nickNameSet;}
+void	Client::setUserNameStatus(bool userNameSet) {_userNameSet = userNameSet;}
+void	Client::setPasswordStatus(bool passwordSet) {_passwordSet = passwordSet;}
+void	Client::setUserModeStatus(bool userModeSet) {_userModeSet = userModeSet;}

@@ -1,0 +1,49 @@
+#pragma once
+
+#include "Server.hpp"
+#include "Buffer.hpp"
+
+class Client{
+	private:
+		int			_fd;
+		Buffer		_in;
+		Buffer		_out;
+		std::string	_userName;
+		std::string	_nickName;
+		std::string	_realName;
+		std::string	_hostName;
+		bool		_authStatus;
+		bool		_nickNameSet;
+		bool		_userNameSet;
+		bool		_passwordSet;
+		bool		_userModeSet;
+	
+	public:
+		Client(int fd);
+		~Client();
+
+		const int		getFd() const;
+		Buffer&	getInBuf();
+		Buffer&	getOutBuf();
+		const std::string&	getUserName() const;
+		const std::string&	getNickName() const;
+		const std::string&	getRealName() const;
+		const std::string&	getHostName() const;
+		bool	getAuthStatus() const;
+		bool	getNickNameStatus() const;
+		bool	getUserNameStatus() const;
+		bool	getPasswordStatus() const;
+		bool	getUserModeStatus() const;
+
+		void	setInBuf(Buffer in);
+		void	setOutBuf(Buffer out);
+		void	setUserName(std::string& userName);
+		void	setNickName(std::string& nickName);
+		void	setRealName(std::string& realName);
+		void	setHostName(std::string& hostName);
+		void	setAuthStatus(bool authStatus);
+		void	setNickNameStatus(bool nickNameSet);
+		void	setUserNameStatus(bool userNameSet);
+		void	setPasswordStatus(bool passwordSet);
+		void	setUserModeStatus(bool userModeSet);
+};
