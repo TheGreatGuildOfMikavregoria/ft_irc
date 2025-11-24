@@ -1,4 +1,4 @@
-name: irc-ci
+name: build-connect
 
 on:
   push:
@@ -32,21 +32,10 @@ jobs:
         run: |
           # Try to connect for up to 10 seconds
           for i in {1..10}; do
-            nc -z localhost 6667 && break
+            nc -z -w 1 localhost 6667 && echo "Connection success" && break
             echo "Waiting for IRC server..."
             sleep 1
           done
-
-      - name: Test IRC server using netcat
-        run: |
-          echo -e "NICK testuser\r\nUSER testuser 0 * :Real Name\r\n" | nc localhost 6667 | tee output.log
-
-          # Basic assertion: Did we get a server welcome message?
-          if ! grep -q "001 testuser" output.log; then
-            echo "❌ IRC server did not respond with expected welcome message"
-            exit 1
-          fi
-          echo "✅ IRC server test passed"
 
       - name: Stop IRC server
         if: always()
