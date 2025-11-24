@@ -21,11 +21,10 @@ jobs:
         run: |
           # Adapt this to your build system: make, cargo, go build, etc.
           make re
-	  if [ $? -ne 0 ]; then
-		echo "Build fail"
-		exit 1
-	  fi
-	
+          if [ $? -ne 0 ]; then
+            echo "Build fail"
+            exit 1
+          fi
 
       - name: Start IRC server
         run: |
@@ -36,19 +35,16 @@ jobs:
       - name: Wait for server to start
         run: |
           # Try to connect for up to 10 seconds
-	  var=0
+          var=0
           for i in {1..10}; do
             nc -z -w 1 localhost 6667 && var=1 && break
             echo "Waiting for IRC server..."
             sleep 1
           done
-	  if [ var -eq 0 ]; then
-		echo "Connection failed"
-		exit 1
+          if [ var -eq 0 ]; then
+            echo "Connection failed"
+            exit 1
           fi
-	  
-	  
-	
 
       - name: Stop IRC server
         if: always()
