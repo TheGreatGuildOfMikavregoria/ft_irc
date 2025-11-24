@@ -41,7 +41,7 @@ jobs:
             echo "Waiting for IRC server..."
             sleep 1
           done
-          if [ var -eq 0 ]; then
+          if [ $var -eq 0 ]; then
             echo "Connection failed"
             exit 1
           fi
