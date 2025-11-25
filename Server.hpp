@@ -61,6 +61,13 @@ class Client;
 class Server
 {
 private:
+	
+	const std::unordered_map<std::string, void (Test::*)(Client &, Command &)> _commandMap = {
+	/*	{"SOME", &Server::_some},
+		{"ASD", &Server::_asd},
+		{"WASD", &Server::_wasd},
+*/
+	};
 	int status; //I believed i needed at somepoint now i dont remember
 	//TO be implemented:
 	std::string password; 
