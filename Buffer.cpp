@@ -4,7 +4,7 @@ Buffer::Buffer() : _buffer() {}
 
 Buffer::~Buffer() {}
 
-void Buffer::append(char *data, size_t len)
+void Buffer::append(char *data, size_t len)//why not take the len insid the function? 
 {
 	if (!data || len == 0)
 		return ;
