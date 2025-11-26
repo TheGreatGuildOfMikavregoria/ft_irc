@@ -30,10 +30,31 @@ Command Example:
 
 */
 
-
-
-void Server::pass(Client& c, Command& cmd) {
-    if (c.getPasswordStatus() == true) {
-        c.getOutBuf().append()
-    }
+void	Server::numericRPL(Client& c, char* format,  ...)
+{
+	std::string result = "";
+	std::va_list args;
+	va_start(args, format);
+	for (const char* p = format; *p != '\0'; ++p)
+	{
+		if (*p == '%')
+		{
+			p++;
+			if (*p == 's')
+				result += (std::string)va_arg(args, const char*);
+			
+		} else if (*p)
+		{
+			result += *p;
+		}
+		
+	}
+	va_end(args);
+	c.getOutBuf().append((char *)result.c_str(), result.length());
 }
+
+// void Server::pass(Client& c, Command& cmd) {
+//     if (c.getPasswordStatus() == true) {
+//         c.getOutBuf().append()
+//     }
+// }

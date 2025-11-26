@@ -11,6 +11,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <stdint.h>
+#include <cstdarg>
 
 
 #include <arpa/inet.h>
@@ -88,6 +89,7 @@ public:
 	static void SignalHandler(int signum);
 	void start_server();
 	bool set_nonblock(int fd);
+	void	numericRPL(Client& c, char* format,  ...);
 
-	void	pass(Client& c, Command& cmd);
+	// void	pass(Client& c, Command& cmd);
 };

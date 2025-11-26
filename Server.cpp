@@ -527,7 +527,6 @@ void Server::_startServerListener()
 		throw std::runtime_error("bind() failed");
 	}
 
-
 	if (listen(socket_fd, 32000) < 0)
 	{
 		close(socket_fd);
@@ -572,4 +571,5 @@ void Server::start_server()
 		std::cout << "Server error: " << e.what() << std::endl;
 	}
 }
+
 
