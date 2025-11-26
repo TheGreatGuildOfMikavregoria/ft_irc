@@ -23,6 +23,7 @@
 #include "Buffer.hpp"
 #include "Command.hpp"
 #include "Client.hpp"
+#include <unordered_map>
 #include <csignal>
 
 #define MAX_CLIENTS 512
@@ -62,11 +63,12 @@ class Server
 {
 private:
 	
-	const std::unordered_map<std::string, void (Test::*)(Client &, Command &)> _commandMap = {
+	const std::unordered_map<std::string, void (Server::*)(Client &, Command &)> _commandMap = {
 	/*	{"SOME", &Server::_some},
 		{"ASD", &Server::_asd},
 		{"WASD", &Server::_wasd},
 */
+		{"TEST", &Server::_testComm}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	//TO be implemented:
@@ -88,6 +90,8 @@ private:
 	void buildPollList(std::vector<pollfd> &pfds);
 	void serverAcceptClients();
 	void handleClientEvents(std::vector<pollfd> &pfds);
+	void _runCmd(Client &, Command &);
+	void _testComm(Client &cl, Command &message);
 
 public:
 	Server(std::string port, std::string pw);

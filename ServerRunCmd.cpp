@@ -2,7 +2,7 @@
 
 
 
-void Server::runCmd(Client &currentClient, Command &message)
+void Server::_runCmd(Client &currentClient, Command &message)
 {
 // TODO: all cmds in uppercase?
 	auto cmd = _commandMap.find(message.getCommand());
@@ -14,4 +14,11 @@ void Server::runCmd(Client &currentClient, Command &message)
 	}
 //	else
 	(this->*(cmd->second))(currentClient, message);
+}
+
+void Server::_testComm(Client &cl, Command &message)
+{
+	(void)cl;
+	(void)message;
+	std::cout << "this is a test command" << std::endl;
 }
