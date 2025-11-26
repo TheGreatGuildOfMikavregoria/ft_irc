@@ -1,11 +1,11 @@
-name: build-n-netcat-connect
+name: build-connect
 
 on:
   push:
   pull_request:
 
 jobs:
-  build_and_connect:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -50,3 +50,4 @@ jobs:
         if: always()
         run: |
           kill $(cat server.pid) || true
+
