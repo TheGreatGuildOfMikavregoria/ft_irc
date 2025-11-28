@@ -32,7 +32,7 @@ Command Example:
 
 void	Server::numericRPL(Client& c, char* format,  ...)
 {
-	std::string result = "";
+	std::string result = "ircserv";
 	std::va_list args;
 	va_start(args, format);
 	for (const char* p = format; *p != '\0'; ++p)
