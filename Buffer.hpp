@@ -25,7 +25,7 @@
 		Buffer();
 		~Buffer();
 
-		void append(char *data, size_t len);
+		void append(const char *data, size_t len);
 		bool empty();
 		char *data();
 		size_t size();

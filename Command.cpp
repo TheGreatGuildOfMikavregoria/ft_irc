@@ -140,3 +140,27 @@ std::vector<std::string> Command::getTokens()
 	return _tokens;
 }
 
+std::string Command::getCommand()
+{
+	if (_tokens.size())
+		return (_tokens[0]);
+	return ("");
+}
+
+bool Command::stringWithinLength(std::string &str, size_t length)
+{
+	return (str.length() <= length);
+}
+
+bool Command::validateParamNum()
+{
+	if (stringToLowercase(this->getCommand()) == "nick")
+	{
+		return (_tokens.size() == 2);
+	}
+	if (stringToLowercase(this->getCommand()) == "ping")
+	{
+		return (_tokens.size() == 2);
+	}
+	return false;
+}

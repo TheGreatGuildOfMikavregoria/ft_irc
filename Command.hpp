@@ -4,6 +4,7 @@
 #include <vector>
 #include <cctype>
 #include "Buffer.hpp"
+#include "Utils.hpp"
 // TODO: debug purposes, remove later
 #include <iostream>
 
@@ -26,4 +27,7 @@ class Command {
 		Command(Buffer &buff);
 		std::vector<std::string> getTokens();
 		unsigned int getStatus();
+		bool stringWithinLength(std::string &, size_t );
+		bool validateParamNum();
+		std::string getCommand();
 };

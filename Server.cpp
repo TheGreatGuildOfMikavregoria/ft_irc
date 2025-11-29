@@ -145,7 +145,7 @@ void Server::sendToClient(int fd,const  std::string &msg)
 // }
 
 
-
+#include <string.h>
 void Server::serviceClientRead(std::size_t index)
 {
 	if (index >= _clients.size())
@@ -165,7 +165,11 @@ void Server::serviceClientRead(std::size_t index)
 	c.getInBuf().append(buffer, static_cast<std::size_t>(received));
 	while (1)
 	{
-		Command message(c.getInBuf());//underlined text**************************************************************************
+		Command message(c.getInBuf());
+		if (message.getStatus() == MESSAGE_COMPLETE)
+		{
+			_runCmd(c, message);
+		}
 		if (message.getStatus() == MESSAGE_INCOMPLETE)
 			return;
 	}
@@ -526,7 +530,6 @@ void Server::_startServerListener()
 		throw std::runtime_error("bind() failed");
 	}
 
-
 	if (listen(socket_fd, 32000) < 0)
 	{
 		close(socket_fd);
@@ -571,4 +574,5 @@ void Server::start_server()
 		std::cout << "Server error: " << e.what() << std::endl;
 	}
 }
+
 
