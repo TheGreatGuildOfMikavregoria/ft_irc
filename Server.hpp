@@ -75,7 +75,7 @@ private:
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	//TO be implemented:
-	std::string password = "pass"; 
+	std::string password; 
 	std::string port;
 	static bool _signal;
 	std::vector<Client> _clients;
