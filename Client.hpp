@@ -13,6 +13,7 @@ class Client{
 		std::string	_realName;
 		std::string	_hostName;
 		bool		_authStatus;
+		bool		_regiStatus;
 		bool		_nickNameSet;
 		bool		_userNameSet;
 		bool		_passwordSet;
@@ -30,6 +31,7 @@ class Client{
 		const std::string&	getRealName() const;
 		const std::string&	getHostName() const;
 		bool	getAuthStatus() const;
+		bool	getRegiStatus() const;
 		bool	getNickNameStatus() const;
 		bool	getUserNameStatus() const;
 		bool	getPasswordStatus() const;
@@ -42,6 +44,7 @@ class Client{
 		void	setRealName(std::string& realName);
 		void	setHostName(std::string& hostName);
 		void	setAuthStatus(bool authStatus);
+		void	setRegiStatus(bool regiStatus);
 		void	setNickNameStatus(bool nickNameSet);
 		void	setUserNameStatus(bool userNameSet);
 		void	setPasswordStatus(bool passwordSet);

@@ -21,5 +21,5 @@ void Server::_testComm(Client &c, Command &message)
 	(void)c;
 	(void)message;
 	std::cout << "this is a test command" << std::endl;
-	numericRPL(c, (char *)RPL_WELCOME, "nick", "networkname", "nick", "user", "host");
+	numericRPL(c, RPL_WELCOME, "nick", "networkname", "nick", "user", "host");
 }

@@ -2,8 +2,8 @@
 
 /*
 PASS message
-    Command: PASS
-    Parameters: <password>
+	Command: PASS
+	Parameters: <password>
 The PASS command is used to set a ‘connection password’. If set, the password must be set before any 
 attempt to register the connection is made. This requires that clients send a PASS command before 
 sending the NICK / USER combination.
@@ -21,16 +21,16 @@ more information or an alternate form of identity verification is desired.
 
 Numeric replies:
 
-    ERR_NEEDMOREPARAMS (461)
-    ERR_ALREADYREGISTERED (462)
-    ERR_PASSWDMISMATCH (464)
+	ERR_NEEDMOREPARAMS (461)
+	ERR_ALREADYREGISTERED (462)
+	ERR_PASSWDMISMATCH (464)
 
 Command Example:
-    PASS secretpasswordhere
+	PASS secretpasswordhere
 
 */
 
-void	Server::numericRPL(Client& c, char* format,  ...)
+void	Server::numericRPL(Client& c, const char* format,  ...)
 {
 	std::string result = "ircserv";
 	std::va_list args;
@@ -47,14 +47,18 @@ void	Server::numericRPL(Client& c, char* format,  ...)
 		{
 			result += *p;
 		}
-		
 	}
 	va_end(args);
-	c.getOutBuf().append((char *)result.c_str(), result.length());
+	c.getOutBuf().append(result.c_str(), result.length());
 }
 
-// void Server::pass(Client& c, Command& cmd) {
-//     if (c.getPasswordStatus() == true) {
-//         c.getOutBuf().append()
-//     }
-// }
+void Server::pass(Client& c, Command& cmd) {
+	if (cmd.getTokens().size() < 2)
+		return (numericRPL(c, ERR_NEEDMOREPARAMS, c.getNickName().c_str(), cmd.getTokens().at(0).c_str()));
+	else if (c.getPasswordStatus() && c.getRegiStatus())
+		return (numericRPL(c, ERR_ALREADYREGISTERED, c.getNickName().c_str()));
+	else if (c.getPasswordStatus() && cmd.getTokens().at(1) != password)
+		return (c.setPasswordStatus(false));
+	if (cmd.getTokens().at(1) == password)
+		return (c.setPasswordStatus(true));
+}

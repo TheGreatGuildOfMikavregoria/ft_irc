@@ -70,11 +70,12 @@ private:
 		{"ASD", &Server::_asd},
 		{"WASD", &Server::_wasd},
 */
-		{"TEST", &Server::_testComm}
+		{"TEST", &Server::_testComm},
+		{"PASS", &Server::pass}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	//TO be implemented:
-	std::string password; 
+	std::string password = "pass"; 
 	std::string port;
 	static bool _signal;
 	std::vector<Client> _clients;
@@ -101,7 +102,7 @@ public:
 	static void SignalHandler(int signum);
 	void start_server();
 	bool set_nonblock(int fd);
-	void	numericRPL(Client& c, char* format,  ...);
+	void	numericRPL(Client& c, const char* format,  ...);
 
-	// void	pass(Client& c, Command& cmd);
+	void	pass(Client& c, Command& cmd);
 };

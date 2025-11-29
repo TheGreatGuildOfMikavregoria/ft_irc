@@ -118,7 +118,7 @@
 #define ERR_USERNOTINCHANNEL	" 441 %s <nick> <channel> :They aren't on that channel"
 #define ERR_NOTONCHANNEL		" 442 %s <channel> :You're not on that channel"
 #define ERR_USERONCHANNEL		" 443 %s <nick> <channel> :is already on channel"
-#define ERR_NEEDMOREPARAMS		" 461 %s <command> :Not enough parameters"
+#define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters\r\n"
 #define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister"
 #define ERR_PASSWDMISMATCH		" 464 %s :Password incorrect"
 #define ERR_CHANNELISFULL		" 471 %s <channel> :Cannot join channel (+l)"
