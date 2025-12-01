@@ -18,6 +18,7 @@ class Client{
 		bool		_userNameSet;
 		bool		_passwordSet;
 		bool		_userModeSet;
+//		std::vector<Client> _clientChannels;
 	
 	public:
 		Client(int fd);

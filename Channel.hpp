@@ -3,6 +3,7 @@
 
 #include <string>
 #include "Client.hpp"
+#include "Utils.hpp"
 
 /*
 Directly Associated Commands
@@ -35,12 +36,17 @@ class Channel
 
 		std::vector<User> _channelUsers;
 		std::vector<std::string> _inviteList;
+		std::vector<std::string> _operators;
 				
 		bool _inviteOnlyMode;
 		bool _clientLimitMode;
 		bool _keyMode;
 		bool _protectedTopicMode;
-		
+
+		void _userAdd(Client &);
+		void _userRemove(Client &);
+		void _chanOperatorAdd(Client &);
+		void _chanOperatorRemove(Client &);
 
 	public:
 		Channel(std::string name)
@@ -58,11 +64,12 @@ class Channel
 		std::vector<User> &getChannelUsers();
 		std::vector<std::string> &getInviteList();
 		
-//basic, status for return
 		int join(Client &);
-//with key
-		int join(Client &, std::string &);
+		int join(Client &, std::string &key);
 		int part(Client &);
+		int kick(Client &source, std::string &nick);
+		int invite(Client &source, std::string &nick);
+		int 
 
 		
 		static bool validateName(std::string &name);
