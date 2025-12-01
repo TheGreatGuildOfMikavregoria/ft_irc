@@ -19,7 +19,7 @@
 	//TOPIC message		442	482	461	403	442	482	331	332	333
 	//NAMES message		353	366
 	//LIST message		321	322	323
-	//NVITE message		341	461	403	442	482	443	336	337
+	//INVITE message		341	461	403	442	482	443	336	337
 	//KICK message		461	403	482	441	442	476
 
 //Server Queries and Commands
@@ -57,7 +57,7 @@
 	//USERHOST message
 	//WALLOPS message
 
-#define RPL_WELCOME				" 001 %s :Welcome to the %s Network, %s[!%s@%s]\r\n"
+#define RPL_WELCOME				" 001 %s :Welcome to the %s Network, %s[!%s@%s]\r\n" //in_use
 #define RPL_YOURHOST			" 002 %s :Your host is <servername>, running version <version>"
 #define RPL_CREATED				" 003 %s :This server was created <datetime>"
 #define RPL_MYINFO				" 004 %s <servername> <version> <available user modes> <available channel modes> [<channel modes with a parameter>]"
@@ -111,15 +111,15 @@
 #define ERR_NOTEXTTOSEND		" 412 %s :No text to send"
 #define ERR_NOTOPLEVEL (413)	//no message?
 #define ERR_WILDTOPLEVEL (414)	//no message?
-#define ERR_NONICKNAMEGIVEN		" 431 %s :No nickname given"
+#define ERR_NONICKNAMEGIVEN		" 431 %s :No nickname given" //in_use
 #define ERR_ERRONEUSNICKNAME	" 432 %s <nick> :Erroneus nickname"
 #define ERR_NICKNAMEINUSE		" 433 %s <nick> :Nickname is already in use"
 #define ERR_NICKCOLLISION		" 436 %s <nick> :Nickname collision KILL from <user>@<host>"
 #define ERR_USERNOTINCHANNEL	" 441 %s <nick> <channel> :They aren't on that channel"
 #define ERR_NOTONCHANNEL		" 442 %s <channel> :You're not on that channel"
 #define ERR_USERONCHANNEL		" 443 %s <nick> <channel> :is already on channel"
-#define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters\r\n"
-#define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister"
+#define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters\r\n" //in_use
+#define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister" //in_use
 #define ERR_PASSWDMISMATCH		" 464 %s :Password incorrect"
 #define ERR_CHANNELISFULL		" 471 %s <channel> :Cannot join channel (+l)"
 #define ERR_INVITEONLYCHAN		" 473 %s <channel> :Cannot join channel (+i)"

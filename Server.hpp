@@ -105,4 +105,7 @@ public:
 	void	numericRPL(Client& c, const char* format,  ...);
 
 	void	pass(Client& c, Command& cmd);
+	void	nick(Client& c, Command& cmd);
+
+	Client*	clientLookup(std::string nickName);
 };

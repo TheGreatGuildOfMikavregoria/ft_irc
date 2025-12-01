@@ -30,8 +30,7 @@ Command Example:
 
 */
 
-void	Server::numericRPL(Client& c, const char* format,  ...)
-{
+void	Server::numericRPL(Client& c, const char* format,  ...) {
 	std::string result = "ircserv";
 	std::va_list args;
 	va_start(args, format);
@@ -52,13 +51,24 @@ void	Server::numericRPL(Client& c, const char* format,  ...)
 	c.getOutBuf().append(result.c_str(), result.length());
 }
 
+Client*	clientLookup(std::string nickName) {
+
+}
+
 void Server::pass(Client& c, Command& cmd) {
 	if (cmd.getTokens().size() < 2)
 		return (numericRPL(c, ERR_NEEDMOREPARAMS, c.getNickName().c_str(), cmd.getTokens().at(0).c_str()));
-	else if (c.getPasswordStatus() && c.getRegiStatus())
+	if (c.getPasswordStatus() && c.getRegiStatus())
 		return (numericRPL(c, ERR_ALREADYREGISTERED, c.getNickName().c_str()));
-	else if (c.getPasswordStatus() && cmd.getTokens().at(1) != password)
+	if (c.getPasswordStatus() && cmd.getTokens().at(1) != password)
 		return (c.setPasswordStatus(false));
 	if (cmd.getTokens().at(1) == password)
 		return (c.setPasswordStatus(true));
+}
+
+
+void Server::nick(Client& c, Command& cmd) {
+	if (cmd.getTokens().size() < 2)
+		return (numericRPL(c, ERR_NONICKNAMEGIVEN, c.getNickName().c_str()));
+	if (this -> clientLookup(cmd.getTokens().at(2)))
 }
