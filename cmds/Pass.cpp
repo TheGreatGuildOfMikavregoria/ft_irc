@@ -51,15 +51,45 @@ void	Server::numericRPL(Client& c, const char* format,  ...) {
 	c.getOutBuf().append(result.c_str(), result.length());
 }
 
-Client*	clientLookup(std::string nickName) {
+Client* Server::clientLookUp(const std::string& nickName) {
+	std::vector<Client>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); ++it) {
+		if (it->getNickName() == nickName) {
+			return &(*it);
+		}
+	}
+	return nullptr;
+}
 
+bool Server::isValidNickName(const std::string& nickName) {
+	if (nickName.empty()) {
+		return false;
+	}
+	if (std::isdigit(nickName[0])) {
+		return false;
+	}
+	if (nickName[0] == '#' || nickName[0] == '&' || nickName[0] == ':') {
+		return false;
+	}
+	for (size_t i = 0; i < nickName.length(); ++i) {
+		char c = nickName[i];
+		if (std::isspace(c)) {
+			return false;
+		}
+		if (!std::isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' && 
+			c != '\\' && c != '|' && c != '-' && c != '_' && c != '^') {
+			return false;
+		}
+	}
+	return true;
 }
 
 void Server::pass(Client& c, Command& cmd) {
+	const std::string& nickName = c.getNickName().c_str();
 	if (cmd.getTokens().size() < 2)
-		return (numericRPL(c, ERR_NEEDMOREPARAMS, c.getNickName().c_str(), cmd.getTokens().at(0).c_str()));
+		return (numericRPL(c, ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0).c_str()));
 	if (c.getPasswordStatus() && c.getRegiStatus())
-		return (numericRPL(c, ERR_ALREADYREGISTERED, c.getNickName().c_str()));
+		return (numericRPL(c, ERR_ALREADYREGISTERED, nickName));
 	if (c.getPasswordStatus() && cmd.getTokens().at(1) != password)
 		return (c.setPasswordStatus(false));
 	if (cmd.getTokens().at(1) == password)
@@ -68,7 +98,16 @@ void Server::pass(Client& c, Command& cmd) {
 
 
 void Server::nick(Client& c, Command& cmd) {
+	const std::string& nickName = c.getNickName().c_str();
+	std::string& newNickName = cmd.getTokens().at(2);
 	if (cmd.getTokens().size() < 2)
-		return (numericRPL(c, ERR_NONICKNAMEGIVEN, c.getNickName().c_str()));
-	if (this -> clientLookup(cmd.getTokens().at(2)))
+		return (numericRPL(c, ERR_NONICKNAMEGIVEN, nickName));
+	if (this -> clientLookUp(newNickName))
+		return (numericRPL(c, ERR_NICKNAMEINUSE, nickName, newNickName));
+	if (!this -> isValidNickName(newNickName))
+		return (numericRPL(c, ERR_ERRONEUSNICKNAME, nickName, newNickName));
+	c.setNickName(newNickName);
+	c.setNickNameStatus(true);
+	std::cout << nickName << " NICK " << newNickName << "\r" << std::endl;	//send a reply ":WiZ NICK Kilroy , :dan-!d@localhost NICK Mamoped"
+	return ;
 }

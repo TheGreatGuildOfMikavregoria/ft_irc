@@ -71,7 +71,8 @@ private:
 		{"WASD", &Server::_wasd},
 */
 		{"TEST", &Server::_testComm},
-		{"PASS", &Server::pass}
+		{"PASS", &Server::pass},
+		{"NICK", &Server::nick}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	//TO be implemented:
@@ -107,5 +108,6 @@ public:
 	void	pass(Client& c, Command& cmd);
 	void	nick(Client& c, Command& cmd);
 
-	Client*	clientLookup(std::string nickName);
+	Client*	clientLookUp(const std::string& nickName);
+	bool	isValidNickName(const std::string& nickName);
 };
