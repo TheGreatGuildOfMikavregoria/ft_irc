@@ -24,7 +24,7 @@
 #include "Buffer.hpp"
 #include "Command.hpp"
 #include "Client.hpp"
-#include "Numerics.hpp"
+#include "NumericRPL.hpp"
 #include <unordered_map>
 #include <csignal>
 
@@ -103,7 +103,7 @@ public:
 	static void SignalHandler(int signum);
 	void start_server();
 	bool set_nonblock(int fd);
-	void	numericRPL(Client& c, const char* format,  ...);
+	// void	numericRPL(Client& c, const char* format,  ...);
 
 	void	pass(Client& c, Command& cmd);
 	void	nick(Client& c, Command& cmd);

@@ -30,26 +30,26 @@ Command Example:
 
 */
 
-void	Server::numericRPL(Client& c, const char* format,  ...) {
-	std::string result = "ircserv";
-	std::va_list args;
-	va_start(args, format);
-	for (const char* p = format; *p != '\0'; ++p)
-	{
-		if (*p == '%')
-		{
-			p++;
-			if (*p == 's')
-				result += (std::string)va_arg(args, const char*);
+// void	Server::numericRPL(Client& c, const char* format,  ...) {
+// 	std::string result = "ircserv";
+// 	std::va_list args;
+// 	va_start(args, format);
+// 	for (const char* p = format; *p != '\0'; ++p)
+// 	{
+// 		if (*p == '%')
+// 		{
+// 			p++;
+// 			if (*p == 's')
+// 				result += (std::string)va_arg(args, const char*);
 			
-		} else if (*p)
-		{
-			result += *p;
-		}
-	}
-	va_end(args);
-	c.getOutBuf().append(result.c_str(), result.length());
-}
+// 		} else if (*p)
+// 		{
+// 			result += *p;
+// 		}
+// 	}
+// 	va_end(args);
+// 	c.getOutBuf().append(result.c_str(), result.length());
+// }
 
 Client* Server::clientLookUp(const std::string& nickName) {
 	std::vector<Client>::iterator it;
@@ -85,9 +85,9 @@ bool Server::isValidNickName(const std::string& nickName) {
 }
 
 void Server::pass(Client& c, Command& cmd) {
-	const std::string& nickName = c.getNickName().c_str();
+	const std::string nickName = c.getNickName();
 	if (cmd.getTokens().size() < 2)
-		return (numericRPL(c, ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0).c_str()));
+		return (numericRPL(c, ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0)));
 	if (c.getPasswordStatus() && c.getRegiStatus())
 		return (numericRPL(c, ERR_ALREADYREGISTERED, nickName));
 	if (c.getPasswordStatus() && cmd.getTokens().at(1) != password)
@@ -98,10 +98,10 @@ void Server::pass(Client& c, Command& cmd) {
 
 
 void Server::nick(Client& c, Command& cmd) {
-	const std::string& nickName = c.getNickName().c_str();
-	std::string& newNickName = cmd.getTokens().at(2);
+	const std::string nickName = c.getNickName();
 	if (cmd.getTokens().size() < 2)
 		return (numericRPL(c, ERR_NONICKNAMEGIVEN, nickName));
+	std::string newNickName = cmd.getTokens().at(1);
 	if (this -> clientLookUp(newNickName))
 		return (numericRPL(c, ERR_NICKNAMEINUSE, nickName, newNickName));
 	if (!this -> isValidNickName(newNickName))

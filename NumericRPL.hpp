@@ -2,6 +2,46 @@
 
 #include "Server.hpp"
 
+#include <string>
+#include <iostream>
+#include <sstream>
+//#include "Client.hpp" 
+
+class Client;
+
+inline std::string stringify(const std::string& s) { return s; }
+inline std::string stringify(const char* s) { return std::string(s); }
+inline std::string stringify(char* s) { return std::string(s); }
+
+template<typename T>
+std::string stringify(T val) { return std::to_string(val); }
+
+inline void buildResponse(std::string& result, const char* format) {
+	result += format;
+}
+
+template<typename T, typename... Args>
+void buildResponse(std::string& result, const char* format, T value, Args... args) {
+	while (*format) {
+		if (*format == '%' && *(format + 1) == 's') {
+			result += stringify(value);
+			format += 2;
+			buildResponse(result, format, args...);
+			return;
+		}
+		result += *format++;
+	}
+}
+
+template<typename ClientT, typename... Args>
+void numericRPL(ClientT& c, const std::string& format, Args... args) {
+	std::string result = ":ircserv"; 
+	buildResponse(result, format.c_str(), args...);
+	if (result.length() < 2 || result.substr(result.length() - 2) != "\r\n") {
+		result += "\r\n";
+	}
+	c.getOutBuf().append(result.c_str(), result.length());
+}
 //Connection Messages
 	//CAP message
 	//AUTHENTICATE message
@@ -57,15 +97,15 @@
 	//USERHOST message
 	//WALLOPS message
 
-#define RPL_WELCOME				" 001 %s :Welcome to the %s Network, %s[!%s@%s]\r\n" //in_use
+#define RPL_WELCOME				" 001 %s :Welcome to the %s Network, %s[!%s@%s]" //in_use
 #define RPL_YOURHOST			" 002 %s :Your host is <servername>, running version <version>"
 #define RPL_CREATED				" 003 %s :This server was created <datetime>"
 #define RPL_MYINFO				" 004 %s <servername> <version> <available user modes> <available channel modes> [<channel modes with a parameter>]"
-#define RPL_ISUPPORT			" 005 %s <1-13 tokens> :are supported by this server" //introduce %t for token
+#define RPL_ISUPPORT			" 005 %s <1-13 tokens> :are supported by this server"
 #define RPL_UMODEIS				" 221 %s <user modes>"
 #define RPL_WHOISCERTFP			" 276 %s <nick> :has client certificate fingerprint <fingerprint>" //what is fingerprint
 #define RPL_AWAY				" 301 %s <nick> :<message>"
-#define RPL_USERHOST			" 302 %s :[<reply>{ <reply>}]" //introduce %r for reply
+#define RPL_USERHOST			" 302 %s :[<reply>{ <reply>}]" 
 #define RPL_UNAWAY				" 305 %s :You are no longer marked as being away"
 #define RPL_NOWAWAY				" 306 %s :You have been marked as being away"
 #define RPL_WHOISREGNICK		" 307 %s <nick> :has identified for this nick"
@@ -112,13 +152,13 @@
 #define ERR_NOTOPLEVEL (413)	//no message?
 #define ERR_WILDTOPLEVEL (414)	//no message?
 #define ERR_NONICKNAMEGIVEN		" 431 %s :No nickname given" //in_use
-#define ERR_ERRONEUSNICKNAME	" 432 %s <nick> :Erroneus nickname"
+#define ERR_ERRONEUSNICKNAME	" 432 %s %s :Erroneus nickname" //in_use
 #define ERR_NICKNAMEINUSE		" 433 %s <nick> :Nickname is already in use"
 //#define ERR_NICKCOLLISION		" 436 %s <nick> :Nickname collision KILL from <user>@<host>" //out of scope. Involves another server
 #define ERR_USERNOTINCHANNEL	" 441 %s <nick> <channel> :They aren't on that channel"
 #define ERR_NOTONCHANNEL		" 442 %s <channel> :You're not on that channel"
 #define ERR_USERONCHANNEL		" 443 %s <nick> <channel> :is already on channel"
-#define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters\r\n" //in_use
+#define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters" //in_use
 #define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister" //in_use
 #define ERR_PASSWDMISMATCH		" 464 %s :Password incorrect"
 #define ERR_CHANNELISFULL		" 471 %s <channel> :Cannot join channel (+l)"
