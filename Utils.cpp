@@ -8,28 +8,23 @@ std::string stringToLowercase(std::string text)
 	return text;
 }
 
-auto getUserIteratorByNickName(const std::vector<Client> &clientVector, const std::string &nickName)
+auto getUserIteratorByNickName(std::vector<Client> &clientVector, const std::string &nickname) -> std::vector<Client>::iterator
 {
-	auto it = clientVector.begin();
-	int index = 0;
-	for (;it != clientVector.end(); ++it)
-	{
-		if (clientVector.at(index).getNickName() == nickName)
-			break;
-		index++;
-	}
-	return (it);
+	auto itStart = clientVector.begin();
+	auto itEnd = clientVector.end();
+	return std::find_if(itStart, itEnd, [&nickname](const Client &client) { return (client.getNickName() == nickname); });
 }
 
-auto getChannelIteratorByChannelName(const std::vector<Channel> &channelVector, const std::string &channelName)
+auto getChannelIteratorByChannelName(std::vector<Channel> &channelVector, const std::string &name) -> std::vector<Channel>::iterator
 {
-	auto it = clientVector.begin();
-	int index = 0;
-	for (;it != clientVector.end(); ++it)
-	{
-		if (clientVector.at(index).getName() == channelName)
-			break;
-		index++;
-	}
-	return (it);
+	auto itStart = channelVector.begin();
+	auto itEnd = channelVector.end();
+	return std::find_if(itStart, itEnd, [&name](const Channel &channel) { return (channel.getName() == name); });
+}
+
+auto getStringIteratorByString(std::vector<std::string> &stringVector, const std::string &str) -> std::vector<std::string>::iterator
+{
+	auto itStart = stringVector.begin();
+	auto itEnd = stringVector.end();
+	return std::find_if(itStart, itEnd, [&str](std::string &strVector) { return (strVector == str); });
 }

@@ -3,7 +3,7 @@
 
 #include <string>
 #include "Client.hpp"
-#include "Utils.hpp"
+//#include "Utils.hpp"
 
 /*
 Directly Associated Commands
@@ -27,6 +27,8 @@ must have modes:
 	l   --- client limit - if on
 */
 
+class Client;
+
 class Channel
 {
 	private:
@@ -34,7 +36,7 @@ class Channel
 		std::string _topic;
 		std::string _key;
 
-		std::vector<User> _channelUsers;
+		std::vector<Client> _channelUsers;
 		std::vector<std::string> _inviteList;
 		std::vector<std::string> _operators;
 				
@@ -47,21 +49,23 @@ class Channel
 		void _userRemove(Client &);
 		void _chanOperatorAdd(Client &);
 		void _chanOperatorRemove(Client &);
+		void _inviteListAdd(std::string &);
+		void _inviteListRemove(std::string &);
 
 	public:
-		Channel(std::string name)
+		Channel(const std::string &name);
 		~Channel();
 		void setKey(std::string &);
 		void setTopic(std::string &);
 		const std::string &getKey() const;
-		const stg::string &getTopic() const;
+		const std::string &getTopic() const;
 		const std::string &getName() const;
 		
 		bool getInviteOnlyMode() const;
 		bool getClientLimitMode() const ;
 		bool getKeyMode() const;
 		bool getProtectedTopicMode() const;
-		std::vector<User> &getChannelUsers();
+		std::vector<Client> &getChannelUsers();
 		std::vector<std::string> &getInviteList();
 		
 		int join(Client &);
@@ -69,13 +73,13 @@ class Channel
 		int part(Client &);
 		int kick(Client &source, std::string &nick);
 		int invite(Client &source, std::string &nick);
-		int 
+//		int 
 
 		
 		static bool validateName(std::string &name);
 //		addUser()
 		
 		
-}
+};
 
 #endif

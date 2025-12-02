@@ -60,6 +60,7 @@ static inline const char* pollMaskStr(short ev) {
 // 	std::string user;
 // };
 class Client;
+class Command;
 
 class Server
 {
