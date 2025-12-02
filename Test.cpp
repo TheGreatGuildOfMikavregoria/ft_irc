@@ -6,19 +6,24 @@ Test::Test(int num) : _some(num)
 {
 	
 }
+/*
+Test::Test(int num) : _some(num)
+{
+}
+*/
 
 int Test::getSome()
 {
 	return _some;
 }
 
-auto getUserIteratorByNickName(std::vector<Test> &clientVector, const int num)
+auto getUserIteratorByNickName(std::vector<int> &clientVector, int num)
 {
 	auto it = clientVector.begin();
 	int index = 0;
 	for (;it != clientVector.end(); ++it)
 	{
-		if (clientVector.at(index).getSome() == num)
+		if (clientVector.at(index) == num)
 			break;
 		index++;
 	}
@@ -27,16 +32,16 @@ auto getUserIteratorByNickName(std::vector<Test> &clientVector, const int num)
 
 int main()
 {
-	const Test test1(5);
-	const Test test2(6);
-	std::vector<Test> tv;
-	tv.push_back(test1);
-	tv.push_back(test2);
+//	Test test1(5);
+//	Test test2(6);
+	std::vector<int> tv;
+	tv.push_back(5);
+	tv.push_back(6);
 	
 	auto iterator = getUserIteratorByNickName(tv, 6);
 	tv.erase(iterator);
-	for (Test  &test : tv)
+	for (int  &num : tv)
 	{
-		std::cout << test.getSome() << std::endl;
+		std::cout << num << std::endl;
 	}
 }

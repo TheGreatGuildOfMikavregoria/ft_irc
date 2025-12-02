@@ -8,10 +8,10 @@ class Test {
 	public:
 		Test();
 		Test(int num);
-		Test(Test&) = default;
+		Test(Test &) = default;
 		Test	&operator=(Test&) = default;
 		~Test() = default;
-		int getSome() const;
+		int getSome();
 	private:
 		int _some;
 	protected:
