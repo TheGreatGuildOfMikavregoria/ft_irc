@@ -34,7 +34,7 @@ void buildResponse(std::string& reply, const char* format, T value, Args... args
 }
 
 template<typename... Args>
-std::string& numericRPL(const std::string& format, Args... args) {
+std::string numericRPL(const std::string& format, Args... args) {
 	std::string reply = ":ircserv"; 
 	buildResponse(reply, format.c_str(), args...);
 	if (reply.length() < 2 || reply.substr(reply.length() - 2) != "\r\n") {
@@ -154,7 +154,7 @@ std::string& numericRPL(const std::string& format, Args... args) {
 #define ERR_WILDTOPLEVEL (414)	//no message?
 #define ERR_NONICKNAMEGIVEN		" 431 %s :No nickname given" //in_use
 #define ERR_ERRONEUSNICKNAME	" 432 %s %s :Erroneus nickname" //in_use
-#define ERR_NICKNAMEINUSE		" 433 %s <nick> :Nickname is already in use"
+#define ERR_NICKNAMEINUSE		" 433 %s :Nickname is already in use" //in_use
 //#define ERR_NICKCOLLISION		" 436 %s <nick> :Nickname collision KILL from <user>@<host>" //out of scope. Involves another server
 #define ERR_USERNOTINCHANNEL	" 441 %s <nick> <channel> :They aren't on that channel"
 #define ERR_NOTONCHANNEL		" 442 %s <channel> :You're not on that channel"
