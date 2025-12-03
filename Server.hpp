@@ -83,6 +83,7 @@ private:
 	//std::vector<Channel> _channels;
 	int _listenFd;
 	int _spareFd;
+	std::string _timeCreated;
 
 	void _startServerListener();
 	void _runLoop();
@@ -106,4 +107,5 @@ public:
 	void	numericRPL(Client& c, const char* format,  ...);
 
 	void	pass(Client& c, Command& cmd);
+	std::string &getTimeCreated();
 };

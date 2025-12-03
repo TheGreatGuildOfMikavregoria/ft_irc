@@ -35,8 +35,9 @@ class Channel
 		std::string _name;
 		std::string _topic;
 		std::string _key;
+		std::string _timeCreated;
 
-		std::vector<Client> _channelUsers;
+		std::vector<Client *> _channelUsers;
 		std::vector<std::string> _inviteList;
 		std::vector<std::string> _operators;
 				
@@ -61,6 +62,7 @@ class Channel
 		const std::string &getTopic() const;
 		const std::string &getName() const;
 		
+		std::string &getTimeCreated();
 		bool getInviteOnlyMode() const;
 		bool getClientLimitMode() const ;
 		bool getKeyMode() const;
@@ -71,8 +73,11 @@ class Channel
 		int join(Client &);
 		int join(Client &, std::string &key);
 		int part(Client &);
+		int part(Client &, std::string &message);
 		int kick(Client &source, std::string &nick);
 		int invite(Client &source, std::string &nick);
+		//int topic(Client &source, )
+		int informUsers(std::string &);
 //		int 
 
 		

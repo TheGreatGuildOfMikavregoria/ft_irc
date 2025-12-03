@@ -2,7 +2,7 @@
 
 bool Command::_validateCommand(std::string &command)
 {
-	int i = 0;
+	size_t i = 0;
 	if (std::isalpha(command[0]))
 	{
 		while (i < command.length())
@@ -29,7 +29,6 @@ bool Command::_validateCommand(std::string &command)
 size_t Command::_identifyNlCr(std::string &tempStr)
 {
 
-	int index = 0;
 	size_t nlPosition = tempStr.find('\n');
 	size_t crPosition = tempStr.find('\r');
 	if (nlPosition == std::string::npos && crPosition == std::string::npos)
@@ -60,8 +59,6 @@ Command::Command(Buffer &buffer) : _buffer(buffer)
 {
 	std::string tempStr(_buffer.data(), _buffer.size());
 	size_t nlCrPosition = _identifyNlCr(tempStr);
-	size_t trailingNlCr = 0;
-
 	if (nlCrPosition == std::string::npos)	
 	{
 		_status = MESSAGE_INCOMPLETE;
@@ -154,11 +151,11 @@ bool Command::stringWithinLength(std::string &str, size_t length)
 
 bool Command::validateParamNum()
 {
-	if (stringToLowercase(this->getCommand()) == "nick")
+	if (Utils::stringToLowercase(this->getCommand()) == "nick")
 	{
 		return (_tokens.size() == 2);
 	}
-	if (stringToLowercase(this->getCommand()) == "ping")
+	if (Utils::stringToLowercase(this->getCommand()) == "ping")
 	{
 		return (_tokens.size() == 2);
 	}

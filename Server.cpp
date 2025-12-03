@@ -13,6 +13,8 @@ void Server::SignalHandler(int signum)
 
 Server::Server(std::string port, std::string pw) : status(0), password(pw), port(port), _clients(), _listenFd(-1)
 {
+// TODO:  protec?
+	_timeCreated = Utils::getCurrentTimeString();
 	try
 	{
 		if (std::stoi(port) < 0 || std::stoi(port) > 65535)

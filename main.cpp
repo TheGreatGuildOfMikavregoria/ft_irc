@@ -3,6 +3,7 @@
 #include "Server.hpp"
 
 #include <string>
+#include "Utils.hpp"
 
 int main(int ac, char **av)
 {
@@ -13,6 +14,8 @@ int main(int ac, char **av)
 			std::string port(av[1]);
 			std::string pw(av[2]);
 			Server srv(port, pw);
+//TODO: remove
+			std::cout << Utils::getCurrentTimeString() << std::endl;
 			signal(SIGINT, Server::SignalHandler);
 			signal(SIGQUIT, Server::SignalHandler);
 			srv.start_server();

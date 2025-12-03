@@ -6,16 +6,15 @@
 	TODO:	list of clients in channel or list of channels in user
 */
 
-void Channel::_userAdd(Client &user)
+// TODO: modify to work with pointers
+void Channel::_userAdd(Client *user)
 {
 	_channelUsers.push_back(user);
 }
 
 void Channel::_userRemove(Client &user)
 {
-
-	int index = 0;
-	auto it = getUserIteratorByNickName(_channelUsers, user.getNickName());
+	auto it = Utils::getUserIteratorByNickName(_channelUsers, user.getNickName());
 	if (it != _channelUsers.end())
 		_channelUsers.erase(it);
 }
@@ -27,7 +26,7 @@ void Channel::_chanOperatorAdd(Client &futureOperator)
 
 void Channel::_chanOperatorRemove(Client &client)
 {
-	auto it = getStringIteratorByString(_operators, client.getNickName());
+	auto it = Utils::getStringIteratorByString(_operators, client.getNickName());
 	if (it != _operators.end())
 		_operators.erase(it);
 }
@@ -38,7 +37,7 @@ void Channel::_inviteListAdd(std::string &toAdd)
 }
 void Channel::_inviteListRemove(std::string &toRemove)
 {
-	auto it = getStringIteratorByString(_inviteList, toRemove);
+	auto it = Utils::getStringIteratorByString(_inviteList, toRemove);
 	if (it != _inviteList.end())
 		_inviteList.erase(it);
 }
@@ -48,6 +47,8 @@ void Channel::_inviteListRemove(std::string &toRemove)
 Channel::Channel(const std::string &name)
 {
 	_name = name;
+// TODO:  protec?
+	_timeCreated = Utils::getCurrentTimeString();
 }
 
 void Channel::setKey(std::string &key)
@@ -108,6 +109,7 @@ std::vector<std::string> &Channel::getInviteList()
 int Channel::join(Client &client)
 {
 	(void)client;
+	if ()
 	return 0;
 }
 
@@ -129,6 +131,13 @@ int Channel::kick(Client &source, std::string &nick)
 	(void)source;
 	(void)nick;
 	return 0;
+}
+
+int invite(Client &source, std::string &nick)
+{
+	(void)source;
+	(void)nick;
+	return (0);
 }
 
 bool Channel::validateName(std::string &name)
