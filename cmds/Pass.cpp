@@ -86,28 +86,37 @@ bool Server::isValidNickName(const std::string& nickName) {
 
 void Server::pass(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
 	if (cmd.getTokens().size() < 2)
-		return (numericRPL(c, ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0)));
-	if (c.getPasswordStatus() && c.getRegiStatus())
-		return (numericRPL(c, ERR_ALREADYREGISTERED, nickName));
-	if (c.getPasswordStatus() && cmd.getTokens().at(1) != password)
-		return (c.setPasswordStatus(false));
-	if (cmd.getTokens().at(1) == password)
-		return (c.setPasswordStatus(true));
+		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
+	else if (c.getPasswordStatus() && c.getRegiStatus())
+		rpl = numericRPL(ERR_ALREADYREGISTERED, nickName);
+	else if (c.getPasswordStatus() && cmd.getTokens().at(1) != password)
+		c.setPasswordStatus(false);
+	else if (cmd.getTokens().at(1) == password)
+		c.setPasswordStatus(true);
+	outBuf.append(rpl.c_str(), rpl.length());
 }
-
 
 void Server::nick(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
 	if (cmd.getTokens().size() < 2)
-		return (numericRPL(c, ERR_NONICKNAMEGIVEN, nickName));
-	std::string newNickName = cmd.getTokens().at(1);
-	if (this -> clientLookUp(newNickName))
-		return (numericRPL(c, ERR_NICKNAMEINUSE, nickName, newNickName));
-	if (!this -> isValidNickName(newNickName))
-		return (numericRPL(c, ERR_ERRONEUSNICKNAME, nickName, newNickName));
-	c.setNickName(newNickName);
-	c.setNickNameStatus(true);
-	std::cout << nickName << " NICK " << newNickName << "\r" << std::endl;	//send a reply ":WiZ NICK Kilroy , :dan-!d@localhost NICK Mamoped"
-	return ;
+		rpl = numericRPL(ERR_NONICKNAMEGIVEN, nickName);
+	else {
+		std::string newNickName = cmd.getTokens().at(1);
+		if (this -> clientLookUp(newNickName))
+			rpl = numericRPL(ERR_NICKNAMEINUSE, nickName, newNickName);
+		else if (!this -> isValidNickName(newNickName))
+			rpl = numericRPL(ERR_ERRONEUSNICKNAME, nickName, newNickName);
+		else {
+			c.setNickName(newNickName);
+			c.setNickNameStatus(true);
+			rpl = nickName + " NICK " + newNickName + "\r\n";
+			//pass rpl to channel and maybe return here
+		}
+	}
+	outBuf.append(rpl.c_str(), rpl.length());
 }

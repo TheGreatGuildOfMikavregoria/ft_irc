@@ -16,31 +16,32 @@ inline std::string stringify(char* s) { return std::string(s); }
 template<typename T>
 std::string stringify(T val) { return std::to_string(val); }
 
-inline void buildResponse(std::string& result, const char* format) {
-	result += format;
+inline void buildResponse(std::string& reply, const char* format) {
+	reply += format;
 }
 
 template<typename T, typename... Args>
-void buildResponse(std::string& result, const char* format, T value, Args... args) {
+void buildResponse(std::string& reply, const char* format, T value, Args... args) {
 	while (*format) {
 		if (*format == '%' && *(format + 1) == 's') {
-			result += stringify(value);
+			reply += stringify(value);
 			format += 2;
-			buildResponse(result, format, args...);
+			buildResponse(reply, format, args...);
 			return;
 		}
-		result += *format++;
+		reply += *format++;
 	}
 }
 
-template<typename ClientT, typename... Args>
-void numericRPL(ClientT& c, const std::string& format, Args... args) {
-	std::string result = ":ircserv"; 
-	buildResponse(result, format.c_str(), args...);
-	if (result.length() < 2 || result.substr(result.length() - 2) != "\r\n") {
-		result += "\r\n";
+template<typename... Args>
+std::string& numericRPL(const std::string& format, Args... args) {
+	std::string reply = ":ircserv"; 
+	buildResponse(reply, format.c_str(), args...);
+	if (reply.length() < 2 || reply.substr(reply.length() - 2) != "\r\n") {
+		reply += "\r\n";
 	}
-	c.getOutBuf().append(result.c_str(), result.length());
+	return (reply);
+	// c.getOutBuf().append(reply.c_str(), reply.length());
 }
 //Connection Messages
 	//CAP message
