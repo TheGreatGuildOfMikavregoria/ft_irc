@@ -107,6 +107,7 @@ public:
 
 	void	pass(Client& c, Command& cmd);
 	void	nick(Client& c, Command& cmd);
+	void	user(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);

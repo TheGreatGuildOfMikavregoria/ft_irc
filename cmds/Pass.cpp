@@ -120,3 +120,20 @@ void Server::nick(Client& c, Command& cmd) {
 	}
 	outBuf.append(rpl.c_str(), rpl.length());
 }
+
+void Server::user(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+	std::string rpl;
+	if (cmd.getTokens().size() < 5 || cmd.getTokens().at(0).empty())
+		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
+	else if (c.getRegiStatus())
+		rpl = numericRPL(ERR_ALREADYREGISTERED, nickName);
+	else {
+		std::string userName = cmd.getTokens().at(1);
+		for (char c : userName) {
+			if (c == '@')
+				userName = "guest"
+		}
+
+	}
+}

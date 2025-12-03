@@ -23,7 +23,7 @@ class Client{
 		Client(int fd);
 		~Client();
 
-		const int	getFd() const;
+		int			getFd() const;
 		Buffer&		getInBuf();
 		Buffer&		getOutBuf();
 		const std::string&	getUserName() const;

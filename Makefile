@@ -13,7 +13,7 @@ ifeq ($(DEBUG),1)
 	CXXFLAGS += -O0 -DDEBUG=1 
 
 else
-	CXXFLAGS += -O2 -DNDEBUG #-Wall -Wextra -Werror
+	CXXFLAGS += -O2 -DNDEBUG -Wall -Wextra -Werror
 endif
 
 all: $(NAME)
