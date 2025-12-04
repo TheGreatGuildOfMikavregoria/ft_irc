@@ -2,6 +2,9 @@
 
 #include "Server.hpp"
 #include "Buffer.hpp"
+#include "Channel.hpp"
+
+class Channel;
 
 class Client{
 	private:
@@ -18,7 +21,7 @@ class Client{
 		bool		_userNameSet;
 		bool		_passwordSet;
 		bool		_userModeSet;
-//		std::vector<Client> _clientChannels;
+		std::vector<Channel *> _clientChannels;
 	
 	public:
 		Client(int fd);

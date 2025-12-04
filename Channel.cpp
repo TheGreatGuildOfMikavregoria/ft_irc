@@ -96,7 +96,7 @@ bool Channel::getProtectedTopicMode() const
 	return _protectedTopicMode;
 }
 
-std::vector<Client> &Channel::getChannelUsers()
+std::vector<Client *> &Channel::getChannelUsers()
 {
 	return _channelUsers;
 }
@@ -109,7 +109,6 @@ std::vector<std::string> &Channel::getInviteList()
 int Channel::join(Client &client)
 {
 	(void)client;
-	if ()
 	return 0;
 }
 

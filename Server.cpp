@@ -555,7 +555,7 @@ void Server::start_server()
 		#if DEBUG
 		std::cout << "Trying to start Server\n";
 		#endif
-
+		_clients.reserve(MAX_CLIENTS);
 		_startServerListener();
 		_runLoop();
 

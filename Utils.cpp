@@ -8,11 +8,11 @@ std::string Utils::stringToLowercase(std::string text)
 	return text;
 }
 // TODO: add one to work with pointers
-auto Utils::getUserIteratorByNickName(std::vector<Client> &clientVector, const std::string &nickname) -> std::vector<Client>::iterator
+std::vector<Client *>::iterator Utils::getUserIteratorByNickName(std::vector<Client *> &clientVector, const std::string &nickname)
 {
 	auto itStart = clientVector.begin();
 	auto itEnd = clientVector.end();
-	return std::find_if(itStart, itEnd, [&nickname](const Client &client) { return (client.getNickName() == nickname); });
+	return std::find_if(itStart, itEnd, [&nickname](const Client *client) { return (client->getNickName() == nickname); });
 }
 
 auto Utils::getChannelIteratorByChannelName(std::vector<Channel> &channelVector, const std::string &name) -> std::vector<Channel>::iterator

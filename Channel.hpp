@@ -46,7 +46,7 @@ class Channel
 		bool _keyMode;
 		bool _protectedTopicMode;
 
-		void _userAdd(Client &);
+		void _userAdd(Client *);
 		void _userRemove(Client &);
 		void _chanOperatorAdd(Client &);
 		void _chanOperatorRemove(Client &);
@@ -67,7 +67,7 @@ class Channel
 		bool getClientLimitMode() const ;
 		bool getKeyMode() const;
 		bool getProtectedTopicMode() const;
-		std::vector<Client> &getChannelUsers();
+		std::vector<Client *> &getChannelUsers();
 		std::vector<std::string> &getInviteList();
 		
 		int join(Client &);
