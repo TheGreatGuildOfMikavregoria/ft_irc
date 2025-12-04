@@ -1,5 +1,6 @@
 #include "../Server.hpp"
 
+#define USERLEN 8
 /*
 PASS message
 	Command: PASS
@@ -84,6 +85,10 @@ bool Server::isValidNickName(const std::string& nickName) {
 	return true;
 }
 
+void Server::registerClient(Client& c) {
+	if ()
+}
+
 void Server::pass(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
 	Buffer& outBuf = c.getOutBuf();
@@ -107,15 +112,19 @@ void Server::nick(Client& c, Command& cmd) {
 		rpl = numericRPL(ERR_NONICKNAMEGIVEN, nickName);
 	else {
 		std::string newNickName = cmd.getTokens().at(1);
-		if (this -> clientLookUp(newNickName))
-			rpl = numericRPL(ERR_NICKNAMEINUSE, nickName, newNickName);
-		else if (!this -> isValidNickName(newNickName))
+		if (!this -> isValidNickName(newNickName))
 			rpl = numericRPL(ERR_ERRONEUSNICKNAME, nickName, newNickName);
+		else if (this -> clientLookUp(newNickName.substr(0,9)))
+			rpl = numericRPL(ERR_NICKNAMEINUSE, nickName, newNickName);
 		else {
+			newNickName = newNickName.substr(0,9);
 			c.setNickName(newNickName);
 			c.setNickNameStatus(true);
-			rpl = nickName + " NICK " + newNickName + "\r\n";
-			//pass rpl to channel and maybe return here
+			if (!c.getRegiStatus())
+					this -> registerClient(c);
+			else 
+				rpl = nickName + " NICK " + newNickName + "\r\n";
+			//pass rpl to all users and maybe return here
 		}
 	}
 	outBuf.append(rpl.c_str(), rpl.length());
@@ -123,6 +132,7 @@ void Server::nick(Client& c, Command& cmd) {
 
 void Server::user(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
 	std::string rpl;
 	if (cmd.getTokens().size() < 5 || cmd.getTokens().at(0).empty())
 		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
@@ -131,9 +141,15 @@ void Server::user(Client& c, Command& cmd) {
 	else {
 		std::string userName = cmd.getTokens().at(1);
 		for (char c : userName) {
-			if (c == '@')
-				userName = "guest"
+			if (c == '@')//cancel the 
+				return;
 		}
-
+		userName = ("~" + userName).substr(0,USERLEN);
+		c.setUserName(userName);
+		c.setUserModeStatus(true);
+		c.setRealName(cmd.getTokens().at(4));
+		this -> registerClient(c);
+		return;
 	}
+	outBuf.append(rpl.c_str(), rpl.length());
 }

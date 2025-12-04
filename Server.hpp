@@ -111,4 +111,5 @@ public:
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);
+	void	registerClient(Client& c);
 };
