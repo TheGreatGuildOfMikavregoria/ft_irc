@@ -100,9 +100,9 @@ std::string numericRPL(const std::string& format, Args... args) {
 
 #define RPL_WELCOME				" 001 %s :Welcome to the %s Network, %s!%s@%s" //in_use
 #define RPL_YOURHOST			" 002 %s :Your host is %s, running version %s" //in_use
-#define RPL_CREATED				" 003 %s :This server was created <datetime>"
-#define RPL_MYINFO				" 004 %s <servername> <version> <available user modes> <available channel modes> [<channel modes with a parameter>]"
-#define RPL_ISUPPORT			" 005 %s <1-13 tokens> :are supported by this server"
+#define RPL_CREATED				" 003 %s :This server was created <datetime>" //in_use //Add params
+#define RPL_MYINFO				" 004 %s <servername> <version> <available user modes> <available channel modes> [<channel modes with a parameter>]" //in_use //Add params
+#define RPL_ISUPPORT			" 005 %s <1-13 tokens> :are supported by this server" //in_use //Add params
 #define RPL_UMODEIS				" 221 %s <user modes>"
 #define RPL_WHOISCERTFP			" 276 %s <nick> :has client certificate fingerprint <fingerprint>" //what is fingerprint
 #define RPL_AWAY				" 301 %s <nick> :<message>"
@@ -147,7 +147,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_CANNOTSENDTOCHAN	" 404 %s <channel> :Cannot send to channel"
 #define ERR_TOOMANYCHANNELS		" 405 %s <channel> :You have joined too many channels"
 #define ERR_TOOMANYTARGETS (407)//no message?
-#define ERR_NOORIGIN			" 409 %s :No origin specified"
+#define ERR_NOORIGIN			" 409 %s :No origin specified" //in_use
 #define ERR_NORECIPIENT			" 411 %s :No recipient given (<command>)"
 #define ERR_NOTEXTTOSEND		" 412 %s :No text to send"
 #define ERR_NOTOPLEVEL (413)	//no message?
@@ -161,7 +161,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_USERONCHANNEL		" 443 %s <nick> <channel> :is already on channel"
 #define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters" //in_use
 #define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister" //in_use
-#define ERR_PASSWDMISMATCH		" 464 %s :Password incorrect"
+#define ERR_PASSWDMISMATCH		" 464 %s :Password incorrect" //in_use
 #define ERR_CHANNELISFULL		" 471 %s <channel> :Cannot join channel (+l)"
 #define ERR_INVITEONLYCHAN		" 473 %s <channel> :Cannot join channel (+i)"
 #define ERR_BANNEDFROMCHAN		" 474 %s <channel> :Cannot join channel (+b)"

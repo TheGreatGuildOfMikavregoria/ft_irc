@@ -70,12 +70,13 @@ void Server::registerClient(Client& c) {
 	Buffer& outBuf = c.getOutBuf();
 	std::string rpl;
 	if (!c.getNickNameStatus() || !c.getUserNameStatus())
-		return ;
+		return ;//Asuming ther's  time out for registration
 	else {
 		if (!c.getPasswordStatus()) {
-			rpl = numericRPL(ERR_PASSWDMISMATCH, nickName); 
-			std::cout << "Dropping client (fd " << c.getFd() << "): password mismatch" << std::endl;
-			close(c.getFd()); //check if drop client can be used here intead of repeating
+			rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
+			outBuf.append(rpl.c_str(), rpl.length());
+			std::cout << "Dropping client (fd " << c.getFd() << "): password mismatch" << std::endl; //client doesn't get to print the meassage before onnection is closed.
+			close(c.getFd()); //check if drop client can be used here intead of repeating these lines
 		}
 		else {
 			c.setRegiStatus(true);
@@ -156,4 +157,13 @@ void Server::user(Client& c, Command& cmd) {
 		return;
 	}
 	outBuf.append(rpl.c_str(), rpl.length());
+}
+
+void Server::ping(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
+	if (cmd.getTokens().size() < 2)
+		rpl = numericRPL(ERR_NOORIGIN, nickName, cmd.getTokens().at(0));
+	
 }

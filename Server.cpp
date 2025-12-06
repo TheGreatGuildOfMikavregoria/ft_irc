@@ -365,7 +365,7 @@ void Server::serverAcceptClients()
 			continue ;
 		}
 		Client c(sock_fd);
-		c.setHostName(inet_ntoa(c_addr.sin_addr));
+		c.setHostName(inet_ntoa(c_addr.sin_addr));//Need c_addr struct to get this value. So added this line here
 		_clients.push_back(c);
 
 		std::cout << "Accepted new client: " << sock_fd << std::endl;
