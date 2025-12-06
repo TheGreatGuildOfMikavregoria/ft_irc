@@ -98,8 +98,8 @@ std::string numericRPL(const std::string& format, Args... args) {
 	//USERHOST message
 	//WALLOPS message
 
-#define RPL_WELCOME				" 001 %s :Welcome to the %s Network, %s[!%s@%s]" //in_use
-#define RPL_YOURHOST			" 002 %s :Your host is <servername>, running version <version>"
+#define RPL_WELCOME				" 001 %s :Welcome to the %s Network, %s!%s@%s" //in_use
+#define RPL_YOURHOST			" 002 %s :Your host is %s, running version %s" //in_use
 #define RPL_CREATED				" 003 %s :This server was created <datetime>"
 #define RPL_MYINFO				" 004 %s <servername> <version> <available user modes> <available channel modes> [<channel modes with a parameter>]"
 #define RPL_ISUPPORT			" 005 %s <1-13 tokens> :are supported by this server"

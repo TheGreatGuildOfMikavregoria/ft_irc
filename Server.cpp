@@ -349,8 +349,6 @@ void Server::serverAcceptClients()
 					dropClient(0, "Emergency fd failsafe 2?");
 					continue;
 				}
-				
-
 			}
 			perror("accept");
 			break;
@@ -367,6 +365,7 @@ void Server::serverAcceptClients()
 			continue ;
 		}
 		Client c(sock_fd);
+		c.setHostName(inet_ntoa(c_addr.sin_addr));
 		_clients.push_back(c);
 
 		std::cout << "Accepted new client: " << sock_fd << std::endl;

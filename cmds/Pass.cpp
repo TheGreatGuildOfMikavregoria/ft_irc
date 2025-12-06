@@ -1,6 +1,9 @@
 #include "../Server.hpp"
 
 #define USERLEN 8
+#define SERVER_NAME "ircserv"
+#define NETWORK_NAME "42Net"
+#define VERSION "1.0"
 
 // void	Server::numericRPL(Client& c, const char* format,  ...) {
 // 	std::string result = "ircserv";
@@ -70,14 +73,15 @@ void Server::registerClient(Client& c) {
 		return ;
 	else {
 		if (!c.getPasswordStatus()) {
-			rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
-			//drop client
+			rpl = numericRPL(ERR_PASSWDMISMATCH, nickName); 
+			std::cout << "Dropping client (fd " << c.getFd() << "): password mismatch" << std::endl;
+			close(c.getFd()); //check if drop client can be used here intead of repeating
 		}
 		else {
 			c.setRegiStatus(true);
-			rpl = numericRPL(RPL_WELCOME, nickName) //add other params
-			+ numericRPL(RPL_YOURHOST, nickName) //add other params
-			+ numericRPL(RPL_CREATED, nickName) //add other params
+			rpl = numericRPL(RPL_WELCOME, nickName, NETWORK_NAME, nickName, c.getUserName(), c.getHostName()) //change macros later
+			+ numericRPL(RPL_YOURHOST, nickName, SERVER_NAME, VERSION) //change macros later 
+			+ numericRPL(RPL_CREATED, nickName) //add datetime
 			+ numericRPL(RPL_MYINFO, nickName) //add other params
 			+ numericRPL(RPL_ISUPPORT, nickName); //add other params
 		}
@@ -116,10 +120,12 @@ void Server::nick(Client& c, Command& cmd) {
 			newNickName = newNickName.substr(0,9);
 			c.setNickName(newNickName);
 			c.setNickNameStatus(true);
+			std::cout << "NickNameStatus: " << c.getNickNameStatus() << std::endl;
+			std::cout << "UserNameStatus: " << c.getUserNameStatus() << std::endl;
 			if (!c.getRegiStatus())
 					this -> registerClient(c);
 			else {
-				rpl = nickName + " NICK " + newNickName + "\r\n";
+				rpl = nickName + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
 				serverBroadcast(rpl);
 			}
 			return;
@@ -144,7 +150,7 @@ void Server::user(Client& c, Command& cmd) {
 		}
 		userName = ("~" + userName).substr(0,USERLEN);
 		c.setUserName(userName);
-		c.setUserModeStatus(true);
+		c.setUserNameStatus(true);
 		c.setRealName(cmd.getTokens().at(4));
 		this -> registerClient(c);
 		return;
