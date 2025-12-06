@@ -11,6 +11,7 @@ Client::Client(int fd) : _fd(fd) {
 	_userNameSet = false;
 	_passwordSet = false;
 	_userModeSet = false;
+	_lastActivity = std::time(nullptr);
 }
 
 Client::~Client() {}
@@ -41,3 +42,5 @@ void	Client::setNickNameStatus(bool nickNameSet) {_nickNameSet = nickNameSet;}
 void	Client::setUserNameStatus(bool userNameSet) {_userNameSet = userNameSet;}
 void	Client::setPasswordStatus(bool passwordSet) {_passwordSet = passwordSet;}
 void	Client::setUserModeStatus(bool userModeSet) {_userModeSet = userModeSet;}
+void	Client::setLastActivity(std::time_t lastActivity) {_lastActivity = lastActivity;}
+std::time_t	Client::getLastActivity() const {return _lastActivity;}

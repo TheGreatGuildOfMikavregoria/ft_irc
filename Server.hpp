@@ -26,8 +26,9 @@
 #include <unordered_map>
 #include <memory>
 #include <csignal>
-
+#include <ctime>
 #define MAX_CLIENTS 512
+#define CLIENT_TIMEOUT 600
 
 ///////////////////////
 #if defined(DEBUG) && DEBUG

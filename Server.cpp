@@ -216,9 +216,34 @@ void Server::buildPollList(std::vector<pollfd> &pfds)
 	}
 }
 
+
+
 void Server::_runLoop()
 {
 	std::vector<pollfd> pfds;
+
+
+
+	auto nextClientTimeout = [&]() -> int
+	{
+		if (_clients.empty())
+			return -1;
+		std::time_t now = std::time(nullptr);
+		int timeout = -1;
+		for (const auto &client : _clients)
+		{
+			int idleTime = static_cast<int>(difftime(now, client->getLastActivity()) / 60.0);
+
+			int remainingTime = CLIENT_TIMEOUT - idleTime;
+
+			if (remainingTime <= 0)
+				return 0;
+			if (timeout == -1 || remainingTime < timeout)
+				timeout = remainingTime;
+		}
+		return timeout;
+	};
+
 
 	for (;;)
 	{
@@ -227,15 +252,14 @@ void Server::_runLoop()
 		DBG("pfds=" << pfds.size()
 			<< " clients=" << _clients.size());
 		
-		int pRes = poll(pfds.data(), pfds.size(), 5000);
+		int pRes = poll(pfds.data(), pfds.size(), nextClientTimeout());
 		if (pRes < 0)
 		{
 			if (errno == EINTR)
 				continue;
 			throw std::runtime_error("poll() failure");
 		}
-		//if (pRes == 0) // noevents = goes straight to timeout 
-		//	continue;
+
 
 		DBG("poll() ready=" << pRes
 			<< " listen.revents=" << pollMaskStr(pfds[0].revents));
