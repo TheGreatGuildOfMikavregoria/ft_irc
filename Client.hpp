@@ -18,6 +18,7 @@ class Client{
 		bool		_userNameSet;
 		bool		_passwordSet;
 		bool		_userModeSet;
+		
 	
 	public:
 		Client(int fd);
@@ -42,7 +43,7 @@ class Client{
 		void	setUserName(std::string& userName);
 		void	setNickName(std::string& nickName);
 		void	setRealName(std::string& realName);
-		void	setHostName(std::string& hostName);
+		void	setHostName(const std::string& hostName);
 		void	setAuthStatus(bool authStatus);
 		void	setRegiStatus(bool regiStatus);
 		void	setNickNameStatus(bool nickNameSet);
