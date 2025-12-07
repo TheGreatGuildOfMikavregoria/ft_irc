@@ -27,10 +27,10 @@
 // }
 
 Client* Server::clientLookUp(const std::string& nickName) {
-	std::vector<Client>::iterator it;
+	std::vector<std::unique_ptr<Client>>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); ++it) {
-		if (it->getNickName() == nickName) {
-			return &(*it);
+		if ((*it)->getNickName() == nickName) {
+			return it;
 		}
 	}
 	return nullptr;
