@@ -171,3 +171,7 @@ void Server::ping(Client& c, Command& cmd) {
 		rpl = ":" SERVER_NAME " PONG "  SERVER_NAME  " :" +  cmd.getTokens().at(1) + "\r\n";
 	outBuf.append(rpl.c_str(), rpl.length());
 }
+
+void Server::oper(Client& c, Command& cmd) {
+	
+}

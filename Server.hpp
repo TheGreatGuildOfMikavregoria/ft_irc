@@ -29,6 +29,8 @@
 #include <csignal>
 
 #define MAX_CLIENTS 512
+#define OPER_NAME   "ircAdmin"
+#define OPER_PASS	"admin@IRC42"
 
 ///////////////////////
 #if defined(DEBUG) && DEBUG
@@ -74,12 +76,15 @@ private:
 		{"PASS", &Server::pass},
 		{"NICK", &Server::nick},
 		{"USER", &Server::user},
-		{"PING", &Server::ping}
+		{"PING", &Server::ping},
+		{"OPER", &Server::oper}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	//TO be implemented:
 	std::string password; 
 	std::string port;
+	std::string _operName;
+	std::string _operPass;
 	static bool _signal;
 	std::vector<Client> _clients;
 	//std::vector<Channel> _channels;
@@ -111,6 +116,7 @@ public:
 	void	nick(Client& c, Command& cmd);
 	void	user(Client& c, Command& cmd);
 	void	ping(Client& c, Command& cmd);
+	void	oper(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);
