@@ -241,7 +241,7 @@ void Server::_runLoop()
 			if (timeout == -1 || remainingTime < timeout)
 				timeout = remainingTime;
 		}
-		return timeout;
+		return timeout * 1000;
 	};
 
 
