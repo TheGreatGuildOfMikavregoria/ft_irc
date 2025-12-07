@@ -73,7 +73,8 @@ private:
 		{"TEST", &Server::_testComm},
 		{"PASS", &Server::pass},
 		{"NICK", &Server::nick},
-		{"USER", &Server::user}
+		{"USER", &Server::user},
+		{"PING", &Server::ping}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	//TO be implemented:

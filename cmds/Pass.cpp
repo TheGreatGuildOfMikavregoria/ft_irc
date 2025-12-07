@@ -62,7 +62,8 @@ bool Server::isValidNickName(const std::string& nickName) {
 void Server::serverBroadcast(const std::string& msg) {
 	std::vector<Client>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); ++it)
-		it->getOutBuf().append(msg.c_str(), msg.length());
+		if ((*it).getRegiStatus())
+			it->getOutBuf().append(msg.c_str(), msg.length());
 }
 
 void Server::registerClient(Client& c) {
@@ -126,7 +127,8 @@ void Server::nick(Client& c, Command& cmd) {
 			if (!c.getRegiStatus())
 					this -> registerClient(c);
 			else {
-				rpl = nickName + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
+				std::string prefix = ":" + nickName + "!" + c.getUserName() + "@" + c.getHostName();
+				rpl = prefix + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
 				serverBroadcast(rpl);
 			}
 			return;
@@ -146,10 +148,10 @@ void Server::user(Client& c, Command& cmd) {
 	else {
 		std::string userName = cmd.getTokens().at(1);
 		for (char c : userName) {
-			if (c == '@')//cancel the 
+			if (c == '@')//ignores command silently. decide the behaviour.
 				return;
 		}
-		userName = ("~" + userName).substr(0,USERLEN);
+		userName = "~" + userName.substr(0,USERLEN);//check if ~ should be included in USERLEN
 		c.setUserName(userName);
 		c.setUserNameStatus(true);
 		c.setRealName(cmd.getTokens().at(4));
@@ -165,5 +167,7 @@ void Server::ping(Client& c, Command& cmd) {
 	std::string rpl;
 	if (cmd.getTokens().size() < 2)
 		rpl = numericRPL(ERR_NOORIGIN, nickName, cmd.getTokens().at(0));
-	
+	else
+		rpl = ":" SERVER_NAME " PONG "  SERVER_NAME  " :" +  cmd.getTokens().at(1) + "\r\n";
+	outBuf.append(rpl.c_str(), rpl.length());
 }
