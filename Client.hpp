@@ -2,6 +2,7 @@
 
 #include "Server.hpp"
 #include "Buffer.hpp"
+#include <ctime>
 
 class Client{
 	private:
@@ -18,6 +19,8 @@ class Client{
 		bool		_userNameSet;
 		bool		_passwordSet;
 		bool		_userModeSet;
+		std::time_t	_lastActivity;
+		
 	
 	public:
 		Client(int fd);
@@ -49,4 +52,6 @@ class Client{
 		void	setUserNameStatus(bool userNameSet);
 		void	setPasswordStatus(bool passwordSet);
 		void	setUserModeStatus(bool userModeSet);
+		void	setLastActivity(std::time_t lastActivity);
+		std::time_t	getLastActivity() const;
 };

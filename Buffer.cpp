@@ -11,6 +11,12 @@ void Buffer::append(const char *data, size_t len)//why not take the len insid th
 	_buffer.insert(_buffer.end(), data, data + len);
 }
 
+
+void Buffer::append(std::string_view s)//why not take the len insid the function? 
+{
+	this->append(s.data(), s.size());
+}
+
 bool Buffer::empty()
 {
 	return _buffer.empty();
