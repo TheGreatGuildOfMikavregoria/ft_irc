@@ -65,6 +65,7 @@ bool Server::serviceClientRead(Client &c)
 	if (received <= 0)
 		return false;
 
+	c.setLastActivity(std::time(nullptr));
 	c.getInBuf().append(buffer, static_cast<std::size_t>(received));
 
 	while (1)
@@ -77,8 +78,6 @@ bool Server::serviceClientRead(Client &c)
 		if (message.getStatus() == MESSAGE_INCOMPLETE)
 			return true;
 	}
-		
-
 }
 
 bool Server::serviceClientWrite(Client &c)
@@ -222,8 +221,6 @@ void Server::_runLoop()
 {
 	std::vector<pollfd> pfds;
 
-
-
 	auto nextClientTimeout = [&]() -> int
 	{
 		if (_clients.empty())
@@ -249,31 +246,44 @@ void Server::_runLoop()
 	{
 		buildPollList(pfds);
 
-		DBG("pfds=" << pfds.size()
-			<< " clients=" << _clients.size());
-		
+										DBG("pfds=" << pfds.size()
+											<< " clients=" << _clients.size());
+										
 		int pRes = poll(pfds.data(), pfds.size(), nextClientTimeout());
 		if (pRes < 0)
 		{
 			if (errno == EINTR)
+			{
+				if (Server::_signal)
+					break;
 				continue;
+			}
 			throw std::runtime_error("poll() failure");
 		}
 
 
-		DBG("poll() ready=" << pRes
-			<< " listen.revents=" << pollMaskStr(pfds[0].revents));
+		for (const auto &client : _clients)
+		{
+			if ((difftime(std::time(nullptr), client->getLastActivity())) / 60.0 > CLIENT_TIMEOUT)
+				dropClient(client->getFd(), "Client timeout");
+		//	std::cout << "Client " << client->getFd() << " timediff " << difftime(std::time(nullptr),client->getLastActivity())  << std::endl;
+		}
+
+												DBG("poll() ready=" << pRes
+													<< " listen.revents=" << pollMaskStr(pfds[0].revents));
 
 		if (pfds[0].revents & POLLIN)
 			serverAcceptClients();
 
 		handleClientEvents(pfds);
 
+
+
 					#if DEBUG
 					for(int i = 0; i < _clients.size(); i++)
 					{
 						std::cout << "Out: [" << i << "] ";
-						Buffer &temp = _clients[i]->out;
+						Buffer &temp = _clients[i]->getOutBuf();
 						if (temp.empty())
 							continue;
 						std::string a(temp.data(), temp.size());
@@ -283,7 +293,7 @@ void Server::_runLoop()
 					for(int i = 0; i < _clients.size(); i++)
 					{
 						std::cout << "In: [" << i << "] ";
-						Buffer &temp = _clients[i]->in;
+						Buffer &temp = _clients[i]->getInBuf();
 						if (temp.empty())
 							continue;
 						std::string a(temp.data(), temp.size());

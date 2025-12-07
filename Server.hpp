@@ -64,7 +64,6 @@ private:
 		{"PASS", &Server::pass}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
-	//TO be implemented:
 	std::string password; 
 	std::string port;
 	static bool _signal;
