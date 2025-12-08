@@ -3,6 +3,7 @@
 
 #include <string>
 #include "Client.hpp"
+#include <set>
 //#include "Utils.hpp"
 
 /*
@@ -37,9 +38,9 @@ class Channel
 		std::string _key;
 		std::string _timeCreated;
 
-		std::vector<Client *> _channelUsers;
-		std::vector<std::string> _inviteList;
-		std::vector<std::string> _operators;
+		std::set<Client *> _channelUsers;
+		std::set<std::string> _inviteList;
+		std::set<std::string> _operators;
 				
 		bool _inviteOnlyMode;
 		bool _clientLimitMode;

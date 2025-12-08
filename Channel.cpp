@@ -9,44 +9,55 @@
 // TODO: modify to work with pointers
 void Channel::_userAdd(Client *user)
 {
-	_channelUsers.push_back(user);
+	_channelUsers.insert(user);
+//	_channelUsers.push_back(user);
 	
 }
 
 void Channel::_userRemove(Client &user)
 {
+	_channelUsers.erase(&user);
+/*
 	auto it = Utils::getUserIteratorByNickName(_channelUsers, user.getNickName());
 	if (it != _channelUsers.end())
 		_channelUsers.erase(it);
+*/
 }
 
 void Channel::_chanOperatorAdd(Client &futureOperator)
 {
-	_operators.push_back(futureOperator.getNickName());
+	//_operators.push_back(futureOperator.getNickName());
+	_operators.insert(futureOperator.getNickName());
 }
 
 void Channel::_chanOperatorRemove(Client &client)
 {
+	_operators.erase(client.getNickName());
+/*
 	auto it = Utils::getStringIteratorByString(_operators, client.getNickName());
 	if (it != _operators.end())
 		_operators.erase(it);
+*/
 }
 
 void Channel::_inviteListAdd(std::string &toAdd)
 {
-	_inviteList.push_back(toAdd);
+	_inviteList.insert(toAdd);
+//	_inviteList.push_back(toAdd);
 }
 void Channel::_inviteListRemove(std::string &toRemove)
 {
+	_inviteList.erase(toRemove);
+/*
 	auto it = Utils::getStringIteratorByString(_inviteList, toRemove);
 	if (it != _inviteList.end())
 		_inviteList.erase(it);
+*/
 }
 
 Channel::Channel(const std::string &name)
 {
 	_name = name;
-// TODO:  protec?
 	_timeCreated = Utils::getCurrentTimeString();
 }
 
