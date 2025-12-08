@@ -10,6 +10,7 @@
 void Channel::_userAdd(Client *user)
 {
 	_channelUsers.push_back(user);
+	
 }
 
 void Channel::_userRemove(Client &user)
@@ -41,8 +42,6 @@ void Channel::_inviteListRemove(std::string &toRemove)
 	if (it != _inviteList.end())
 		_inviteList.erase(it);
 }
-
-
 
 Channel::Channel(const std::string &name)
 {
@@ -109,6 +108,7 @@ std::vector<std::string> &Channel::getInviteList()
 int Channel::join(Client &client)
 {
 	(void)client;
+	_userAdd(&client);
 	return 0;
 }
 
@@ -146,6 +146,14 @@ bool Channel::validateName(std::string &name)
 	if (name[0] != '#' && name[0] != '&')
 		return (false);
 	return (true);
+}
+
+void Channel::broadcast(std::string &message)
+{
+	for (Client *userPtr : _channelUsers)
+	{
+		userPtr->getOutBuf().append(message.c_str(), message.length());
+	}
 }
 /*
 bool Channel::validateModes(std::string &mode)

@@ -14,6 +14,14 @@ std::vector<Client *>::iterator Utils::getUserIteratorByNickName(std::vector<Cli
 	auto itEnd = clientVector.end();
 	return std::find_if(itStart, itEnd, [&nickname](const Client *client) { return (client->getNickName() == nickname); });
 }
+/*
+static Client *getClientPtrByNickName(std::vector<Client *> &clientVector, const std::string &nickName)
+{
+	auto itStart = clientVector.begin();
+	auto itEnd = clientVector.end();
+	return std::find_if(itStart, itEnd, [&nickname](const Client *client) { return (client->getNickName() == nickname); });
+}
+*/
 
 auto Utils::getChannelIteratorByChannelName(std::vector<Channel> &channelVector, const std::string &name) -> std::vector<Channel>::iterator
 {

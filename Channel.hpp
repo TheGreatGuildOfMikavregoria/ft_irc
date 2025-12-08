@@ -77,7 +77,7 @@ class Channel
 		int kick(Client &source, std::string &nick);
 		int invite(Client &source, std::string &nick);
 		//int topic(Client &source, )
-		int informUsers(std::string &);
+		void broadcast(std::string &);
 //		int 
 
 		
