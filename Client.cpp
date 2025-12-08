@@ -5,7 +5,7 @@ Client::Client(int fd) : _fd(fd) {
 	_nickName = "*";
 	_realName = "*";
 	_hostName = "*";
-	_authStatus = false;
+	_userMode = "";
 	_regiStatus = false;
 	_nickNameSet = false;
 	_userNameSet = false;
@@ -23,7 +23,7 @@ const 	std::string&	Client::getUserName() const {return _userName;}
 const 	std::string&	Client::getNickName() const {return _nickName;}
 const 	std::string&	Client::getRealName() const {return _realName;}
 const 	std::string&	Client::getHostName() const {return _hostName;}
-bool	Client::getAuthStatus() const {return _authStatus;}
+const 	std::string&	Client::getUserMode() const {return _userMode;}
 bool	Client::getRegiStatus() const {return _regiStatus;}
 bool	Client::getNickNameStatus() const {return _nickNameSet;}
 bool	Client::getUserNameStatus() const {return _userNameSet;}
@@ -36,7 +36,7 @@ void	Client::setUserName(std::string& userName) {_userName = userName;}
 void	Client::setNickName(std::string& nickName) {_nickName = nickName;}
 void	Client::setRealName(std::string& realName) {_realName = realName;}
 void	Client::setHostName(std::string hostName) {_hostName = hostName;}
-void	Client::setAuthStatus(bool authStatus) {_authStatus = authStatus;}
+void	Client::setUserMode(std::string& userMode) {_userMode = userMode;}
 void	Client::setRegiStatus(bool regiStatus) {_regiStatus = regiStatus;}
 void	Client::setNickNameStatus(bool nickNameSet) {_nickNameSet = nickNameSet;}
 void	Client::setUserNameStatus(bool userNameSet) {_userNameSet = userNameSet;}

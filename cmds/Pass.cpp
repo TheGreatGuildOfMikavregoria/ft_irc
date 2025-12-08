@@ -38,12 +38,12 @@
 
 Client* Server::clientLookUp(const std::string& nickName) {
 
-    for (auto& clientPtr : _clients) {
-        if (clientPtr->getNickName() == nickName) {
-            return clientPtr.get(); // Return the raw pointer
-        }
-    }
-    return nullptr;
+	for (auto& clientPtr : _clients) {
+		if (clientPtr->getNickName() == nickName) {
+			return clientPtr.get(); // Return the raw pointer
+		}
+	}
+	return nullptr;
 }
 
 bool Server::isValidNickName(const std::string& nickName) {
@@ -77,11 +77,11 @@ bool Server::isValidNickName(const std::string& nickName) {
 // }
 
 void Server::serverBroadcast(const std::string& msg) {
-    for (auto& clientPtr : _clients) {
-        if (clientPtr && clientPtr->getRegiStatus()) {
-            clientPtr->getOutBuf().append(msg.c_str(), msg.length());
-        }
-    }
+	for (auto& clientPtr : _clients) {
+		if (clientPtr && clientPtr->getRegiStatus()) {
+			clientPtr->getOutBuf().append(msg.c_str(), msg.length());
+		}
+	}
 }
 
 void Server::registerClient(Client& c) {
@@ -107,6 +107,15 @@ void Server::registerClient(Client& c) {
 		}
 		outBuf.append(rpl.c_str(), rpl.length());
 	}	
+}
+
+bool Server::isValidOperHost(const std::string &clientIP, int clientFD)
+{
+	struct sockaddr_in local_addr;
+	socklen_t len = sizeof(local_addr);
+	getsockname(clientFD, (struct sockaddr *)&local_addr, &len);
+	std::string serverIP = inet_ntoa(local_addr.sin_addr);
+	return (clientIP == "127.0.0.1" || clientIP == serverIP);
 }
 
 void Server::pass(Client& c, Command& cmd) {
@@ -196,7 +205,18 @@ void Server::oper(Client& c, Command& cmd) {
 	std::string rpl;
 	if (cmd.getTokens().size() < 3)
 		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
-	if (cmd.getTokens().at(1) != OPER_NAME || cmd.getTokens().at(2) != OPER_PASS)
+	else if (cmd.getTokens().at(1) != OPER_NAME || cmd.getTokens().at(2) != OPER_PASS)
 		rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
-		
+	else if (!this->isValidOperHost(c.getHostName(), c.getFd()))
+		rpl = numericRPL(ERR_NOOPERHOST, nickName);
+	else {
+		rpl = numericRPL(RPL_YOUREOPER, nickName);
+		outBuf.append(rpl.c_str(), rpl.length());
+		if (c.getUserMode().find('o') == std::string::npos) {
+			rpl = ":" + nickName + " MODE " + nickName + " +o\r\n";
+			serverBroadcast(rpl);
+		}
+		return;
+	}
+	outBuf.append(rpl.c_str(), rpl.length());
 }

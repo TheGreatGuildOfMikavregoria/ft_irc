@@ -111,4 +111,5 @@ public:
 	bool	isValidNickName(const std::string& nickName);
 	void	registerClient(Client& c);
 	void	serverBroadcast(const std::string& msg);
+	bool	isValidOperHost(const std::string &clientIP, int clientFD);
 };

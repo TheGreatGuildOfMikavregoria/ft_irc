@@ -60,7 +60,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 	//TOPIC message		442	482	461	403	442	482	331	332	333
 	//NAMES message		353	366
 	//LIST message		321	322	323
-	//INVITE message		341	461	403	442	482	443	336	337
+	//INVITE message	341	461	403	442	482	443	336	337
 	//KICK message		461	403	482	441	442	476
 
 //Server Queries and Commands

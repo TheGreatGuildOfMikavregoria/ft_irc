@@ -13,7 +13,8 @@ class Client{
 		std::string	_nickName;
 		std::string	_realName;
 		std::string	_hostName;
-		bool		_authStatus;
+		std::string	_userMode;
+		// bool		_authStatus;
 		bool		_regiStatus;
 		bool		_nickNameSet;
 		bool		_userNameSet;
@@ -33,20 +34,20 @@ class Client{
 		const std::string&	getNickName() const;
 		const std::string&	getRealName() const;
 		const std::string&	getHostName() const;
+		const std::string&	getUserMode() const;
 		bool	getAuthStatus() const;
 		bool	getRegiStatus() const;
 		bool	getNickNameStatus() const;
 		bool	getUserNameStatus() const;
 		bool	getPasswordStatus() const;
 		bool	getUserModeStatus() const;
-
 		void	setInBuf(Buffer in);
 		void	setOutBuf(Buffer out);
 		void	setUserName(std::string& userName);
 		void	setNickName(std::string& nickName);
 		void	setRealName(std::string& realName);
 		void	setHostName(std::string hostName);
-		void	setAuthStatus(bool authStatus);
+		void	setUserMode(std::string& userMode);
 		void	setRegiStatus(bool regiStatus);
 		void	setNickNameStatus(bool nickNameSet);
 		void	setUserNameStatus(bool userNameSet);
