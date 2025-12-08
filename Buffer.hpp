@@ -8,6 +8,7 @@
 // #include <iostream>
 // #include <stdexcept>
 #include <string>
+#include <string_view>
 // #include <arpa/inet.h>
 // #include <netinet/in.h>
 // #include <poll.h>
@@ -26,6 +27,7 @@
 		~Buffer();
 
 		void append(const char *data, size_t len);
+		void append(std::string_view s);
 		bool empty();
 		char *data();
 		size_t size();

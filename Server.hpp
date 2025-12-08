@@ -12,8 +12,6 @@
 #include <stdexcept>
 #include <stdint.h>
 #include <cstdarg>
-
-
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <poll.h>
@@ -26,9 +24,11 @@
 #include "Client.hpp"
 #include "Numerics.hpp"
 #include <unordered_map>
+#include <memory>
 #include <csignal>
-
+#include <ctime>
 #define MAX_CLIENTS 512
+#define CLIENT_TIMEOUT 600
 
 ///////////////////////
 #if defined(DEBUG) && DEBUG
@@ -48,17 +48,7 @@ static inline const char* pollMaskStr(short ev) {
 	if (!s.empty()) s.pop_back();
 	return s.empty() ? "-" : s.c_str();
 }
-//////////////////////////
 
-// struct Conn
-// {
-// 	int fd;
-// 	Buffer in;
-// 	Buffer out;
-
-// 	std::string nick;
-// 	std::string user;
-// };
 class Client;
 class Command;
 
@@ -75,11 +65,10 @@ private:
 		{"PASS", &Server::pass}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
-	//TO be implemented:
 	std::string password; 
 	std::string port;
 	static bool _signal;
-	std::vector<Client> _clients;
+	std::vector<std::unique_ptr<Client>> _clients;
 	//std::vector<Channel> _channels;
 	int _listenFd;
 	int _spareFd;
@@ -88,8 +77,8 @@ private:
 	void _startServerListener();
 	void _runLoop();
 	void dropClient(std::size_t index, const std::string &reason);
-	void serviceClientRead(std::size_t index);
-	void serviceClientWrite(std::size_t index);
+	bool serviceClientRead(Client &c);
+	bool serviceClientWrite(Client &c);
 	// void processInput(std::string &buff, Client &conn);
 	void sendToClient(int fd, const std::string &msg);
 	void buildPollList(std::vector<pollfd> &pfds);
