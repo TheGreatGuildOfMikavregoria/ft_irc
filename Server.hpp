@@ -22,13 +22,15 @@
 #include "Buffer.hpp"
 #include "Command.hpp"
 #include "Client.hpp"
-#include "Numerics.hpp"
+#include "NumericRPL.hpp"
 #include <unordered_map>
 #include <memory>
 #include <csignal>
 #include <ctime>
 #define MAX_CLIENTS 512
 #define CLIENT_TIMEOUT 600
+#define OPER_NAME   "ircAdmin"
+#define OPER_PASS	"admin@IRC42"
 
 ///////////////////////
 #if defined(DEBUG) && DEBUG
@@ -62,11 +64,17 @@ private:
 		{"WASD", &Server::_wasd},
 */
 		{"TEST", &Server::_testComm},
-		{"PASS", &Server::pass}
+		{"PASS", &Server::pass},
+		{"NICK", &Server::nick},
+		{"USER", &Server::user},
+		{"PING", &Server::ping},
+		{"OPER", &Server::oper}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
 	std::string port;
+	std::string _operName;
+	std::string _operPass;
 	static bool _signal;
 	std::vector<std::unique_ptr<Client>> _clients;
 	//std::vector<Channel> _channels;
@@ -93,8 +101,17 @@ public:
 	static void SignalHandler(int signum);
 	void start_server();
 	bool set_nonblock(int fd);
-	void	numericRPL(Client& c, const char* format,  ...);
+	// void	numericRPL(Client& c, const char* format,  ...);
 
 	void	pass(Client& c, Command& cmd);
 	std::string &getTimeCreated();
+	void	nick(Client& c, Command& cmd);
+	void	user(Client& c, Command& cmd);
+	void	ping(Client& c, Command& cmd);
+	void	oper(Client& c, Command& cmd);
+
+	Client*	clientLookUp(const std::string& nickName);
+	bool	isValidNickName(const std::string& nickName);
+	void	registerClient(Client& c);
+	void	serverBroadcast(const std::string& msg);
 };

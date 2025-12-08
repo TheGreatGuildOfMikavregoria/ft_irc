@@ -1,64 +1,202 @@
 #include "../Server.hpp"
 
-/*
-PASS message
-	Command: PASS
-	Parameters: <password>
-The PASS command is used to set a ‘connection password’. If set, the password must be set before any 
-attempt to register the connection is made. This requires that clients send a PASS command before 
-sending the NICK / USER combination.
+#define USERLEN 8
+#define SERVER_NAME "ircserv"
+#define NETWORK_NAME "42Net"
+#define VERSION "1.0"
 
-The password supplied must match the one defined in the server configuration. It is possible to send 
-multiple PASS commands before registering but only the last one sent is used for verification and it 
-may not be changed once the client has been registered.
-
-If the password supplied does not match the password expected by the server, then the server SHOULD 
-send ERR_PASSWDMISMATCH (464) and MAY then close the connection with ERROR. Servers MUST send at least 
-one of these two messages.
-
-Servers may also consider requiring SASL authentication upon connection as an alternative to this, when 
-more information or an alternate form of identity verification is desired.
-
-Numeric replies:
-
-	ERR_NEEDMOREPARAMS (461)
-	ERR_ALREADYREGISTERED (462)
-	ERR_PASSWDMISMATCH (464)
-
-Command Example:
-	PASS secretpasswordhere
-
-*/
-
-void	Server::numericRPL(Client& c, const char* format,  ...)
-{
-	std::string result = "ircserv";
-	std::va_list args;
-	va_start(args, format);
-	for (const char* p = format; *p != '\0'; ++p)
-	{
-		if (*p == '%')
-		{
-			p++;
-			if (*p == 's')
-				result += (std::string)va_arg(args, const char*);
+// void	Server::numericRPL(Client& c, const char* format,  ...) {
+// 	std::string result = "ircserv";
+// 	std::va_list args;
+// 	va_start(args, format);
+// 	for (const char* p = format; *p != '\0'; ++p)
+// 	{
+// 		if (*p == '%')
+// 		{
+// 			p++;
+// 			if (*p == 's')
+// 				result += (std::string)va_arg(args, const char*);
 			
-		} else if (*p)
-		{
-			result += *p;
+// 		} else if (*p)
+// 		{
+// 			result += *p;
+// 		}
+// 	}
+// 	va_end(args);
+// 	c.getOutBuf().append(result.c_str(), result.length());
+// }
+
+// Client* Server::clientLookUp(const std::string& nickName) {
+// 	std::vector<Client>::iterator it;
+// 	for (it = _clients.begin(); it != _clients.end(); ++it) {
+// 		if (it->getNickName() == nickName) {
+// 			return &(*it);
+// 		}
+// 	}
+// 	return nullptr;
+// }
+
+Client* Server::clientLookUp(const std::string& nickName) {
+
+    for (auto& clientPtr : _clients) {
+        if (clientPtr->getNickName() == nickName) {
+            return clientPtr.get(); // Return the raw pointer
+        }
+    }
+    return nullptr;
+}
+
+bool Server::isValidNickName(const std::string& nickName) {
+	if (nickName.empty()) {
+		return false;
+	}
+	if (std::isdigit(nickName[0])) {
+		return false;
+	}
+	if (nickName[0] == '#' || nickName[0] == '&' || nickName[0] == ':') {
+		return false;
+	}
+	for (size_t i = 0; i < nickName.length(); ++i) {
+		char c = nickName[i];
+		if (std::isspace(c)) {
+			return false;
+		}
+		if (!std::isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' && 
+			c != '\\' && c != '|' && c != '-' && c != '_' && c != '^') {
+			return false;
 		}
 	}
-	va_end(args);
-	c.getOutBuf().append(result.c_str(), result.length());
+	return true;
+}
+
+// void Server::serverBroadcast(const std::string& msg) {
+// 	std::vector<Client>::iterator it;
+// 	for (it = _clients.begin(); it != _clients.end(); ++it)
+// 		if ((*it).getRegiStatus())
+// 			it->getOutBuf().append(msg.c_str(), msg.length());
+// }
+
+void Server::serverBroadcast(const std::string& msg) {
+    for (auto& clientPtr : _clients) {
+        if (clientPtr && clientPtr->getRegiStatus()) {
+            clientPtr->getOutBuf().append(msg.c_str(), msg.length());
+        }
+    }
+}
+
+void Server::registerClient(Client& c) {
+	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
+	if (!c.getNickNameStatus() || !c.getUserNameStatus())
+		return ;//Asuming ther's time out for registration
+	else {
+		if (!c.getPasswordStatus()) {
+			rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
+			outBuf.append(rpl.c_str(), rpl.length());
+			std::cout << "Dropping client (fd " << c.getFd() << "): password mismatch" << std::endl; //client doesn't get to print the meassage before onnection is closed.
+			close(c.getFd()); //check if drop client can be used here intead of repeating these lines
+		}
+		else {
+			c.setRegiStatus(true);
+			rpl = numericRPL(RPL_WELCOME, nickName, NETWORK_NAME, nickName, c.getUserName(), c.getHostName()) //change macros later
+			+ numericRPL(RPL_YOURHOST, nickName, SERVER_NAME, VERSION) //change macros later 
+			+ numericRPL(RPL_CREATED, nickName) //add datetime
+			+ numericRPL(RPL_MYINFO, nickName) //add other params
+			+ numericRPL(RPL_ISUPPORT, nickName); //add other params
+		}
+		outBuf.append(rpl.c_str(), rpl.length());
+	}	
 }
 
 void Server::pass(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
 	if (cmd.getTokens().size() < 2)
-		return (numericRPL(c, ERR_NEEDMOREPARAMS, c.getNickName().c_str(), cmd.getTokens().at(0).c_str()));
+		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
 	else if (c.getPasswordStatus() && c.getRegiStatus())
-		return (numericRPL(c, ERR_ALREADYREGISTERED, c.getNickName().c_str()));
+		rpl = numericRPL(ERR_ALREADYREGISTERED, nickName);
 	else if (c.getPasswordStatus() && cmd.getTokens().at(1) != password)
-		return (c.setPasswordStatus(false));
-	if (cmd.getTokens().at(1) == password)
-		return (c.setPasswordStatus(true));
+		c.setPasswordStatus(false);
+	else if (cmd.getTokens().at(1) == password)
+		c.setPasswordStatus(true);
+	outBuf.append(rpl.c_str(), rpl.length());
+}
+
+void Server::nick(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
+	if (cmd.getTokens().size() < 2)
+		rpl = numericRPL(ERR_NONICKNAMEGIVEN, nickName);
+	else {
+		std::string newNickName = cmd.getTokens().at(1);
+		if (!this -> isValidNickName(newNickName))
+			rpl = numericRPL(ERR_ERRONEUSNICKNAME, nickName, newNickName);
+		else if (this -> clientLookUp(newNickName.substr(0,9)))
+			rpl = numericRPL(ERR_NICKNAMEINUSE, nickName, newNickName);
+		else {
+			newNickName = newNickName.substr(0,9);
+			c.setNickName(newNickName);
+			c.setNickNameStatus(true);
+			std::cout << "NickNameStatus: " << c.getNickNameStatus() << std::endl;
+			std::cout << "UserNameStatus: " << c.getUserNameStatus() << std::endl;
+			if (!c.getRegiStatus())
+					this -> registerClient(c);
+			else {
+				std::string prefix = ":" + nickName + "!" + c.getUserName() + "@" + c.getHostName();
+				rpl = prefix + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
+				serverBroadcast(rpl);
+			}
+			return;
+		}
+	}
+	outBuf.append(rpl.c_str(), rpl.length());
+}
+
+void Server::user(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
+	if (cmd.getTokens().size() < 5 || cmd.getTokens().at(0).empty())
+		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
+	else if (c.getRegiStatus())
+		rpl = numericRPL(ERR_ALREADYREGISTERED, nickName);
+	else {
+		std::string userName = cmd.getTokens().at(1);
+		for (char c : userName) {
+			if (c == '@')//ignores command silently. decide the behaviour.
+				return;
+		}
+		userName = "~" + userName.substr(0,USERLEN);//check if ~ should be included in USERLEN
+		c.setUserName(userName);
+		c.setUserNameStatus(true);
+		c.setRealName(cmd.getTokens().at(4));
+		this -> registerClient(c);
+		return;
+	}
+	outBuf.append(rpl.c_str(), rpl.length());
+}
+
+void Server::ping(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
+	if (cmd.getTokens().size() < 2)
+		rpl = numericRPL(ERR_NOORIGIN, nickName, cmd.getTokens().at(0));
+	else
+		rpl = ":" SERVER_NAME " PONG "  SERVER_NAME  " :" +  cmd.getTokens().at(1) + "\r\n";
+	outBuf.append(rpl.c_str(), rpl.length());
+}
+
+void Server::oper(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
+	if (cmd.getTokens().size() < 3)
+		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
+	if (cmd.getTokens().at(1) != OPER_NAME || cmd.getTokens().at(2) != OPER_PASS)
+		rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
+		
 }
