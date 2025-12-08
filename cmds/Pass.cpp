@@ -26,14 +26,24 @@
 // 	c.getOutBuf().append(result.c_str(), result.length());
 // }
 
+// Client* Server::clientLookUp(const std::string& nickName) {
+// 	std::vector<Client>::iterator it;
+// 	for (it = _clients.begin(); it != _clients.end(); ++it) {
+// 		if (it->getNickName() == nickName) {
+// 			return &(*it);
+// 		}
+// 	}
+// 	return nullptr;
+// }
+
 Client* Server::clientLookUp(const std::string& nickName) {
-	std::vector<std::unique_ptr<Client>>::iterator it;
-	for (it = _clients.begin(); it != _clients.end(); ++it) {
-		if ((*it)->getNickName() == nickName) {
-			return it;
-		}
-	}
-	return nullptr;
+
+    for (auto& clientPtr : _clients) {
+        if (clientPtr->getNickName() == nickName) {
+            return clientPtr.get(); // Return the raw pointer
+        }
+    }
+    return nullptr;
 }
 
 bool Server::isValidNickName(const std::string& nickName) {
@@ -59,11 +69,19 @@ bool Server::isValidNickName(const std::string& nickName) {
 	return true;
 }
 
+// void Server::serverBroadcast(const std::string& msg) {
+// 	std::vector<Client>::iterator it;
+// 	for (it = _clients.begin(); it != _clients.end(); ++it)
+// 		if ((*it).getRegiStatus())
+// 			it->getOutBuf().append(msg.c_str(), msg.length());
+// }
+
 void Server::serverBroadcast(const std::string& msg) {
-	std::vector<Client>::iterator it;
-	for (it = _clients.begin(); it != _clients.end(); ++it)
-		if ((*it).getRegiStatus())
-			it->getOutBuf().append(msg.c_str(), msg.length());
+    for (auto& clientPtr : _clients) {
+        if (clientPtr && clientPtr->getRegiStatus()) {
+            clientPtr->getOutBuf().append(msg.c_str(), msg.length());
+        }
+    }
 }
 
 void Server::registerClient(Client& c) {
@@ -71,7 +89,7 @@ void Server::registerClient(Client& c) {
 	Buffer& outBuf = c.getOutBuf();
 	std::string rpl;
 	if (!c.getNickNameStatus() || !c.getUserNameStatus())
-		return ;//Asuming ther's  time out for registration
+		return ;//Asuming ther's time out for registration
 	else {
 		if (!c.getPasswordStatus()) {
 			rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
@@ -173,5 +191,12 @@ void Server::ping(Client& c, Command& cmd) {
 }
 
 void Server::oper(Client& c, Command& cmd) {
-	
+	const std::string nickName = c.getNickName();
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
+	if (cmd.getTokens().size() < 3)
+		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
+	if (cmd.getTokens().at(1) != OPER_NAME || cmd.getTokens().at(2) != OPER_PASS)
+		rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
+		
 }
