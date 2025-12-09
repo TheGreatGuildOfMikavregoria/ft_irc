@@ -140,7 +140,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_ENDOFBANLIST		" 368 %s <channel> :End of channel ban list"
 #define RPL_WHOISHOST			" 378 %s <nick> :is connecting from *@localhost 127.0.0.1"
 #define RPL_WHOISMODES			" 379 %s <nick> :is using modes +ailosw"
-#define RPL_YOUREOPER			" 381 %s :You are now an IRC operator"
+#define RPL_YOUREOPER			" 381 %s :You are now an IRC operator" //in_use
 #define ERR_NOSUCHNICK			" 401 %s <nickname> :No such nick/channel"
 #define ERR_NOSUCHSERVER		" 402 %s <server name> :No such server" //PING:Deprecated Numeric Reply
 #define ERR_NOSUCHCHANNEL		" 403 %s <channel> :No such channel"
@@ -169,7 +169,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_BADCHANMASK			" 476 %s <channel> :Bad Channel Mask"
 #define ERR_NOPRIVILEGES		" 481 %s :Permission Denied- You're not an IRC operator"
 #define ERR_CHANOPRIVSNEEDED	" 482 %s <channel> :You're not channel operator"
-#define ERR_NOOPERHOST			" 491 %s :No O-lines for your host"
+#define ERR_NOOPERHOST			" 491 %s :No O-lines for your host" //in_use
 #define ERR_UMODEUNKNOWNFLAG	" 501 %s :Unknown MODE flag"
 #define ERR_USERSDONTMATCH		" 502 %s :Cant change mode for other users"
 #define RPL_WHOISSECURE			" 671 %s <nick> :is using a secure connection"

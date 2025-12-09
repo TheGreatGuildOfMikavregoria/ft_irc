@@ -67,7 +67,8 @@ private:
 		{"NICK", &Server::nick},
 		{"USER", &Server::user},
 		{"PING", &Server::ping},
-		{"OPER", &Server::oper}
+		{"OPER", &Server::oper},
+		{"QUIT", &Server::quit}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
@@ -106,6 +107,7 @@ public:
 	void	user(Client& c, Command& cmd);
 	void	ping(Client& c, Command& cmd);
 	void	oper(Client& c, Command& cmd);
+	void	quit(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);

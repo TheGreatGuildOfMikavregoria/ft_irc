@@ -40,7 +40,7 @@ Client* Server::clientLookUp(const std::string& nickName) {
 
 	for (auto& clientPtr : _clients) {
 		if (clientPtr->getNickName() == nickName) {
-			return clientPtr.get(); // Return the raw pointer
+			return clientPtr.get();
 		}
 	}
 	return nullptr;
@@ -154,8 +154,7 @@ void Server::nick(Client& c, Command& cmd) {
 			if (!c.getRegiStatus())
 					this -> registerClient(c);
 			else {
-				std::string prefix = ":" + nickName + "!" + c.getUserName() + "@" + c.getHostName();
-				rpl = prefix + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
+				rpl = nickName + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
 				serverBroadcast(rpl);
 			}
 			return;
@@ -213,6 +212,8 @@ void Server::oper(Client& c, Command& cmd) {
 		rpl = numericRPL(RPL_YOUREOPER, nickName);
 		outBuf.append(rpl.c_str(), rpl.length());
 		if (c.getUserMode().find('o') == std::string::npos) {
+			std::string strMode = c.getUserMode() + "o";
+			c.setUserMode(strMode);
 			rpl = ":" + nickName + " MODE " + nickName + " +o\r\n";
 			serverBroadcast(rpl);
 		}
@@ -220,3 +221,16 @@ void Server::oper(Client& c, Command& cmd) {
 	}
 	outBuf.append(rpl.c_str(), rpl.length());
 }
+
+void Server::quit(Client& c, Command& cmd) {
+	(void) c;
+	(void) cmd;
+}
+
+// void Server::dropClient(Client& c, const std::string& reason)
+// {
+// 	if (c.getFd() >= 0)
+// 		close(c.getFd());
+
+// 	_clients.erase(_clients.begin() + index);
+// }
