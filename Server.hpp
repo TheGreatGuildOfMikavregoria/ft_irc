@@ -77,7 +77,7 @@ private:
 	std::string _operPass;
 	static bool _signal;
 	std::vector<std::unique_ptr<Client>> _clients;
-	//std::vector<Channel> _channels;
+	std::vector<Channel> _channels;
 	int _listenFd;
 	int _spareFd;
 	std::string _timeCreated;

@@ -106,12 +106,12 @@ bool Channel::getProtectedTopicMode() const
 	return _protectedTopicMode;
 }
 
-std::vector<Client *> &Channel::getChannelUsers()
+std::set<Client *> &Channel::getChannelUsers()
 {
 	return _channelUsers;
 }
 
-std::vector<std::string> &Channel::getInviteList()
+std::set<std::string> &Channel::getInviteList()
 {
 	return _inviteList;
 }

@@ -68,8 +68,8 @@ class Channel
 		bool getClientLimitMode() const ;
 		bool getKeyMode() const;
 		bool getProtectedTopicMode() const;
-		std::vector<Client *> &getChannelUsers();
-		std::vector<std::string> &getInviteList();
+		std::set<Client *> &getChannelUsers();
+		std::set<std::string> &getInviteList();
 		
 		int join(Client &);
 		int join(Client &, std::string &key);
@@ -79,13 +79,7 @@ class Channel
 		int invite(Client &source, std::string &nick);
 		//int topic(Client &source, )
 		void broadcast(std::string &);
-//		int 
-
-		
 		static bool validateName(std::string &name);
-//		addUser()
-		
-		
 };
 
 #endif
