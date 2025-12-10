@@ -223,14 +223,44 @@ void Server::oper(Client& c, Command& cmd) {
 }
 
 void Server::quit(Client& c, Command& cmd) {
-	(void) c;
-	(void) cmd;
+	const std::string nickName = c.getNickName();
+	const std::string reason = cmd.getTokens().at(1);
+	Buffer& outBuf = c.getOutBuf();
+	std::string rpl;
+	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
+	this -> error(c,rpl);
+	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
+	
+	std::set<Channel*>::iterator it;
+
+	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end(); ++it) {
+    	Channel* chan = *it;
+		chan->chanBroadcast(c, rpl);
+		//remove the user from channel here to avoid the dangling pointer
+
+	}
+	//ad the disconnect flag to the client
+
 }
+
+void Server::error(Client& c, const std::string& msg) {
+	std::string err_msg;
+	Buffer& outBuf = c.getOutBuf();
+	err_msg = "ERROR :" + msg + "\r\n";
+	outBuf.append(err_msg.c_str(), err_msg.length());
+}
+
+
 
 // void Server::dropClient(Client& c, const std::string& reason)
 // {
-// 	if (c.getFd() >= 0)
+// 	if (c.getFd() >= 0) //is this check needed? it is contructed with valid fd right?
 // 		close(c.getFd());
 
-// 	_clients.erase(_clients.begin() + index);
+// 	_clients.erase( 
+// 		std::remove_if(_clients.begin(), _clients.end(),
+// 		[&](const std::unique_ptr<Client>& p){
+//             return p.get() == &c;
+//         }),
+//     	_clients.end());
 // }

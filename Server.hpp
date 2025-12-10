@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm> //for remove_if
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -108,10 +109,14 @@ public:
 	void	ping(Client& c, Command& cmd);
 	void	oper(Client& c, Command& cmd);
 	void	quit(Client& c, Command& cmd);
+	void	error(Client& c, const std::string& msg);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);
 	void	registerClient(Client& c);
 	void	serverBroadcast(const std::string& msg);
 	bool	isValidOperHost(const std::string &clientIP, int clientFD);
+	// void	dropClient(Client& c, const std::string& reason);
+
+
 };
