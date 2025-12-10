@@ -42,13 +42,12 @@ class Channel
 		std::set<std::string> _inviteList;
 		std::set<std::string> _operators;
 				
-		bool _inviteOnlyMode;
-		bool _clientLimitMode;
-		bool _keyMode;
-		bool _protectedTopicMode;
+		bool _inviteOnlyMode = false;
+		bool _keyMode = false;
+		bool _protectedTopicMode = false;
+		bool _clientLimitMode = false;
+		size_t _clientLimit = false;
 
-		void _userAdd(Client *);
-		void _userRemove(Client &);
 		void _chanOperatorAdd(Client &);
 		void _chanOperatorRemove(Client &);
 		void _inviteListAdd(std::string &);
@@ -56,7 +55,7 @@ class Channel
 
 	public:
 		Channel(const std::string &name);
-		~Channel();
+		~Channel() = default;
 		void setKey(std::string &);
 		void setTopic(std::string &);
 		const std::string &getKey() const;
@@ -78,7 +77,10 @@ class Channel
 		int kick(Client &source, std::string &nick);
 		int invite(Client &source, std::string &nick);
 		//int topic(Client &source, )
-		void broadcast(std::string &);
+		void chanBroadcast(std::string &);
+		void chanBroadcast(Client &, std::string &);
+		void userAdd(Client *);
+		void userRemove(Client &);
 		static bool validateName(std::string &name);
 };
 
