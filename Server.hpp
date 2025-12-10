@@ -22,6 +22,7 @@
 #include "Buffer.hpp"
 #include "Command.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 #include "NumericRPL.hpp"
 #include <unordered_map>
 #include <memory>
@@ -68,7 +69,8 @@ private:
 		{"NICK", &Server::nick},
 		{"USER", &Server::user},
 		{"PING", &Server::ping},
-		{"OPER", &Server::oper}
+		{"OPER", &Server::oper},
+		{"JOIN", &Server::join}
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
@@ -109,6 +111,7 @@ public:
 	void	user(Client& c, Command& cmd);
 	void	ping(Client& c, Command& cmd);
 	void	oper(Client& c, Command& cmd);
+	void	join(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);

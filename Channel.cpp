@@ -116,7 +116,8 @@ std::set<std::string> &Channel::getInviteList()
 
 int Channel::join(Client &client)
 {
-	(void)client;
+	std::string rpl;
+	auto outBuf = client.getOutBuf();
 	//TODO: think through repeated join
 	if (_keyMode)
 		return 475;
@@ -130,13 +131,18 @@ int Channel::join(Client &client)
 	std::string prefix = ":" + client.getNickName();
 	std::string message = prefix + " JOIN " + _name + "\r\n";
 	this->chanBroadcast(message);
-	return 0;
+//TODO: errcode for internal error?
+	if (_topic.size())
+		rpl = numericRPL(RPL_TOPIC, client.getNickName(), _name, _topic);
+	else
+		rpl = numericRPL(RPL_NOTOPIC, client.getNickName(), _name);
+	outBuf.append(rpl.c_str(), rpl.length());
+	names(client);
+	return 1;
 }
 
 int Channel::join(Client &client, std::string &key)
 {
-	(void)client;
-	(void)key;
 	if (_keyMode && key != _key)
 		return 475;
 	return join(client, key);
@@ -161,13 +167,22 @@ int Channel::invite(Client &source, std::string &nick)
 	(void)nick;
 	return (0);
 }
-/*
+
 int Channel::names(Client &source)
 {
+	std::string rpl;
+	auto outBuf = source.getOutBuf();
+	std::string names;
+	for (Client *client : _channelUsers)
+	{
+		names += client->getNickName() + " ";
+	}
 	// TODO: check mode??
-	numericRPL()
+	rpl = numericRPL(RPL_NAMREPLY, source.getNickName(), "=", _name, names);
+	rpl += numericRPL(RPL_ENDOFNAMES, source.getNickName(), _name);
+	outBuf.append(rpl.c_str(), rpl.length());
+	return 1;
 }
-*/
 /*
 const std::string &Channel::getTopic() const
 {

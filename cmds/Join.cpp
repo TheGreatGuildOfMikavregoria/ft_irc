@@ -20,48 +20,88 @@ std::vector<std::string> getSeparatedParams(std::string param)
 }
 
 void Server::join(Client& c, Command& cmd) {
-	if (cmd.length() == 1)
+	const std::string nickName = c.getNickName();
+	std::string rpl;
+	auto outBuf = c.getOutBuf();
+	if (!c.getRegiStatus())
+	{
+		rpl = numericRPL(ERR_NOTREGISTERED, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+	if (cmd.getTokens().size() == 1)
 	{
 		//some error
+		//ERR_NEEDMOREPARAMS (461)
+		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens()[0]);
+		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	std::vector <std::string> channels = getSeparatedParams(cmd[1]);
-	if (cmd.length() == 2)
+	if (cmd.getTokens().size() == 2 && cmd.getTokens()[1] == "0")
 	{
-		for (auto channelName : channels)
-		{
-			auto it = Utils::getChannelIteratorByChannelName( _channels, channelName);
-			if (it == _channels.end)
-			{
-				_channels.push_back(Channel(*it));
-				int status = _channels[_channels.size() - 1].join(c);
-				if (status ==2324234234)
-				{
-					//todo: rpl something
-				}
-			}
-		}
-		//handle join with channel names only
+		//TODO: PART all user joined channels
 		return ;
 	}
-	if (cmd.length() == 3)
-	{	
-		std::vector <std::string> keys = getSeparatedParams(cmd[2]);
-		
-		for (auto channelName : channels)
+	std::vector <std::string> channels = getSeparatedParams(cmd.getTokens()[1]);
+	std::vector <std::string> keys;
+	if (cmd.getTokens().size() == 3)
+		keys = getSeparatedParams(cmd.getTokens()[2]);
+
+	auto chanIterStart = channels.begin();
+	auto keyIterStart = keys.begin();
+	auto chanIterEnd = channels.end();
+	auto keyIterEnd = keys.end();
+	int status;
+	for (; chanIterStart < chanIterEnd; ++chanIterStart, ++keyIterStart)
+	{
+		auto it = Utils::getChannelIteratorByChannelName( _channels, *chanIterStart);
+		if (it == _channels.end())
 		{
-			auto it = Utils::getChannelIteratorByChannelName( _channels, channelName);
-			if (it == _channels.end)
+			//create and join
+			if (!Channel::validateName(*chanIterStart))
 			{
-				_channels.push_back(Channel(*it));
-				int status = _channels[_channels.size() - 1].join(c);
-				if (status ==2324234234)
-				{
-					//todo: rpl something
-				}
+				//ERR_BADCHANMASK (476)
+				rpl = numericRPL(ERR_BADCHANMASK, nickName, *chanIterStart);
+				outBuf.append(rpl.c_str(), rpl.length());
+				continue ;
+			}
+			// TODO: check chan limit
+			//TODO: internall error check
+			Channel newChan(*chanIterStart);
+			status = it->join(c);
+			_channels.push_back(newChan);
+			continue;
+		}
+		else
+		{
+
+			if (keyIterStart < keyIterEnd)
+				status = it->join(c, *keyIterStart);
+			else
+				status = it->join(c);
+			if (status == 475)
+			{
+				rpl = numericRPL(ERR_BADCHANNELKEY, nickName, *chanIterStart);
+				outBuf.append(rpl.c_str(), rpl.length());
+				continue;
+			}
+			else if (status == 471)
+			{
+				rpl = numericRPL(ERR_CHANNELISFULL, nickName, *chanIterStart);
+				outBuf.append(rpl.c_str(), rpl.length());
+				continue;
+			}
+			else if (status == 473)
+			{
+				rpl = numericRPL(ERR_INVITEONLYCHAN, nickName, *chanIterStart);
+				outBuf.append(rpl.c_str(), rpl.length());
+				continue;
+			}
+			else if (status == 1)
+			{
+				//SUCCESS and join handled everything
 			}
 		}
-		//handle join with channel names only
-		return ;
 	}
+	return ;
 }

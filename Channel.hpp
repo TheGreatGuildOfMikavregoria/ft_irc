@@ -76,6 +76,7 @@ class Channel
 		int part(Client &, std::string &message);
 		int kick(Client &source, std::string &nick);
 		int invite(Client &source, std::string &nick);
+		int names(Client &);
 		//int topic(Client &source, )
 		void chanBroadcast(std::string &);
 		void chanBroadcast(Client &, std::string &);

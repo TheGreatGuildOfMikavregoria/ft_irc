@@ -23,6 +23,7 @@ class Client{
 		bool		_passwordSet;
 		bool		_userModeSet;
 		std::time_t	_lastActivity;
+		std::set<Channel*> _userChannels;
 	
 	public:
 		Client(int fd);
@@ -56,4 +57,5 @@ class Client{
 		void	setUserModeStatus(bool userModeSet);
 		void	setLastActivity(std::time_t lastActivity);
 		std::time_t	getLastActivity() const;
+		std::set<Channel*>& getUserChannels();
 };

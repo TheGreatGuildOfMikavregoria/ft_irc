@@ -28,6 +28,7 @@ bool	Client::getNickNameStatus() const {return _nickNameSet;}
 bool	Client::getUserNameStatus() const {return _userNameSet;}
 bool	Client::getPasswordStatus() const {return _passwordSet;}
 bool	Client::getUserModeStatus() const {return _userModeSet;}
+std::set<Channel*>& Client::getUserChannels() {return _userChannels;}
 
 void	Client::setInBuf(Buffer in) {_in = in;}
 void	Client::setOutBuf(Buffer out) {_out = out;}
