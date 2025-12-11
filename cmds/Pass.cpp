@@ -243,24 +243,26 @@ void Server::oper(Client& c, Command& cmd) {
 	}
 	outBuf.append(rpl.c_str(), rpl.length());
 }
-
-// void Server::quit(Client& c, Command& cmd) {
-// 	const std::string nickName = c.getNickName();
-// 	const std::string reason = cmd.getTokens().at(1);
-// 	Buffer& outBuf = c.getOutBuf();
-// 	std::string rpl;
-// 	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
-// 	this -> error(c,rpl);
-// 	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
-// 	std::set<Channel*>::iterator it;
-// 	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end(); ++it) {
-//     	Channel* chan = *it;
-// 		chan->chanBroadcast(c, rpl);
-// 		//remove the user from channel here to avoid the dangling pointer
-// 	}
-// 	//ad the disconnect flag to the client
-// }
-
+/*
+void Server::quit(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+ 	const std::string reason = cmd.getTokens().at(1);
+ 	Buffer& outBuf = c.getOutBuf();
+ 	std::string rpl;
+ 	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
+ 	this -> error(c,rpl);
+ 	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
+ 	std::set<Channel*>::iterator it;
+ 	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end(); ++it) {
+	     	Channel* chan = *it;
+ 		chan->chanBroadcast(c, rpl);
+ 		//remove the user from channel here to avoid the dangling pointer
+		chan->userRemove(c);
+		(void)outBuf;
+ 	}
+ 	//ad the disconnect flag to the client
+}
+*/
 void Server::error(Client& c, const std::string& msg) {
 	std::string err_msg;
 	Buffer& outBuf = c.getOutBuf();

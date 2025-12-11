@@ -72,7 +72,7 @@ private:
 		{"USER", &Server::user},
 		{"PING", &Server::ping},
 		{"OPER", &Server::oper},
-		// {"QUIT", &Server::quit}
+		//{"QUIT", &Server::quit},
 		{"JOIN", &Server::join},
 	};
 	int status; //I believed i needed at somepoint now i dont remember
@@ -114,7 +114,7 @@ public:
 	void	user(Client& c, Command& cmd);
 	void	ping(Client& c, Command& cmd);
 	void	oper(Client& c, Command& cmd);
-	// void	quit(Client& c, Command& cmd);
+//	void	quit(Client& c, Command& cmd);
 	void	error(Client& c, const std::string& msg);
 	void	join(Client& c, Command& cmd);
 

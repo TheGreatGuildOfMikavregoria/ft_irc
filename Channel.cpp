@@ -15,8 +15,9 @@ void Channel::userAdd(Client *user)
 
 void Channel::userRemove(Client &user)
 {
-	auto userChannels = user.getUserChannels();
-	auto usChanIt = userChannels.find(this);
+	std::set<Channel *>	&userChannels = user.getUserChannels();
+	auto			usChanIt = userChannels.find(this);
+
 	if (usChanIt != userChannels.end())
 		userChannels.erase(usChanIt);
 	_channelUsers.erase(&user);
