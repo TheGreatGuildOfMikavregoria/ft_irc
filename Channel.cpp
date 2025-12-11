@@ -206,11 +206,17 @@ const std::string &Channel::getTopic() const
 */
 bool Channel::validateName(std::string &name)
 {
-	if (!name.length())
+	if (name.length() < 2 || name.length() > 50)
 		return (false);
-	if (name[0] != '#' && name[0] != '&')
+	if (name[0] != '#' && name[0] != '&' && name[0] != '+' && name[0] != '!')
 		return (false);
-	return (name.length() >= 2);
+	for (size_t i = 1; i < name.length(); ++i)
+	{
+		unsigned char c = name[i];
+		if (c == ' ' || c == ',' || c == '\a')
+			return false;
+	}
+	return true;
 }
 
 void Channel::chanBroadcast(std::string &message)
