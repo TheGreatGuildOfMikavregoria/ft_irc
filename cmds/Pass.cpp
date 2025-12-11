@@ -149,8 +149,6 @@ void Server::nick(Client& c, Command& cmd) {
 			newNickName = newNickName.substr(0,9);
 			c.setNickName(newNickName);
 			c.setNickNameStatus(true);
-			std::cout << "NickNameStatus: " << c.getNickNameStatus() << std::endl;
-			std::cout << "UserNameStatus: " << c.getUserNameStatus() << std::endl;
 			if (!c.getRegiStatus())
 					this -> registerClient(c);
 			else {
