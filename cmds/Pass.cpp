@@ -243,7 +243,7 @@ void Server::oper(Client& c, Command& cmd) {
 	}
 	outBuf.append(rpl.c_str(), rpl.length());
 }
-/*
+
 void Server::quit(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
  	const std::string reason = cmd.getTokens().at(1);
@@ -262,7 +262,7 @@ void Server::quit(Client& c, Command& cmd) {
  	}
  	//ad the disconnect flag to the client
 }
-*/
+
 void Server::error(Client& c, const std::string& msg) {
 	std::string err_msg;
 	Buffer& outBuf = c.getOutBuf();

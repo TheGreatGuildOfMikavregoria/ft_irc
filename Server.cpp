@@ -38,6 +38,12 @@ void Server::dropClient(std::size_t index, const std::string &reason)
 		return;
 
 	Client &c = *_clients[index];
+	auto channels = c.getUserChannels();
+	for (Channel* channel : channels)
+	{
+		if (channel)
+			channel->userRemove(c);
+	}
 	if (!reason.empty())
 		std::cout << "Dropping client (fd " << c.getFd() << "): " << reason << std::endl;
 
@@ -386,5 +392,4 @@ void Server::start_server()
 		std::cout << "Server error: " << e.what() << std::endl;
 	}
 }
-
 

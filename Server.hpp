@@ -114,7 +114,7 @@ public:
 	void	user(Client& c, Command& cmd);
 	void	ping(Client& c, Command& cmd);
 	void	oper(Client& c, Command& cmd);
-//	void	quit(Client& c, Command& cmd);
+	void	quit(Client& c, Command& cmd);
 	void	error(Client& c, const std::string& msg);
 	void	join(Client& c, Command& cmd);
 

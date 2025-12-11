@@ -16,6 +16,7 @@ std::vector<std::string> getSeparatedParams(std::string param)
 		param = param.substr(index + 1);
 		index = param.find(',');
 	}
+	params.push_back(param.substr(0, index));
 	return params;
 }
 
