@@ -45,7 +45,7 @@ class Client{
 		const std::string&	getNickName() const;
 		const std::string&	getRealName() const;
 		const std::string&	getHostName() const;
-		const std::string&	getUserMode() const;
+		const std::string	getUserMode() const; 
 		bool	getRegiStatus() const;
 		bool	getNickNameStatus() const;
 		bool	getUserNameStatus() const;

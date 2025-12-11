@@ -48,7 +48,7 @@ std::time_t	Client::getLastActivity() const {return _lastActivity;}
 void	Client::addMode(int mask) {_userMode |= mask;}
 void	Client::removeMode(int mask) {_userMode &= ~mask;}
 bool	Client::hasMode(int mask) const {return (_userMode & mask);}
-const 	std::string&	Client::getUserMode() const {
+const 	std::string	Client::getUserMode() const {
 	std::string s = "+";//change apropriately
 	if (_userMode & ModeInvi) s += 'i';
 	if (_userMode & ModeOper) s += 'o';
