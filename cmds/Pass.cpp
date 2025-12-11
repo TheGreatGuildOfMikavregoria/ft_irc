@@ -198,6 +198,30 @@ void Server::ping(Client& c, Command& cmd) {
 	outBuf.append(rpl.c_str(), rpl.length());
 }
 
+// void Server::oper(Client& c, Command& cmd) {
+// 	const std::string nickName = c.getNickName();
+// 	Buffer& outBuf = c.getOutBuf();
+// 	std::string rpl;
+// 	if (cmd.getTokens().size() < 3)
+// 		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
+// 	else if (cmd.getTokens().at(1) != OPER_NAME || cmd.getTokens().at(2) != OPER_PASS)
+// 		rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
+// 	else if (!this->isValidOperHost(c.getHostName(), c.getFd()))
+// 		rpl = numericRPL(ERR_NOOPERHOST, nickName);
+// 	else {
+// 		rpl = numericRPL(RPL_YOUREOPER, nickName);
+// 		outBuf.append(rpl.c_str(), rpl.length());
+// 		if (c.getUserMode().find('o') == std::string::npos) {
+// 			std::string strMode = c.getUserMode() + "o";
+// 			c.setUserMode(strMode);
+// 			rpl = ":" + nickName + " MODE " + nickName + " +o\r\n";
+// 			serverBroadcast(rpl);
+// 		}
+// 		return;
+// 	}
+// 	outBuf.append(rpl.c_str(), rpl.length());
+// }
+
 void Server::oper(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
 	Buffer& outBuf = c.getOutBuf();
@@ -211,9 +235,8 @@ void Server::oper(Client& c, Command& cmd) {
 	else {
 		rpl = numericRPL(RPL_YOUREOPER, nickName);
 		outBuf.append(rpl.c_str(), rpl.length());
-		if (c.getUserMode().find('o') == std::string::npos) {
-			std::string strMode = c.getUserMode() + "o";
-			c.setUserMode(strMode);
+		if (!c.hasMode(Client::ModeOper)) {
+			c.addMode(Client::ModeOper);
 			rpl = ":" + nickName + " MODE " + nickName + " +o\r\n";
 			serverBroadcast(rpl);
 		}
@@ -230,9 +253,7 @@ void Server::quit(Client& c, Command& cmd) {
 	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
 	this -> error(c,rpl);
 	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
-	
 	std::set<Channel*>::iterator it;
-
 	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end(); ++it) {
     	Channel* chan = *it;
 		chan->chanBroadcast(c, rpl);

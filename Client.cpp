@@ -5,7 +5,7 @@ Client::Client(int fd) : _fd(fd) {
 	_nickName = "*";
 	_realName = "*";
 	_hostName = "*";
-	_userMode = "";
+	_userMode = ModeNone;
 	_regiStatus = false;
 	_nickNameSet = false;
 	_userNameSet = false;
@@ -23,7 +23,7 @@ const 	std::string&	Client::getUserName() const {return _userName;}
 const 	std::string&	Client::getNickName() const {return _nickName;}
 const 	std::string&	Client::getRealName() const {return _realName;}
 const 	std::string&	Client::getHostName() const {return _hostName;}
-const 	std::string&	Client::getUserMode() const {return _userMode;}
+
 bool	Client::getRegiStatus() const {return _regiStatus;}
 bool	Client::getNickNameStatus() const {return _nickNameSet;}
 bool	Client::getUserNameStatus() const {return _userNameSet;}
@@ -37,7 +37,6 @@ void	Client::setUserName(std::string& userName) {_userName = userName;}
 void	Client::setNickName(std::string& nickName) {_nickName = nickName;}
 void	Client::setRealName(std::string& realName) {_realName = realName;}
 void	Client::setHostName(std::string hostName) {_hostName = hostName;}
-void	Client::setUserMode(std::string& userMode) {_userMode = userMode;}
 void	Client::setRegiStatus(bool regiStatus) {_regiStatus = regiStatus;}
 void	Client::setNickNameStatus(bool nickNameSet) {_nickNameSet = nickNameSet;}
 void	Client::setUserNameStatus(bool userNameSet) {_userNameSet = userNameSet;}
@@ -45,3 +44,15 @@ void	Client::setPasswordStatus(bool passwordSet) {_passwordSet = passwordSet;}
 void	Client::setUserModeStatus(bool userModeSet) {_userModeSet = userModeSet;}
 void	Client::setLastActivity(std::time_t lastActivity) {_lastActivity = lastActivity;}
 std::time_t	Client::getLastActivity() const {return _lastActivity;}
+
+void	Client::addMode(int mask) {_userMode |= mask;}
+void	Client::removeMode(int mask) {_userMode &= ~mask;}
+bool	Client::hasMode(int mask) const {return (_userMode & mask);}
+const 	std::string&	Client::getUserMode() const {
+	std::string s = "+";//change apropriately
+	if (_userMode & ModeInvi) s += 'i';
+	if (_userMode & ModeOper) s += 'o';
+	if (_userMode & ModeWallop) s += 'w';
+	if (_userMode & ModeNotice) s += 'n';
+	return s;
+}

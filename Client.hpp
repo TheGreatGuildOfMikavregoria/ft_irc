@@ -16,17 +16,25 @@ class Client{
 		std::string	_nickName;
 		std::string	_realName;
 		std::string	_hostName;
-		std::string	_userMode;
+		int			_userMode;
 		bool		_regiStatus;
 		bool		_nickNameSet;
 		bool		_userNameSet;
 		bool		_passwordSet;
-		bool		_userModeSet;
+		bool		_userModeSet;//is this needed
 		std::time_t	_lastActivity;
 		std::set<Channel*> _userChannels;
 		
 	
 	public:
+	    enum mode {
+        ModeNone	= 0,
+        ModeInvi	= 1 << 0,
+        ModeOper	= 1 << 1,
+        ModeWallop	= 1 << 2, //remove later
+        ModeNotice	= 1 << 3  //remove later
+    	};
+
 		Client(int fd);
 		~Client();
 
@@ -43,7 +51,7 @@ class Client{
 		bool	getUserNameStatus() const;
 		bool	getPasswordStatus() const;
 		bool	getUserModeStatus() const;
-		std::time_t	getLastActivity() const;
+		std::time_t			getLastActivity() const;
 		std::set<Channel*>& getUserChannels();
 		void	setInBuf(Buffer in);
 		void	setOutBuf(Buffer out);
@@ -51,12 +59,16 @@ class Client{
 		void	setNickName(std::string& nickName);
 		void	setRealName(std::string& realName);
 		void	setHostName(std::string hostName);
-		void	setUserMode(std::string& userMode);
+
 		void	setRegiStatus(bool regiStatus);
 		void	setNickNameStatus(bool nickNameSet);
 		void	setUserNameStatus(bool userNameSet);
 		void	setPasswordStatus(bool passwordSet);
-		void	setUserModeStatus(bool userModeSet);
+		void	setUserModeStatus(bool userModeSet);//is this needed
 		void	setLastActivity(std::time_t lastActivity);
+
+		bool	hasMode(int mode) const;
+		void	addMode(int mode);
+		void	removeMode(int mode);
 
 };
