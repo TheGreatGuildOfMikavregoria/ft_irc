@@ -70,8 +70,8 @@ class Channel
 		std::set<Client *> &getChannelUsers();
 		std::set<std::string> &getInviteList();
 		
-		int join(Client &);
-		int join(Client &, std::string &key);
+		void join(Client &, bool);
+		void join(Client &, std::string &key);
 		int part(Client &);
 		int part(Client &, std::string &message);
 		int kick(Client &source, std::string &nick);

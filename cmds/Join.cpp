@@ -52,7 +52,6 @@ void Server::join(Client& c, Command& cmd) {
 	auto keyIterStart = keys.begin();
 	auto chanIterEnd = channels.end();
 	auto keyIterEnd = keys.end();
-	int status;
 	for (; chanIterStart != chanIterEnd; ++chanIterStart, ++keyIterStart)
 	{
 		auto it = Utils::getChannelIteratorByChannelName( _channels, *chanIterStart);
@@ -71,40 +70,16 @@ void Server::join(Client& c, Command& cmd) {
 			Channel newChan(*chanIterStart);
 			_channels.push_back(newChan);
 			it = Utils::getChannelIteratorByChannelName(_channels, *chanIterStart);
-			status = it->join(c);
+			it->join(c, false);
 			continue;
 		}
 		else
 		{
 
 			if (keyIterStart < keyIterEnd)
-				status = it->join(c, *keyIterStart);
+				it->join(c, *keyIterStart);
 			else
-				status = it->join(c);
-			// TODO: move to chan join
-			if (status == 475)
-			{
-				rpl = numericRPL(ERR_BADCHANNELKEY, nickName, *chanIterStart);
-				outBuf.append(rpl.c_str(), rpl.length());
-				continue;
-			}
-			else if (status == 471)
-			{
-				rpl = numericRPL(ERR_CHANNELISFULL, nickName, *chanIterStart);
-				outBuf.append(rpl.c_str(), rpl.length());
-				continue;
-			}
-			else if (status == 473)
-			{
-				rpl = numericRPL(ERR_INVITEONLYCHAN, nickName, *chanIterStart);
-				outBuf.append(rpl.c_str(), rpl.length());
-				continue;
-			}
-			// TODO: check chan limit
-			else if (status == 1)
-			{
-				//SUCCESS and join handled everything
-			}
+				it->join(c, false);
 		}
 	}
 	return ;
