@@ -67,6 +67,7 @@ void Server::sendToClient(int fd,const  std::string &msg)
 
 bool Server::serviceClientRead(Client &c)
 {
+
 	char buffer[4096];
 	ssize_t received = recv(c.getFd(), buffer, sizeof(buffer), 0);
 
@@ -98,6 +99,12 @@ bool Server::serviceClientWrite(Client &c)
 		return false;
 
 	c.getOutBuf().discard(static_cast<std::size_t>(sent));
+	//disconnects the client after clearing the outbuf is discoonect flag is set
+	if (c.getDisconnectFlag() && c.getOutBuf().empty()){
+		return false;
+		//this -> dropClient(c);
+	}
+
 	return true;
 }
 

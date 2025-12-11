@@ -72,7 +72,7 @@ private:
 		{"USER", &Server::user},
 		{"PING", &Server::ping},
 		{"OPER", &Server::oper},
-		//{"QUIT", &Server::quit},
+		{"QUIT", &Server::quit},
 		{"JOIN", &Server::join},
 	};
 	int status; //I believed i needed at somepoint now i dont remember
@@ -123,7 +123,7 @@ public:
 	void	registerClient(Client& c);
 	void	serverBroadcast(const std::string& msg);
 	bool	isValidOperHost(const std::string &clientIP, int clientFD);
-	// void	dropClient(Client& c, const std::string& reason);
+	void	dropClient(Client& c);
 
 
 };

@@ -211,7 +211,7 @@ void Channel::chanBroadcast(Client &client, std::string &message)
 {
 	for (Client *userPtr : _channelUsers)
 	{
-		if (!(userPtr == &client))
+		if (userPtr != &client)
 			userPtr->getOutBuf().append(message.c_str(), message.length());
 	}
 }
