@@ -22,7 +22,7 @@ std::vector<std::string> getSeparatedParams(std::string param)
 void Server::join(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
 	std::string rpl;
-	auto outBuf = c.getOutBuf();
+	Buffer &outBuf = c.getOutBuf();
 	if (!c.getRegiStatus())
 	{
 		rpl = numericRPL(ERR_NOTREGISTERED, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
