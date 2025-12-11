@@ -28,6 +28,7 @@
 #include <memory>
 #include <csignal>
 #include <ctime>
+#include <list>
 #define MAX_CLIENTS 512
 #define CLIENT_TIMEOUT 600
 #define OPER_NAME   "ircAdmin"
@@ -79,7 +80,7 @@ private:
 	std::string _operPass;
 	static bool _signal;
 	std::vector<std::unique_ptr<Client>> _clients;
-	std::vector<Channel> _channels;
+	std::list<Channel> _channels;
 	int _listenFd;
 	int _spareFd;
 	std::string _timeCreated;

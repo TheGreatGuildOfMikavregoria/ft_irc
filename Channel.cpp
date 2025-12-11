@@ -117,7 +117,7 @@ std::set<std::string> &Channel::getInviteList()
 int Channel::join(Client &client)
 {
 	std::string rpl;
-	auto outBuf = client.getOutBuf();
+	Buffer &outBuf = client.getOutBuf();
 	//TODO: think through repeated join
 	if (_keyMode)
 		return 475;
@@ -171,14 +171,14 @@ int Channel::invite(Client &source, std::string &nick)
 int Channel::names(Client &source)
 {
 	std::string rpl;
-	auto outBuf = source.getOutBuf();
-	std::string names;
+	Buffer &outBuf = source.getOutBuf();
+	std::string namesToList;
 	for (Client *client : _channelUsers)
 	{
-		names += client->getNickName() + " ";
+		namesToList += client->getNickName() + " ";
 	}
 	// TODO: check mode??
-	rpl = numericRPL(RPL_NAMREPLY, source.getNickName(), "=", _name, names);
+	rpl = numericRPL(RPL_NAMREPLY, source.getNickName(), "=", _name, namesToList);
 	rpl += numericRPL(RPL_ENDOFNAMES, source.getNickName(), _name);
 	outBuf.append(rpl.c_str(), rpl.length());
 	return 1;

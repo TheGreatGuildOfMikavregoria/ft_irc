@@ -135,7 +135,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_ENDOFEXCEPTLIST		" 349 %s <channel> :End of channel exception list"
 #define RPL_WHOREPLY			" 352 %s <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
 #define RPL_NAMREPLY			" 353 %s %s %s :%s" // in_use
-#define RPL_ENDOFNAMES			" 366 %s %s :End of /NAMES list"
+#define RPL_ENDOFNAMES			" 366 %s %s :End of /NAMES list" //in_use
 #define RPL_BANLIST				" 367 %s <channel> <mask> [<who> <set-ts>]"
 #define RPL_ENDOFBANLIST		" 368 %s <channel> :End of channel ban list"
 #define RPL_WHOISHOST			" 378 %s <nick> :is connecting from *@localhost 127.0.0.1"

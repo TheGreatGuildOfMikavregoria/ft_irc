@@ -23,7 +23,7 @@ static Client *getClientPtrByNickName(std::vector<Client *> &clientVector, const
 }
 */
 
-auto Utils::getChannelIteratorByChannelName(std::vector<Channel> &channelVector, const std::string &name) -> std::vector<Channel>::iterator
+auto Utils::getChannelIteratorByChannelName(std::list<Channel> &channelVector, const std::string &name) -> std::list<Channel>::iterator
 {
 	auto itStart = channelVector.begin();
 	auto itEnd = channelVector.end();

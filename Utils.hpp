@@ -4,7 +4,7 @@
 #include <ctime>
 #include "Client.hpp"
 #include "Channel.hpp"
-
+#include <list>
 class Client;
 class Channel;
 
@@ -15,7 +15,7 @@ class Utils {
 		static std::vector<Client *>::iterator getUserIteratorByNickName(std::vector<Client *> &clientVector, const std::string &nickName); 
 //		static Client *getClientPtrByNickName(std::vector<Client *> &clientVector, const std::string &nickName); 
 
-		static auto getChannelIteratorByChannelName(std::vector<Channel> &clientVector, const std::string &name) -> std::vector<Channel>::iterator;
+		static auto getChannelIteratorByChannelName(std::list<Channel> &clientVector, const std::string &name) -> std::list<Channel>::iterator;
 		static auto getStringIteratorByString(std::vector<std::string> &stringVector, const std::string &str) -> std::vector<std::string>::iterator;
 		static std::string getCurrentTimeString();
 };

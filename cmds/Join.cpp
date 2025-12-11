@@ -52,7 +52,7 @@ void Server::join(Client& c, Command& cmd) {
 	auto chanIterEnd = channels.end();
 	auto keyIterEnd = keys.end();
 	int status;
-	for (; chanIterStart < chanIterEnd; ++chanIterStart, ++keyIterStart)
+	for (; chanIterStart != chanIterEnd; ++chanIterStart, ++keyIterStart)
 	{
 		auto it = Utils::getChannelIteratorByChannelName( _channels, *chanIterStart);
 		if (it == _channels.end())
@@ -68,8 +68,9 @@ void Server::join(Client& c, Command& cmd) {
 			// TODO: check chan limit
 			//TODO: internall error check
 			Channel newChan(*chanIterStart);
-			status = it->join(c);
 			_channels.push_back(newChan);
+			it = Utils::getChannelIteratorByChannelName(_channels, *chanIterStart);
+			status = it->join(c);
 			continue;
 		}
 		else
@@ -79,6 +80,7 @@ void Server::join(Client& c, Command& cmd) {
 				status = it->join(c, *keyIterStart);
 			else
 				status = it->join(c);
+			// TODO: move to chan join
 			if (status == 475)
 			{
 				rpl = numericRPL(ERR_BADCHANNELKEY, nickName, *chanIterStart);
@@ -97,6 +99,7 @@ void Server::join(Client& c, Command& cmd) {
 				outBuf.append(rpl.c_str(), rpl.length());
 				continue;
 			}
+			// TODO: check chan limit
 			else if (status == 1)
 			{
 				//SUCCESS and join handled everything
