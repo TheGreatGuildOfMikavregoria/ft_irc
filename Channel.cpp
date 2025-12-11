@@ -115,17 +115,29 @@ std::set<std::string> &Channel::getInviteList()
 	return _inviteList;
 }
 
-int Channel::join(Client &client)
+void Channel::join(Client &client, bool keyValidated)
 {
 	std::string rpl;
 	Buffer &outBuf = client.getOutBuf();
 	//TODO: think through repeated join
-	if (_keyMode)
-		return 475;
+	if (!keyValidated && _keyMode)
+	{
+		rpl = numericRPL(ERR_BADCHANNELKEY, client.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
 	if (_clientLimitMode && _channelUsers.size() == _clientLimit)
-		return 471;
+	{
+		rpl = numericRPL(ERR_CHANNELISFULL, client.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
 	if (_inviteOnlyMode && !_channelUsers.count(&client))
-		return 473;
+	{
+		rpl = numericRPL(ERR_INVITEONLYCHAN, client.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
 	userAdd(&client);
 	if (_operators.size() == 0)
 		_operators.insert(client.getNickName());
@@ -139,14 +151,16 @@ int Channel::join(Client &client)
 		rpl = numericRPL(RPL_NOTOPIC, client.getNickName(), _name);
 	outBuf.append(rpl.c_str(), rpl.length());
 	names(client);
-	return 1;
 }
 
-int Channel::join(Client &client, std::string &key)
+void Channel::join(Client &client, std::string &key)
 {
-	if (_keyMode && key != _key)
-		return 475;
-	return join(client);
+	if (key != _key)
+	{
+		join(client, false);
+		return ;
+	}
+	join(client, true);
 }
 
 int Channel::part(Client &client)
