@@ -2,11 +2,19 @@
 
 std::string Utils::stringToLowercase(std::string text)
 {
-	int i = 0;
 	for (char &c : text)
-		c = std::tolower(text[i]);
+		c = std::tolower(c);
 	return text;
 }
+
+std::string Utils::stringToUppercase(std::string text)
+{
+	for (char &c : text)
+		c = std::toupper(c);
+	return text;
+}
+
+
 // TODO: add one to work with pointers
 std::vector<Client *>::iterator Utils::getUserIteratorByNickName(std::vector<Client *> &clientVector, const std::string &nickname)
 {

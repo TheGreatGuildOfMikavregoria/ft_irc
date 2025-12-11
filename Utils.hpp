@@ -12,6 +12,7 @@ class Utils {
 	public:
 		static std::string stringToLowercase(std::string text);
 
+		static std::string stringToUppercase(std::string text);
 		static std::vector<Client *>::iterator getUserIteratorByNickName(std::vector<Client *> &clientVector, const std::string &nickName); 
 //		static Client *getClientPtrByNickName(std::vector<Client *> &clientVector, const std::string &nickName); 
 
