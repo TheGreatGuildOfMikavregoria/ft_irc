@@ -248,7 +248,9 @@ void Server::oper(Client& c, Command& cmd) {
 
 void Server::quit(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
- 	const std::string reason = cmd.getTokens().at(1);
+	std::string reason;
+	if (!(cmd.getTokens().size() < 2))
+		reason = cmd.getTokens().at(1);
 	// Buffer& outBuf = c.getOutBuf();
  	std::string rpl;
  	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
@@ -256,7 +258,7 @@ void Server::quit(Client& c, Command& cmd) {
  	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
  	std::set<Channel*>::iterator it;
  	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end(); ++it) {
-	    Channel* chan = *it;
+		Channel* chan = *it;
 		chan->userRemove(c);
  		chan->chanBroadcast(c, rpl);
  	}
@@ -278,7 +280,7 @@ void Server::dropClient(Client& c)
 	_clients.erase( 
 		std::remove_if(_clients.begin(), _clients.end(),
 		[&](const std::unique_ptr<Client>& p){
-            return p.get() == &c;
-        }),
-    	_clients.end());
+			return p.get() == &c;
+		}),
+		_clients.end());
 }
