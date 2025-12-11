@@ -94,8 +94,10 @@ void Server::registerClient(Client& c) {
 		if (!c.getPasswordStatus()) {
 			rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
 			outBuf.append(rpl.c_str(), rpl.length());
-			std::cout << "Dropping client (fd " << c.getFd() << "): password mismatch" << std::endl; //client doesn't get to print the meassage before onnection is closed.
-			close(c.getFd()); //check if drop client can be used here intead of repeating these lines
+			// std::cout << "Dropping client (fd " << c.getFd() << "): password mismatch" << std::endl; //client doesn't get to print the meassage before onnection is closed.
+			// close(c.getFd()); //check if drop client can be used here intead of repeating these lines
+			c.setDisconnectFlag(true);
+			return;
 		}
 		else {
 			c.setRegiStatus(true);
@@ -152,7 +154,7 @@ void Server::nick(Client& c, Command& cmd) {
 			if (!c.getRegiStatus())
 					this -> registerClient(c);
 			else {
-				rpl = nickName + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
+				rpl = ":" + nickName + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
 				serverBroadcast(rpl);
 			}
 			return;
@@ -243,26 +245,24 @@ void Server::oper(Client& c, Command& cmd) {
 	}
 	outBuf.append(rpl.c_str(), rpl.length());
 }
-/*
+
 void Server::quit(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
  	const std::string reason = cmd.getTokens().at(1);
- 	Buffer& outBuf = c.getOutBuf();
+	// Buffer& outBuf = c.getOutBuf();
  	std::string rpl;
  	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
  	this -> error(c,rpl);
  	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
  	std::set<Channel*>::iterator it;
  	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end(); ++it) {
-	     	Channel* chan = *it;
- 		chan->chanBroadcast(c, rpl);
- 		//remove the user from channel here to avoid the dangling pointer
+	    Channel* chan = *it;
 		chan->userRemove(c);
-		(void)outBuf;
+ 		chan->chanBroadcast(c, rpl);
  	}
- 	//ad the disconnect flag to the client
+	c.setDisconnectFlag(true);
 }
-*/
+
 void Server::error(Client& c, const std::string& msg) {
 	std::string err_msg;
 	Buffer& outBuf = c.getOutBuf();
@@ -270,17 +270,15 @@ void Server::error(Client& c, const std::string& msg) {
 	outBuf.append(err_msg.c_str(), err_msg.length());
 }
 
+void Server::dropClient(Client& c)
+{
+	if (c.getFd() >= 0) //is this check needed? it is contructed with valid fd right?
+		close(c.getFd());
 
-
-// void Server::dropClient(Client& c, const std::string& reason)
-// {
-// 	if (c.getFd() >= 0) //is this check needed? it is contructed with valid fd right?
-// 		close(c.getFd());
-
-// 	_clients.erase( 
-// 		std::remove_if(_clients.begin(), _clients.end(),
-// 		[&](const std::unique_ptr<Client>& p){
-//             return p.get() == &c;
-//         }),
-//     	_clients.end());
-// }
+	_clients.erase( 
+		std::remove_if(_clients.begin(), _clients.end(),
+		[&](const std::unique_ptr<Client>& p){
+            return p.get() == &c;
+        }),
+    	_clients.end());
+}
