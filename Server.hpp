@@ -23,11 +23,13 @@
 #include "Buffer.hpp"
 #include "Command.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 #include "NumericRPL.hpp"
 #include <unordered_map>
 #include <memory>
 #include <csignal>
 #include <ctime>
+#include <list>
 #define MAX_CLIENTS 512
 #define CLIENT_TIMEOUT 600
 #define OPER_NAME   "ircAdmin"
@@ -53,6 +55,7 @@ static inline const char* pollMaskStr(short ev) {
 }
 
 class Client;
+class Command;
 
 class Server
 {
@@ -68,8 +71,9 @@ private:
 		{"NICK", &Server::nick},
 		{"USER", &Server::user},
 		{"PING", &Server::ping},
-		{"OPER", &Server::oper}//,
+		{"OPER", &Server::oper},
 		// {"QUIT", &Server::quit}
+		{"JOIN", &Server::join},
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
@@ -78,9 +82,10 @@ private:
 	std::string _operPass;
 	static bool _signal;
 	std::vector<std::unique_ptr<Client>> _clients;
-	//std::vector<Channel> _channels;
+	std::list<Channel> _channels;
 	int _listenFd;
 	int _spareFd;
+	std::string _timeCreated;
 
 	void _startServerListener();
 	void _runLoop();
@@ -104,12 +109,14 @@ public:
 	// void	numericRPL(Client& c, const char* format,  ...);
 
 	void	pass(Client& c, Command& cmd);
+	std::string &getTimeCreated();
 	void	nick(Client& c, Command& cmd);
 	void	user(Client& c, Command& cmd);
 	void	ping(Client& c, Command& cmd);
 	void	oper(Client& c, Command& cmd);
 	// void	quit(Client& c, Command& cmd);
 	void	error(Client& c, const std::string& msg);
+	void	join(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);

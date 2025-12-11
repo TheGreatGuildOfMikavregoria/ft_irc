@@ -13,6 +13,8 @@ void Server::SignalHandler(int signum)
 
 Server::Server(std::string port, std::string pw) : status(0), password(pw), port(port), _operName(OPER_NAME), _operPass(OPER_PASS), _clients(), _listenFd(-1)
 {
+// TODO:  protec?
+	_timeCreated = Utils::getCurrentTimeString();
 	_clients.reserve(MAX_CLIENTS);
 	try
 	{
@@ -363,7 +365,7 @@ void Server::start_server()
 		#if DEBUG
 		std::cout << "Trying to start Server\n";
 		#endif
-
+		_clients.reserve(MAX_CLIENTS);
 		_startServerListener();
 		_runLoop();
 

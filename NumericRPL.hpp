@@ -124,8 +124,8 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_CHANNELMODEIS		" 324 %s <channel> <modestring> <mode arguments>..." //see what are mode args
 #define RPL_CREATIONTIME		" 329 %s <channel> <creationtime>"
 #define RPL_WHOISACCOUNT		" 330 %s <nick> <account> :is logged in as"
-#define RPL_NOTOPIC				" 331 %s <channel> :No topic is set"
-#define RPL_TOPIC				" 332 %s <channel> :<topic>"
+#define RPL_NOTOPIC				" 331 %s %s :No topic is set" //in_use
+#define RPL_TOPIC				" 332 %s %s :%s" // in_use
 #define RPL_TOPICWHOTIME		" 333 %s <channel> <nick> <setat>"
 #define RPL_INVITELIST			" 336 %s <channel>"
 #define RPL_ENDOFINVITELIST		" 337 %s :End of /INVITE list"
@@ -134,8 +134,8 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_EXCEPTLIST			" 348 %s <channel> <mask>"
 #define RPL_ENDOFEXCEPTLIST		" 349 %s <channel> :End of channel exception list"
 #define RPL_WHOREPLY			" 352 %s <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
-#define RPL_NAMREPLY			" 353 %s <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}" //check prefixes
-#define RPL_ENDOFNAMES			" 366 %s <channel> :End of /NAMES list"
+#define RPL_NAMREPLY			" 353 %s %s %s :%s" // in_use
+#define RPL_ENDOFNAMES			" 366 %s %s :End of /NAMES list" //in_use
 #define RPL_BANLIST				" 367 %s <channel> <mask> [<who> <set-ts>]"
 #define RPL_ENDOFBANLIST		" 368 %s <channel> :End of channel ban list"
 #define RPL_WHOISHOST			" 378 %s <nick> :is connecting from *@localhost 127.0.0.1"
@@ -159,14 +159,15 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_USERNOTINCHANNEL	" 441 %s <nick> <channel> :They aren't on that channel"
 #define ERR_NOTONCHANNEL		" 442 %s <channel> :You're not on that channel"
 #define ERR_USERONCHANNEL		" 443 %s <nick> <channel> :is already on channel"
+#define ERR_NOTREGISTERED 	" 451 %s :You have not registered" //in_use
 #define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters" //in_use
 #define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister" //in_use
 #define ERR_PASSWDMISMATCH		" 464 %s :Password incorrect" //in_use
-#define ERR_CHANNELISFULL		" 471 %s <channel> :Cannot join channel (+l)"
-#define ERR_INVITEONLYCHAN		" 473 %s <channel> :Cannot join channel (+i)"
+#define ERR_CHANNELISFULL		" 471 %s %s :Cannot join channel (+l)" // in_use
+#define ERR_INVITEONLYCHAN		" 473 %s %s :Cannot join channel (+i)" //in_use
 #define ERR_BANNEDFROMCHAN		" 474 %s <channel> :Cannot join channel (+b)"
-#define ERR_BADCHANNELKEY		" 475 %s <channel> :Cannot join channel (+k)"
-#define ERR_BADCHANMASK			" 476 %s <channel> :Bad Channel Mask"
+#define ERR_BADCHANNELKEY		" 475 %s %s :Cannot join channel (+k)" //in_use
+#define ERR_BADCHANMASK			" 476 %s %s :Bad Channel Mask" //in_use
 #define ERR_NOPRIVILEGES		" 481 %s :Permission Denied- You're not an IRC operator"
 #define ERR_CHANOPRIVSNEEDED	" 482 %s <channel> :You're not channel operator"
 #define ERR_NOOPERHOST			" 491 %s :No O-lines for your host" //in_use

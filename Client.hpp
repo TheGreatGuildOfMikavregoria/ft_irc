@@ -2,6 +2,9 @@
 
 #include "Server.hpp"
 #include "Buffer.hpp"
+#include "Channel.hpp"
+
+class Channel;
 #include <ctime>
 #include <set>
 
@@ -24,7 +27,6 @@ class Client{
 		bool		_userModeSet;//is this needed
 		std::time_t	_lastActivity;
 		std::set<Channel*> _userChannels;
-		
 	
 	public:
 	    enum mode {
@@ -38,7 +40,7 @@ class Client{
 		Client(int fd);
 		~Client();
 
-		int			getFd() const;
+		int	getFd() const;
 		Buffer&		getInBuf();
 		Buffer&		getOutBuf();
 		const std::string&	getUserName() const;

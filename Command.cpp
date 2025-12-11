@@ -59,7 +59,6 @@ Command::Command(Buffer &buffer) : _buffer(buffer)
 {
 	std::string tempStr(_buffer.data(), _buffer.size());
 	size_t nlCrPosition = _identifyNlCr(tempStr);
-
 	if (nlCrPosition == std::string::npos)	
 	{
 		_status = MESSAGE_INCOMPLETE;
@@ -152,11 +151,11 @@ bool Command::stringWithinLength(std::string &str, size_t length)
 
 bool Command::validateParamNum()
 {
-	if (stringToLowercase(this->getCommand()) == "nick")
+	if (Utils::stringToLowercase(this->getCommand()) == "nick")
 	{
 		return (_tokens.size() == 2);
 	}
-	if (stringToLowercase(this->getCommand()) == "ping")
+	if (Utils::stringToLowercase(this->getCommand()) == "ping")
 	{
 		return (_tokens.size() == 2);
 	}

@@ -223,6 +223,7 @@ void Server::ping(Client& c, Command& cmd) {
 void Server::oper(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
 	Buffer& outBuf = c.getOutBuf();
+	(void)outBuf;
 	std::string rpl;
 	if (cmd.getTokens().size() < 3)
 		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));

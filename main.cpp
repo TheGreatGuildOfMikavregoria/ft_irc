@@ -3,6 +3,7 @@
 #include "Server.hpp"
 
 #include <string>
+#include "Utils.hpp"
 
 int main(int ac, char **av)
 {
