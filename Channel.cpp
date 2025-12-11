@@ -145,7 +145,7 @@ int Channel::join(Client &client, std::string &key)
 {
 	if (_keyMode && key != _key)
 		return 475;
-	return join(client, key);
+	return join(client);
 }
 
 int Channel::part(Client &client)
