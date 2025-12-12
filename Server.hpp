@@ -56,7 +56,7 @@ static inline const char* pollMaskStr(short ev) {
 
 class Client;
 class Command;
-
+class Channel;
 class Server
 {
 private:
@@ -74,7 +74,9 @@ private:
 		{"OPER", &Server::oper},
 		{"QUIT", &Server::quit},
 		{"JOIN", &Server::join},
+		{"PRIVMSG", &Server::privmsg},
 	};
+
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
 	std::string port;
@@ -124,6 +126,8 @@ public:
 	void	serverBroadcast(const std::string& msg);
 	bool	isValidOperHost(const std::string &clientIP, int clientFD);
 	void	dropClient(Client& c);
+	void	privmsg(Client &c, Command &cmd);
+	Channel* getChannelByName(std::string &ch);
 
 
 };
