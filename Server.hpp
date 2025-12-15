@@ -74,6 +74,7 @@ private:
 		{"OPER", &Server::oper},
 		{"QUIT", &Server::quit},
 		{"JOIN", &Server::join},
+		{"MODE", &Server::mode},
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
@@ -117,6 +118,7 @@ public:
 	void	quit(Client& c, Command& cmd);
 	void	error(Client& c, const std::string& msg);
 	void	join(Client& c, Command& cmd);
+	void	mode(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);

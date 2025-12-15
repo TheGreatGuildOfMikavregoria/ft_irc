@@ -82,6 +82,7 @@ class Channel
 		void chanBroadcast(Client &, std::string &);
 		void userAdd(Client *);
 		void userRemove(Client &);
+		static bool isValidChanPrefix(std::string &name);
 		static bool validateName(std::string &name);
 };
 

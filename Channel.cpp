@@ -204,6 +204,12 @@ const std::string &Channel::getTopic() const
 	return _topic;
 }
 */
+bool Channel::isValidChanPrefix(std::string &name)
+{
+	if (name[0] != '#' && name[0] != '&' && name[0] != '!' && name[0] != '+' )
+		return (false);
+	return true;
+}
 bool Channel::validateName(std::string &name)
 {
 	if (!name.length())
