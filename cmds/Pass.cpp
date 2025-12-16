@@ -196,6 +196,9 @@ void Server::ping(Client& c, Command& cmd) {
 	else
 		rpl = ":" SERVER_NAME " PONG "  SERVER_NAME  " :" +  cmd.getTokens().at(1) + "\r\n";
 	outBuf.append(rpl.c_str(), rpl.length());
+	std::cout << "----Ping RPL ----" << std::endl;
+	std::cout << c.getNickName() << " "<< rpl;
+	std::cout << "----Ping RPL END----" << std::endl;
 }
 
 // void Server::oper(Client& c, Command& cmd) {
@@ -257,10 +260,10 @@ void Server::quit(Client& c, Command& cmd) {
  	this -> error(c,rpl);
  	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
  	std::set<Channel*>::iterator it;
- 	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end(); ++it) {
 		Channel* chan = *it;
+ 		it++;
 		chan->userRemove(c);
- 		chan->chanBroadcast(c, rpl);
+		chan->chanBroadcast(c, rpl);
  	}
 	c.setDisconnectFlag(true);
 }

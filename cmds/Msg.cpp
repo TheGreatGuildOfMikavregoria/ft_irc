@@ -13,7 +13,6 @@ Channel* Server::getChannelByName(std::string &ch)
 //   Parameters: <target>{,<target>} <text to be sent>
 void Server::privmsg(Client &c, Command &cmd)
 {
-	(void)cmd;
 	auto tokens = cmd.getTokens();
 	Buffer &outBuf = c.getOutBuf();
 
@@ -40,6 +39,16 @@ void Server::privmsg(Client &c, Command &cmd)
 		return ;//407 ERR_TOOMANYTARGETS (407)
 	}
 
+	#if DEBUG
+	std::cout << "----MSG----"<< std::endl;
+	auto debug{0};
+	for (auto &token : tokens)
+	{
+		std::cout << debug++ << " "<< token << std::endl;
+	}
+	std::cout << "----MSG-END----"<< std::endl;
+	#endif
+	
 	if (receiver.at(0) == '#')
 	{
 		//Send to channel

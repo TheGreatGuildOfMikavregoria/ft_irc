@@ -13,6 +13,7 @@ Client::Client(int fd) : _fd(fd) {
 	_userModeSet = false;
 	_disconnectFlag = false;
 	_lastActivity = std::time(nullptr);
+	_waitingPong = false;
 }
 
 Client::~Client() {}
@@ -31,6 +32,7 @@ bool	Client::getUserNameStatus() const {return _userNameSet;}
 bool	Client::getPasswordStatus() const {return _passwordSet;}
 bool	Client::getUserModeStatus() const {return _userModeSet;}
 bool	Client::getDisconnectFlag() const {return _disconnectFlag;}
+bool	Client::getWaitingPong() const {return _waitingPong;}
 std::set<Channel*>& Client::getUserChannels() {return _userChannels;}
 
 void	Client::setInBuf(Buffer in) {_in = in;}
@@ -46,6 +48,7 @@ void	Client::setPasswordStatus(bool passwordSet) {_passwordSet = passwordSet;}
 void	Client::setUserModeStatus(bool userModeSet) {_userModeSet = userModeSet;}
 void	Client::setDisconnectFlag(bool disconnectFlag) {_disconnectFlag = disconnectFlag;}
 void	Client::setLastActivity(std::time_t lastActivity) {_lastActivity = lastActivity;}
+void	Client::setWaitingPong() {_waitingPong = getWaitingPong() ? 0 : 1;}
 std::time_t	Client::getLastActivity() const {return _lastActivity;}
 
 void	Client::addMode(int mask) {_userMode |= mask;}

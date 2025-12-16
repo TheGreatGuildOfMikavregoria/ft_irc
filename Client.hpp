@@ -26,6 +26,7 @@ class Client{
 		bool		_passwordSet;
 		bool		_userModeSet;//is this needed
 		bool		_disconnectFlag;
+		bool		_waitingPong;
 		std::time_t	_lastActivity;
 		std::set<Channel*> _userChannels;
 	
@@ -55,6 +56,7 @@ class Client{
 		bool	getPasswordStatus() const;
 		bool	getUserModeStatus() const;
 		bool	getDisconnectFlag() const;
+		bool	getWaitingPong() const;
 		std::time_t			getLastActivity() const;
 		std::set<Channel*>& getUserChannels();
 		void	setInBuf(Buffer in);
@@ -63,7 +65,7 @@ class Client{
 		void	setNickName(std::string& nickName);
 		void	setRealName(std::string& realName);
 		void	setHostName(std::string hostName);
-
+		void	setWaitingPong();
 		void	setRegiStatus(bool regiStatus);
 		void	setNickNameStatus(bool nickNameSet);
 		void	setUserNameStatus(bool userNameSet);

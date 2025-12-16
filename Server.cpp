@@ -1,11 +1,11 @@
 #include "Server.hpp"
 
-bool Server::_signal = false;
+bool Server::_signal_int_quit = false;
 
 void Server::SignalHandler(int signum)
 {
 	(void)signum;
-	Server::_signal = true;
+	Server::_signal_int_quit = true;
 	#if DEBUG
 	std::cout << "Signal was clickered" << std::endl;
 	#endif 
@@ -160,10 +160,6 @@ void Server::serverAcceptClients()
 		int sock_fd = accept(_listenFd, reinterpret_cast<sockaddr *>(&c_addr), &c_len);
 		if (sock_fd < 0)
 		{
-			#if DEBUG
-			std::cout << std::strerror(errno);
-			std::cout << " ;;;too much bs\n";
-			#endif
 
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
 				break ;
@@ -230,7 +226,13 @@ void Server::buildPollList(std::vector<pollfd> &pfds)
 	}
 }
 
-
+ssize_t Server::indexForFd(int fd)
+{
+	for (size_t i = 0; i < _clients.size(); ++i)
+		if (_clients[i]->getFd() == fd)
+			return static_cast<ssize_t>(i);
+	return -1;
+}
 
 void Server::_runLoop()
 {
@@ -244,80 +246,61 @@ void Server::_runLoop()
 		int timeout = -1;
 		for (const auto &client : _clients)
 		{
-			int idleTime = static_cast<int>(difftime(now, client->getLastActivity()) / 60.0);
+			int idleTime = client->getWaitingPong() ? CLIENT_TIMEOUT : CLIENT_PONG_WAITTIME;
 
-			int remainingTime = CLIENT_TIMEOUT - idleTime;
+			int remainingTime = idleTime -  static_cast<int>(std::difftime(now, client->getLastActivity()));;
 
 			if (remainingTime <= 0)
-				return 0;
+				return 1000;
 			if (timeout == -1 || remainingTime < timeout)
 				timeout = remainingTime;
 		}
 		return timeout * 1000;
 	};
 
+	auto n{0};
 
 	for (;;)
 	{
+		
+		std::cout <<"------------------------ Loop: " <<n++ << "------------------------" <<std::endl;
 		buildPollList(pfds);
 
-										DBG("pfds=" << pfds.size()
-											<< " clients=" << _clients.size());
-										
 		int pRes = poll(pfds.data(), pfds.size(), nextClientTimeout());
 		if (pRes < 0)
 		{
 			if (errno == EINTR)
 			{
-				if (Server::_signal)
+				if (Server::_signal_int_quit)
 					break;
 				continue;
 			}
 			throw std::runtime_error("poll() failure");
 		}
 
-
-		for (const auto &client : _clients)
+		for (ssize_t i = _clients.size() - 1; i >= 0; --i)
 		{
-			if ((difftime(std::time(nullptr), client->getLastActivity())) / 60.0 > CLIENT_TIMEOUT)
-				dropClient(client->getFd(), "Client timeout");
+			auto &client = _clients[i];
+			if (client->getWaitingPong() == false && std::difftime(std::time(nullptr), client->getLastActivity()) > CLIENT_PONG_WAITTIME)
+			{
+				client->setWaitingPong();
+				sendToClient(client->getFd(), "PING");
+				std::cout << "Server has sent a ping request to: "<< client->getNickName() << std::endl;
+			}
+			else if (client->getWaitingPong() == true && std::difftime(std::time(nullptr), client->getLastActivity()) > CLIENT_TIMEOUT)
+			{	
+				sendToClient(client->getFd(), "Server: Client timed out (PONG check failed).");
+				dropClient(static_cast<size_t>(i), "Client timeout");
+			}
+
 		//	std::cout << "Client " << client->getFd() << " timediff " << difftime(std::time(nullptr),client->getLastActivity())  << std::endl;
 		}
-
-												DBG("poll() ready=" << pRes
-													<< " listen.revents=" << pollMaskStr(pfds[0].revents));
-
 		if (pfds[0].revents & POLLIN)
 			serverAcceptClients();
 
 		handleClientEvents(pfds);
 
-
-
-					#if DEBUG
-					for(int i = 0; i < _clients.size(); i++)
-					{
-						std::cout << "Out: [" << i << "] ";
-						Buffer &temp = _clients[i]->getOutBuf();
-						if (temp.empty())
-							continue;
-						std::string a(temp.data(), temp.size());
-						std::cout << a;
-						std::cout <<std::endl;
-					}
-					for(int i = 0; i < _clients.size(); i++)
-					{
-						std::cout << "In: [" << i << "] ";
-						Buffer &temp = _clients[i]->getInBuf();
-						if (temp.empty())
-							continue;
-						std::string a(temp.data(), temp.size());
-						std::cout  << a;
-						std::cout <<std::endl;
-					}
-					#endif
-
-		if (Server::_signal == true)
+		if (Server::_signal_int_quit)
 			break;
 	}
 
@@ -335,19 +318,15 @@ void Server::_startServerListener()
 	if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 		throw std::runtime_error("setsockopt(SO_REUSEADDR) failed");
 
-
 	#if DEBUG
 	std::cout << "Socket id:"<< socket_fd << std::endl;
 	#endif
-	
 
 	sockaddr_in addr;
 	std::memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(std::stoi(port));
 	addr.sin_addr.s_addr = INADDR_ANY;
-
-
 
 	if (bind(socket_fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) < 0)
 	{
@@ -378,6 +357,7 @@ void Server::start_server()
 		#if DEBUG
 		std::cout << "Trying to start Server\n";
 		#endif
+
 		_clients.reserve(MAX_CLIENTS);
 		_startServerListener();
 		_runLoop();
