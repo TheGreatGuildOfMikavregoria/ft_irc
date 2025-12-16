@@ -65,7 +65,7 @@ class Client{
 		void	setNickName(std::string& nickName);
 		void	setRealName(std::string& realName);
 		void	setHostName(std::string hostName);
-		void	setWaitingPong();
+		void	setWaitingPong(bool waitingPong);
 		void	setRegiStatus(bool regiStatus);
 		void	setNickNameStatus(bool nickNameSet);
 		void	setUserNameStatus(bool userNameSet);

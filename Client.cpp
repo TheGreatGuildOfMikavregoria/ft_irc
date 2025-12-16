@@ -48,7 +48,7 @@ void	Client::setPasswordStatus(bool passwordSet) {_passwordSet = passwordSet;}
 void	Client::setUserModeStatus(bool userModeSet) {_userModeSet = userModeSet;}
 void	Client::setDisconnectFlag(bool disconnectFlag) {_disconnectFlag = disconnectFlag;}
 void	Client::setLastActivity(std::time_t lastActivity) {_lastActivity = lastActivity;}
-void	Client::setWaitingPong() {_waitingPong = getWaitingPong() ? 0 : 1;}
+void	Client::setWaitingPong(bool waitingPong) {_waitingPong = waitingPong;}
 std::time_t	Client::getLastActivity() const {return _lastActivity;}
 
 void	Client::addMode(int mask) {_userMode |= mask;}

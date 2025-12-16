@@ -283,7 +283,7 @@ void Server::_runLoop()
 			auto &client = _clients[i];
 			if (client->getWaitingPong() == false && std::difftime(std::time(nullptr), client->getLastActivity()) > CLIENT_PONG_WAITTIME)
 			{
-				client->setWaitingPong();
+				client->setWaitingPong(true);
 				sendToClient(client->getFd(), "PING");
 				std::cout << "Server has sent a ping request to: "<< client->getNickName() << std::endl;
 			}
