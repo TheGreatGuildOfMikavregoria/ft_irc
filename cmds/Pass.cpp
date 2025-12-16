@@ -260,6 +260,7 @@ void Server::quit(Client& c, Command& cmd) {
  	this -> error(c,rpl);
  	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
  	std::set<Channel*>::iterator it;
+ 	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end();) {
 		Channel* chan = *it;
  		it++;
 		chan->userRemove(c);
