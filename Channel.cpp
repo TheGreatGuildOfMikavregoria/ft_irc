@@ -7,12 +7,14 @@
 */
 
 // TODO: modify to work with pointers
+// TODO: change
 void Channel::userAdd(Client *user)
 {
 	_channelUsers.insert(user);
 	user->getUserChannels().insert(this);
 }
 
+// TODO change
 void Channel::userRemove(Client &user)
 {
 	std::set<Channel *>	&userChannels = user.getUserChannels();
