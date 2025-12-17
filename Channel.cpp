@@ -214,7 +214,7 @@ bool Channel::validateName(std::string &name)
 {
 	if (!name.length())
 		return (false);
-	if (name[0] != '#' && name[0] != '&')
+	if (!hasChanPrefix(name))
 		return (false);
 	return (name.length() >= 2);
 }
