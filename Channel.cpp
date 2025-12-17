@@ -165,10 +165,15 @@ void Channel::join(Client &client, std::string &key)
 	join(client, true);
 }
 
-int Channel::part(Client &client)
+void Channel::part(Client &client, std::string &&reason)
 {
-	(void)client;
-	return 0;
+	std::string response;
+	if (reason.length())
+		response = ":" + client.getNickName() + " PART " + _name + " :" + reason +  "\r\n";
+	else
+		response = ":" + client.getNickName() + " PART " + _name + "\r\n";
+	chanBroadcast(response);
+	userRemove(client);
 }
 
 int Channel::kick(Client &source, std::string &nick)

@@ -1,6 +1,7 @@
 #include "../Server.hpp"
 
-void Server::join(Client& c, Command& cmd) {
+void Server::part(Client &c, Command &cmd)
+{
 	const std::string nickName = c.getNickName();
 	std::string rpl;
 	Buffer &outBuf = c.getOutBuf();
@@ -16,21 +17,10 @@ void Server::join(Client& c, Command& cmd) {
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	if (cmd.getTokens().size() == 2 && cmd.getTokens()[1] == "0")
-	{
-		
-		//TODO: PART all user joined channels
-		for (Channel &channel : _channels)
-		{
-			channel.part(c, "");
-		}
-		return ;
-	}
 	std::vector <std::string> channels = Utils::ft_split(cmd.getTokens()[1], ',');
-	std::vector <std::string> keys;
+	std::string reason;
 	if (cmd.getTokens().size() == 3)
-		keys = Utils::ft_split(cmd.getTokens()[2], ',');
-
+		reason = cmd.getTokens()[2];
 	auto chanIterStart = channels.begin();
 	auto keyIterStart = keys.begin();
 	auto chanIterEnd = channels.end();
@@ -40,30 +30,19 @@ void Server::join(Client& c, Command& cmd) {
 		auto it = Utils::getChannelIteratorByChannelName( _channels, *chanIterStart);
 		if (it == _channels.end())
 		{
-			//create and join
-			if (!Channel::validateName(*chanIterStart))
-			{
-				//ERR_BADCHANMASK (476)
-				rpl = numericRPL(ERR_BADCHANMASK, nickName, *chanIterStart);
-				outBuf.append(rpl.c_str(), rpl.length());
-				continue ;
-			}
-			// TODO: check chan limit
-			//TODO: internall error check
-			Channel newChan(*chanIterStart);
-			_channels.push_back(newChan);
-			it = Utils::getChannelIteratorByChannelName(_channels, *chanIterStart);
-			it->join(c, false);
-			continue;
+			rpl = numericRPL(ERR_NOSUCHCHANNEL, nickName, *chanIterStart);
+			outBuf.append(rpl.c_str(), rpl.length());
 		}
 		else
 		{
-
-			if (keyIterStart < keyIterEnd)
-				it->join(c, *keyIterStart);
+			std::set<Channel *> &userChannels = c.getUserChannels();
+			if (userChannels.count(channelPtr))
+				it->part(c, reason);
 			else
-				it->join(c, false);
+			{
+				std::string rpl = numericRPL(ERR_NOTONCHANNEL, c.getNickName(), chanIterStart);
+				outBuf.append(rpl.c_str(), rpl.length());
+			}
 		}
 	}
-	return ;
 }

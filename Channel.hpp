@@ -46,7 +46,7 @@ class Channel
 		bool _keyMode = false;
 		bool _protectedTopicMode = false;
 		bool _clientLimitMode = false;
-		size_t _clientLimit = false;
+		size_t _clientLimit = 0;
 
 		void _chanOperatorAdd(Client &);
 		void _chanOperatorRemove(Client &);
@@ -72,8 +72,7 @@ class Channel
 		
 		void join(Client &, bool);
 		void join(Client &, std::string &key);
-		int part(Client &);
-		int part(Client &, std::string &message);
+		void part(Client &, std::string &&message);
 		int kick(Client &source, std::string &nick);
 		int invite(Client &source, std::string &nick);
 		int names(Client &);
