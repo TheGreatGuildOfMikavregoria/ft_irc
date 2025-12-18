@@ -241,3 +241,16 @@ bool Channel::validateModes(std::string &mode)
 	
 }
 */
+
+const std::string	Channel::getChanMode() const {
+
+}
+
+const std::string	Channel::getChanModeParams() const {
+	std::string s = "+";//change apropriately
+	if (_userMode & ModeInvi) s += 'i';
+	if (_userMode & ModeOper) s += 'o';
+	if (_userMode & ModeWallop) s += 'w';
+	if (_userMode & ModeNotice) s += 'n';
+	return s;
+}

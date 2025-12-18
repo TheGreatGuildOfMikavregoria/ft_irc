@@ -84,6 +84,9 @@ class Channel
 		void userRemove(Client &);
 		static bool hasChanPrefix(std::string &name);
 		static bool validateName(std::string &name);
+		
+		const 	std::string	getChanMode() const;
+		const	std::string	getChanModeParams() const;
 };
 
 #endif
