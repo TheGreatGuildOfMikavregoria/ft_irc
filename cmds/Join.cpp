@@ -18,11 +18,11 @@ void Server::join(Client& c, Command& cmd) {
 	}
 	if (cmd.getTokens().size() == 2 && cmd.getTokens()[1] == "0")
 	{
-		
+		std::string reason;
 		//TODO: PART all user joined channels
 		for (Channel &channel : _channels)
 		{
-			channel.part(c, "");
+			channel.part(c, reason);
 		}
 		return ;
 	}

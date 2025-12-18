@@ -122,19 +122,19 @@ void Channel::join(Client &client, bool keyValidated)
 	std::string rpl;
 	Buffer &outBuf = client.getOutBuf();
 	//TODO: think through repeated join
-	if (!keyValidated && _keyMode)
+	if (!keyValidated && getKeyMode())
 	{
 		rpl = numericRPL(ERR_BADCHANNELKEY, client.getNickName(), _name);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	if (_clientLimitMode && _channelUsers.size() == _clientLimit)
+	if (getClientLimitMode() && _channelUsers.size() == _clientLimit)
 	{
 		rpl = numericRPL(ERR_CHANNELISFULL, client.getNickName(), _name);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	if (_inviteOnlyMode && !_channelUsers.count(&client))
+	if (getInviteOnlyMode() && !_channelUsers.count(&client))
 	{
 		rpl = numericRPL(ERR_INVITEONLYCHAN, client.getNickName(), _name);
 		outBuf.append(rpl.c_str(), rpl.length());
@@ -165,7 +165,7 @@ void Channel::join(Client &client, std::string &key)
 	join(client, true);
 }
 
-void Channel::part(Client &client, std::string &&reason)
+void Channel::part(Client &client, std::string &reason)
 {
 	std::string response;
 	if (reason.length())

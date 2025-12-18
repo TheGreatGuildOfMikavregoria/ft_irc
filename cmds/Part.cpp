@@ -22,10 +22,8 @@ void Server::part(Client &c, Command &cmd)
 	if (cmd.getTokens().size() == 3)
 		reason = cmd.getTokens()[2];
 	auto chanIterStart = channels.begin();
-	auto keyIterStart = keys.begin();
 	auto chanIterEnd = channels.end();
-	auto keyIterEnd = keys.end();
-	for (; chanIterStart != chanIterEnd; ++chanIterStart, ++keyIterStart)
+	for (; chanIterStart != chanIterEnd; ++chanIterStart)
 	{
 		auto it = Utils::getChannelIteratorByChannelName( _channels, *chanIterStart);
 		if (it == _channels.end())
@@ -36,11 +34,12 @@ void Server::part(Client &c, Command &cmd)
 		else
 		{
 			std::set<Channel *> &userChannels = c.getUserChannels();
-			if (userChannels.count(channelPtr))
+			Channel &chanRef = *it;
+			if (userChannels.count(&chanRef))
 				it->part(c, reason);
 			else
 			{
-				std::string rpl = numericRPL(ERR_NOTONCHANNEL, c.getNickName(), chanIterStart);
+				std::string rpl = numericRPL(ERR_NOTONCHANNEL, c.getNickName(), *chanIterStart);
 				outBuf.append(rpl.c_str(), rpl.length());
 			}
 		}
