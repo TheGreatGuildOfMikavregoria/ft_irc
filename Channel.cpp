@@ -169,9 +169,9 @@ void Channel::part(Client &client, std::string &reason)
 {
 	std::string response;
 	if (reason.length())
-		response = ":" + client.getNickName() + " PART " + _name + " :" + reason +  "\r\n";
+		response = ":" + client.getNickName() + "@" + client.getHostName()  + " PART " + _name + " :" + reason +  "\r\n";
 	else
-		response = ":" + client.getNickName() + " PART " + _name + "\r\n";
+		response = ":" + client.getNickName()  + "@" + client.getHostName() + " PART " + _name + "\r\n";
 	chanBroadcast(response);
 	userRemove(client);
 }
