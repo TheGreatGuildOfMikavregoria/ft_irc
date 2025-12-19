@@ -30,18 +30,16 @@ void Server::part(Client &c, Command &cmd)
 		{
 			rpl = numericRPL(ERR_NOSUCHCHANNEL, nickName, *chanIterStart);
 			outBuf.append(rpl.c_str(), rpl.length());
+			return;
 		}
+		std::set<Channel *> &userChannels = c.getUserChannels();
+		Channel &chanRef = *it;
+		if (userChannels.count(&chanRef))
+			it->part(c, reason);
 		else
 		{
-			std::set<Channel *> &userChannels = c.getUserChannels();
-			Channel &chanRef = *it;
-			if (userChannels.count(&chanRef))
-				it->part(c, reason);
-			else
-			{
-				std::string rpl = numericRPL(ERR_NOTONCHANNEL, c.getNickName(), *chanIterStart);
-				outBuf.append(rpl.c_str(), rpl.length());
-			}
+			std::string rpl = numericRPL(ERR_NOTONCHANNEL, c.getNickName(), *chanIterStart);
+			outBuf.append(rpl.c_str(), rpl.length());
 		}
 	}
 }
