@@ -1,5 +1,6 @@
 ircserv
 .vscode
+*.swp
 
 # Prerequisites
 *.d
