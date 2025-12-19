@@ -122,32 +122,34 @@ void Channel::join(Client &client, bool keyValidated)
 	std::time_t topicChange;
 	std::string rpl;
 	Buffer &outBuf = client.getOutBuf();
+	std::string nickname = client.getNickName();
 	//TODO: think through repeated join
 	if (!keyValidated && getKeyMode())
 	{
-		rpl = numericRPL(ERR_BADCHANNELKEY, client.getNickName(), _name);
+		rpl = numericRPL(ERR_BADCHANNELKEY, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
 	if (getClientLimitMode() && _channelUsers.size() == _clientLimit)
 	{
-		rpl = numericRPL(ERR_CHANNELISFULL, client.getNickName(), _name);
+		rpl = numericRPL(ERR_CHANNELISFULL, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
 	if (getInviteOnlyMode() && !_channelUsers.count(&client))
 	{
-		rpl = numericRPL(ERR_INVITEONLYCHAN, client.getNickName(), _name);
+		rpl = numericRPL(ERR_INVITEONLYCHAN, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
 	userAdd(&client);
+	_inviteListRemove(nickname);
 	if (_operators.size() == 0)
-		_operators.insert(client.getNickName());
-	std::string prefix = ":" + client.getNickName();
+		_operators.insert(nickname);
+	std::string prefix = ":" + nickname;
 	std::string message = prefix + " JOIN " + _name + "\r\n";
 	this->chanBroadcast(message);
-	_topicUpdatedWho = client.getNickName();
+	_topicUpdatedWho = nickname;
 	topicChange = std::time(nullptr);
 	if (topicChange != static_cast<time_t>(-1))
 		_topicUpdatedTime = topicChange;
@@ -221,11 +223,34 @@ int Channel::kick(Client &source, std::string &nick)
 	return 0;
 }
 
-int Channel::invite(Client &source, std::string &nick)
+bool Channel::invite(Client &source, std::string &nick)
 {
-	(void)source;
-	(void)nick;
-	return (0);
+	std::string rpl;
+	Buffer &outBuf = source.getOutBuf();
+	if (!_channelUsers.count(&source))
+	{
+		rpl = numericRPL(ERR_NOTONCHANNEL, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return false;
+	}
+//TODO : new mode considerations
+	if (getInviteOnlyMode() && !_operators.count(source.getNickName()))
+	{
+		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return false;
+	}
+	auto userIt = std::find_if(_channelUsers.begin(), _channelUsers.end(), [&nick](Client *client){ return client->getNickName() == nick; });
+	if (userIt != _channelUsers.end())
+	{
+		rpl = numericRPL(ERR_USERONCHANNEL, source.getNickName(), nick, _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return false;
+	}
+	rpl = numericRPL(RPL_INVITING, source.getNickName(), nick, _name);
+	outBuf.append(rpl.c_str(), rpl.length());
+	_inviteListAdd(nick);
+	return (true);
 }
 
 void Channel::names(Client &source)
