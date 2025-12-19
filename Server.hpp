@@ -75,6 +75,7 @@ private:
 		{"QUIT", &Server::quit},
 		{"JOIN", &Server::join},
 		{"PART", &Server::part},
+		{"TOPIC", &Server::topic},
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
@@ -119,6 +120,7 @@ public:
 	void	error(Client& c, const std::string& msg);
 	void	join(Client& c, Command& cmd);
 	void	part(Client& c, Command& cmd);
+	void	topic(Client &c, Command &cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);

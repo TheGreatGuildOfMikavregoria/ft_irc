@@ -119,6 +119,7 @@ std::set<std::string> &Channel::getInviteList()
 
 void Channel::join(Client &client, bool keyValidated)
 {
+	std::time_t topicChange;
 	std::string rpl;
 	Buffer &outBuf = client.getOutBuf();
 	//TODO: think through repeated join
@@ -146,12 +147,11 @@ void Channel::join(Client &client, bool keyValidated)
 	std::string prefix = ":" + client.getNickName();
 	std::string message = prefix + " JOIN " + _name + "\r\n";
 	this->chanBroadcast(message);
-//TODO: errcode for internal error?
-	if (_topic.size())
-		rpl = numericRPL(RPL_TOPIC, client.getNickName(), _name, _topic);
-	else
-		rpl = numericRPL(RPL_NOTOPIC, client.getNickName(), _name);
-	outBuf.append(rpl.c_str(), rpl.length());
+	_topicUpdatedWho = client.getNickName();
+	topicChange = std::time(nullptr);
+	if (topicChange != static_cast<time_t>(-1))
+		_topicUpdatedTime = topicChange;
+	topic(client, false);
 	names(client);
 }
 
@@ -176,6 +176,44 @@ void Channel::part(Client &client, std::string &reason)
 	userRemove(client);
 }
 
+void Channel::topic(Client &c, bool broadcast)
+{
+	std::string rpl;
+	Buffer &outBuff = c.getOutBuf();
+	if (_topic.size())
+		rpl = numericRPL(RPL_TOPIC, c.getNickName(), _name, _topic);
+	else
+		rpl = numericRPL(RPL_NOTOPIC, c.getNickName(), _name);
+	rpl += numericRPL(RPL_TOPICWHOTIME, c.getNickName(), _name, _topicUpdatedWho, Utils::longToString(_topicUpdatedTime));
+	if (broadcast)
+		chanBroadcast(rpl);
+	else
+		outBuff.append(rpl.c_str(), rpl.length());
+	
+// RPL_TOPICWHOTIME
+}
+
+void Channel::topic(Client &c, std::string &newTopic)
+{
+	std::string rpl;
+	Buffer &outBuff = c.getOutBuf();
+	std::time_t topicChange;
+	if (getProtectedTopicMode() && !_operators.count(c.getNickName()))
+	{
+		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, c.getNickName(), _name);
+		outBuff.append(rpl.c_str(), rpl.length());
+		return;
+	}
+//		it->topic(c, );
+	topicChange = std::time(nullptr);
+	if (topicChange != static_cast<time_t>(-1))
+		_topicUpdatedTime = topicChange;
+	_topicUpdatedWho = c.getNickName();
+	_topic = newTopic;
+	topic(c, true);
+// try set new topic, reply??
+}
+
 int Channel::kick(Client &source, std::string &nick)
 {
 	(void)source;
@@ -190,7 +228,7 @@ int Channel::invite(Client &source, std::string &nick)
 	return (0);
 }
 
-int Channel::names(Client &source)
+void Channel::names(Client &source)
 {
 	std::string rpl;
 	Buffer &outBuf = source.getOutBuf();
@@ -203,7 +241,6 @@ int Channel::names(Client &source)
 	rpl = numericRPL(RPL_NAMREPLY, source.getNickName(), "=", _name, namesToList);
 	rpl += numericRPL(RPL_ENDOFNAMES, source.getNickName(), _name);
 	outBuf.append(rpl.c_str(), rpl.length());
-	return 1;
 }
 /*
 const std::string &Channel::getTopic() const

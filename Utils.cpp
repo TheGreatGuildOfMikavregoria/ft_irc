@@ -35,6 +35,13 @@ std::vector<std::string> Utils::ft_split(std::string param, char sep)
 	return params;
 }
 
+std::string Utils::longToString(long someLong)
+{
+	std::ostringstream stream;
+	stream << someLong;
+	return stream.str();
+}
+
 
 // TODO: add one to work with pointers
 std::vector<Client *>::iterator Utils::getUserIteratorByNickName(std::vector<Client *> &clientVector, const std::string &nickname)

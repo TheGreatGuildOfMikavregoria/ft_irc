@@ -126,7 +126,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_WHOISACCOUNT		" 330 %s <nick> <account> :is logged in as"
 #define RPL_NOTOPIC				" 331 %s %s :No topic is set" //in_use
 #define RPL_TOPIC				" 332 %s %s :%s" // in_use
-#define RPL_TOPICWHOTIME		" 333 %s <channel> <nick> <setat>"
+#define RPL_TOPICWHOTIME		" 333 %s %s %s %s" //in_use
 #define RPL_INVITELIST			" 336 %s <channel>"
 #define RPL_ENDOFINVITELIST		" 337 %s :End of /INVITE list"
 #define RPL_WHOISACTUALLY (338) //read more on format
@@ -169,7 +169,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_BADCHANNELKEY		" 475 %s %s :Cannot join channel (+k)" //in_use
 #define ERR_BADCHANMASK			" 476 %s %s :Bad Channel Mask" //in_use
 #define ERR_NOPRIVILEGES		" 481 %s :Permission Denied- You're not an IRC operator"
-#define ERR_CHANOPRIVSNEEDED	" 482 %s <channel> :You're not channel operator"
+#define ERR_CHANOPRIVSNEEDED	" 482 %s %s :You're not channel operator" // in_use
 #define ERR_NOOPERHOST			" 491 %s :No O-lines for your host" //in_use
 #define ERR_UMODEUNKNOWNFLAG	" 501 %s :Unknown MODE flag"
 #define ERR_USERSDONTMATCH		" 502 %s :Cant change mode for other users"

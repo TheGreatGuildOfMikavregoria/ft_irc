@@ -35,6 +35,8 @@ class Channel
 	private:
 		std::string _name;
 		std::string _topic;
+		std::time_t _topicUpdatedTime;
+		std::string _topicUpdatedWho;
 		std::string _key;
 		std::string _timeCreated;
 
@@ -75,8 +77,9 @@ class Channel
 		void part(Client &, std::string &message);
 		int kick(Client &source, std::string &nick);
 		int invite(Client &source, std::string &nick);
-		int names(Client &);
-		//int topic(Client &source, )
+		void names(Client &);
+		void topic(Client &source, bool);
+		void topic(Client &source, std::string &newTopic);
 		void chanBroadcast(std::string &);
 		void chanBroadcast(Client &, std::string &);
 		void userAdd(Client *);
