@@ -33,7 +33,6 @@ void Server::invite(Client& c, Command& cmd) {
 		invitee = clientLookUp(cmd.getTokens()[1]);
 		if (invitee != nullptr)
 		{
-			std::cout << "found client" << std::endl;
 			outBuf = invitee->getOutBuf();
 			rpl = ":" + c.getNickName() + " INVITE " + cmd.getTokens()[1] + " " + cmd.getTokens()[2] + "\r\n";
 			outBuf.append(rpl.c_str(), rpl.length());
