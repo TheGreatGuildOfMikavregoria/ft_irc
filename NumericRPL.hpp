@@ -130,7 +130,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_INVITELIST			" 336 %s <channel>"
 #define RPL_ENDOFINVITELIST		" 337 %s :End of /INVITE list"
 #define RPL_WHOISACTUALLY (338) //read more on format
-#define RPL_INVITING			" 341 %s <nick> <channel>"
+#define RPL_INVITING			" 341 %s %s %s" //in_use
 #define RPL_EXCEPTLIST			" 348 %s <channel> <mask>"
 #define RPL_ENDOFEXCEPTLIST		" 349 %s <channel> :End of channel exception list"
 #define RPL_WHOREPLY			" 352 %s <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
