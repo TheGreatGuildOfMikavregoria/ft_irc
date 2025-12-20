@@ -77,6 +77,7 @@ private:
 		{"PART", &Server::part},
 		{"TOPIC", &Server::topic},
 		{"INVITE", &Server::invite},
+		{"MODE", &Server::mode},
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
@@ -123,6 +124,7 @@ public:
 	void	part(Client& c, Command& cmd);
 	void	topic(Client &c, Command &cmd);
 	void	invite(Client &c, Command &cmd);
+	void	mode(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);
