@@ -145,11 +145,13 @@ void Channel::join(Client &client, bool keyValidated)
 	userAdd(&client);
 	_inviteListRemove(nickname);
 	if (_operators.size() == 0)
+	{
 		_operators.insert(nickname);
+		_topicUpdatedWho = nickname;
+	}
 	std::string prefix = ":" + nickname;
 	std::string message = prefix + " JOIN " + _name + "\r\n";
 	this->chanBroadcast(message);
-	_topicUpdatedWho = nickname;
 	topicChange = std::time(nullptr);
 	if (topicChange != static_cast<time_t>(-1))
 		_topicUpdatedTime = topicChange;
@@ -171,9 +173,9 @@ void Channel::part(Client &client, std::string &reason)
 {
 	std::string response;
 	if (reason.length())
-		response = ":" + client.getNickName() + "@" + client.getHostName()  + " PART " + _name + " :" + reason +  "\r\n";
+		response = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName()  + " PART " + _name + " :" + reason +  "\r\n";
 	else
-		response = ":" + client.getNickName()  + "@" + client.getHostName() + " PART " + _name + "\r\n";
+		response = ":" + client.getNickName() + "!" + client.getUserName()  + "@" + client.getHostName() + " PART " + _name + "\r\n";
 	chanBroadcast(response);
 	userRemove(client);
 }
