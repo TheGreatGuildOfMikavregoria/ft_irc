@@ -38,15 +38,17 @@ class Channel
 		std::string _key;
 		std::string _timeCreated;
 
-		std::set<Client *> _channelUsers;
-		std::set<std::string> _inviteList;
-		std::set<std::string> _operators;
-				
-		bool _inviteOnlyMode = false;
-		bool _keyMode = false;
-		bool _protectedTopicMode = false;
-		bool _clientLimitMode = false;
-		size_t _clientLimit = false;
+		std::set<Client *>		_channelUsers;
+		std::set<std::string>	_inviteList;
+		std::set<std::string>	_operators;
+		
+
+		// bool _inviteOnlyMode = false;
+		// bool _keyMode = false;
+		// bool _protectedTopicMode = false;
+		// bool _clientLimitMode = false;
+		int		_chanMode		= 0;
+		size_t	_clientLimit	= 0;
 
 		void _chanOperatorAdd(Client &);
 		void _chanOperatorRemove(Client &);
@@ -54,6 +56,14 @@ class Channel
 		void _inviteListRemove(std::string &);
 
 	public:
+		enum mode {
+		ModeNone			= 0,
+		ModeInviteOnly		= 1 << 0,
+		ModeProtectedTopic	= 1 << 1,
+		ModeKeyOn			= 1 << 2,
+		ModeOperator		= 1 << 3,
+		ModeClientLim		= 1 << 4
+		};
 		Channel(const std::string &name);
 		~Channel() = default;
 		void setKey(std::string &);
@@ -85,6 +95,9 @@ class Channel
 		static bool hasChanPrefix(std::string &name);
 		static bool validateName(std::string &name);
 		
+		void	addMode(int mask);
+		void	removeMode(int mask);
+		bool	hasMode(int mask) const;
 		const 	std::string	getChanMode() const;
 		const	std::string	getChanModeParams() const;
 };

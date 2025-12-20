@@ -246,11 +246,15 @@ const std::string	Channel::getChanMode() const {
 
 }
 
+void	Channel::addMode(int mask) {_chanMode |= mask;}
+void	Channel::removeMode(int mask) {_chanMode &= ~mask;}
+bool	Channel::hasMode(int mask) const {return (_chanMode & mask);}
 const std::string	Channel::getChanModeParams() const {
 	std::string s = "+";//change apropriately
-	if (_userMode & ModeInvi) s += 'i';
-	if (_userMode & ModeOper) s += 'o';
-	if (_userMode & ModeWallop) s += 'w';
-	if (_userMode & ModeNotice) s += 'n';
+	if (_chanMode & ModeInviteOnly) s += 'i';
+	if (_chanMode & ModeProtectedTopic) s += 't';
+	if (_chanMode & ModeKeyOn) s += 'k';
+	if (_chanMode & ModeOperator) s += 'o';
+	if (_chanMode & ModeClientLim) s += 'l';
 	return s;
 }
