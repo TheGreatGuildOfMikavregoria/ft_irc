@@ -223,11 +223,45 @@ void Channel::topic(Client &c, std::string &newTopic)
 // try set new topic, reply??
 }
 
-int Channel::kick(Client &source, std::string &nick)
+void Channel::kick(Client &source, std::string &user, std::string &reason)
 {
-	(void)source;
-	(void)nick;
-	return 0;
+	std::string rpl;
+	Buffer &outBuf = source.getOutBuf();
+	if (!_channelUsers.count(&source))
+	{
+		rpl = numericRPL(ERR_NOTONCHANNEL, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+	if  (!_operators.count(source.getNickName()))
+	{
+		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+/*
+	if  (!_operators.count(source.getNickName()))
+	{
+		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+*/
+	auto userIt = std::find_if(_channelUsers.begin(), _channelUsers.end(), [&user](Client *client){ return client->getUserName() == user; });
+	if (userIt == _channelUsers.end())
+	{
+		rpl = numericRPL(ERR_USERNOTINCHANNEL, source.getNickName(), user, _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+//	const Client &clientToKick = *userIt;
+
+	userRemove(dynamic_cast<Client &>(*userIt));
+	rpl = ":" + source.getNickName() + "!" +source.getUserName() + "@" + source.getHostName() + " KICK " + _name +  " " + user;
+	if (reason.length())
+		rpl += " :" + reason;
+	rpl += "\r\n";
+	return ;
 }
 
 bool Channel::invite(Client &source, std::string &nick)

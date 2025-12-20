@@ -85,7 +85,7 @@ class Channel
 		void join(Client &, bool);
 		void join(Client &, std::string &key);
 		void part(Client &, std::string &message);
-		int kick(Client &source, std::string &nick);
+		void kick(Client &source, std::string &nick, std::string &reason);
 		bool invite(Client &source, std::string &nick);
 		void names(Client &);
 		void topic(Client &source, bool);

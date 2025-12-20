@@ -156,7 +156,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_ERRONEUSNICKNAME	" 432 %s %s :Erroneus nickname" //in_use
 #define ERR_NICKNAMEINUSE		" 433 %s :Nickname is already in use" //in_use
 //#define ERR_NICKCOLLISION		" 436 %s <nick> :Nickname collision KILL from <user>@<host>" //out of scope. Involves another server
-#define ERR_USERNOTINCHANNEL	" 441 %s <nick> <channel> :They aren't on that channel"
+#define ERR_USERNOTINCHANNEL	" 441 %s %s %s :They aren't on that channel" // in_use
 #define ERR_NOTONCHANNEL		" 442 %s %s :You're not on that channel" //in_use
 #define ERR_USERONCHANNEL		" 443 %s %s %s :is already on channel" //in_use
 #define ERR_NOTREGISTERED 	" 451 %s :You have not registered" //in_use

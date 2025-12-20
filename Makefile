@@ -1,7 +1,7 @@
 CXX = c++
 NAME = ircserv
 
-SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRunCmd.cpp Channel.cpp cmds/Pass.cpp cmds/Join.cpp cmds/Part.cpp cmds/Topic.cpp cmds/Invite.cpp cmds/Mode.cpp
+SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRunCmd.cpp Channel.cpp cmds/Pass.cpp cmds/Join.cpp cmds/Part.cpp cmds/Topic.cpp cmds/Invite.cpp cmds/Mode.cpp cmds/Kick.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 INCLUDES =

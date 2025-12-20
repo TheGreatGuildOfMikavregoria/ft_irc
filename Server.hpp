@@ -78,6 +78,7 @@ private:
 		{"TOPIC", &Server::topic},
 		{"INVITE", &Server::invite},
 		{"MODE", &Server::mode},
+		{"KICK", &Server::kick},
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
@@ -125,6 +126,7 @@ public:
 	void	topic(Client &c, Command &cmd);
 	void	invite(Client &c, Command &cmd);
 	void	mode(Client& c, Command& cmd);
+	void	kick(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);
