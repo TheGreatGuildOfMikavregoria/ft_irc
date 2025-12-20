@@ -87,6 +87,11 @@ const std::string &Channel::getName() const
 	return _name;
 }
 
+const std::string &Channel::getTimeCreated()
+{
+	return _timeCreated;
+}
+
 bool Channel::getInviteOnlyMode() const
 {
 	return hasMode(ModeInviteOnly);

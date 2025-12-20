@@ -121,8 +121,8 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_LISTSTART			" 321 %s Channel :Users  Name"
 #define RPL_LIST				" 322 %s <channel> <client count> :<topic>"
 #define RPL_LISTEND				" 323 %s :End of /LIST"
-#define RPL_CHANNELMODEIS		" 324 %s <channel> <modestring> <mode arguments>..." //see what are mode args
-#define RPL_CREATIONTIME		" 329 %s <channel> <creationtime>"
+#define RPL_CHANNELMODEIS		" 324 %s %s %s %s" //in_use
+#define RPL_CREATIONTIME		" 329 %s %s %s" //in_use
 #define RPL_WHOISACCOUNT		" 330 %s <nick> <account> :is logged in as"
 #define RPL_NOTOPIC				" 331 %s %s :No topic is set" //in_use
 #define RPL_TOPIC				" 332 %s %s :%s" // in_use

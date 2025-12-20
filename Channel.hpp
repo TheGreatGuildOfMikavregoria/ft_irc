@@ -73,7 +73,7 @@ class Channel
 		const std::string &getTopic() const;
 		const std::string &getName() const;
 		
-		std::string &getTimeCreated();
+		const std::string &getTimeCreated();
 		bool getInviteOnlyMode() const;
 		bool getClientLimitMode() const ;
 		bool getKeyMode() const;

@@ -13,8 +13,8 @@ void	Server::mode(Client& c, Command& cmd)
 		if (it == _channels.end())
 			rpl = numericRPL(ERR_NOSUCHCHANNEL, nickName, target);
 		if (cmd.getTokens().size() < 3) {
-			rpl = numericRPL(RPL_CHANNELMODEIS, target, (*it).getChanMode(), (*it).getClientLimit());
-			(void)outBuf;
+			rpl = numericRPL(RPL_CHANNELMODEIS, nickName, target, (*it).getChanMode(), (*it).getClientLimit());
+			rpl += numericRPL(RPL_CREATIONTIME, nickName, target, (*it).getTimeCreated());
 		}
 	}
 }

@@ -53,6 +53,11 @@ void Server::dropClient(std::size_t index, const std::string &reason)
 	_clients.erase(_clients.begin() + index);
 }
 
+const std::string &Server::getTimeCreated()
+{
+	return _timeCreated;
+}
+
 void Server::sendToClient(int fd,const  std::string &msg)
 {
 	std::string payload = msg;

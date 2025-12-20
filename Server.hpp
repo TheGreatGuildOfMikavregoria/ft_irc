@@ -112,8 +112,9 @@ public:
 	bool set_nonblock(int fd);
 	// void	numericRPL(Client& c, const char* format,  ...);
 
-	void	pass(Client& c, Command& cmd);
-	std::string &getTimeCreated();
+	const std::string &getTimeCreated();
+
+
 	void	nick(Client& c, Command& cmd);
 	void	user(Client& c, Command& cmd);
 	void	ping(Client& c, Command& cmd);
