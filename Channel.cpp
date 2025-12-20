@@ -89,22 +89,27 @@ const std::string &Channel::getName() const
 
 bool Channel::getInviteOnlyMode() const
 {
-	return _inviteOnlyMode;
+	return hasMode(ModeInviteOnly);
 }
 
 bool Channel::getClientLimitMode() const
 {
-	return _clientLimitMode;
+	return hasMode(ModeClientLim);
+}
+
+size_t Channel::getClientLimit() const
+{
+	return _clientLimit;
 }
 
 bool Channel::getKeyMode() const
 {
-	return _keyMode;
+	return hasMode(ModeKeyOn);
 }
 
 bool Channel::getProtectedTopicMode() const
 {
-	return _protectedTopicMode;
+	return hasMode(ModeProtectedTopic);
 }
 
 std::set<Client *> &Channel::getChannelUsers()
@@ -315,18 +320,27 @@ bool Channel::validateModes(std::string &mode)
 */
 
 const std::string	Channel::getChanMode() const {
-
+	std::string s = "+";//change apropriately
+	if (_chanMode & ModeClientLim) s += 'l';
+	if (_chanMode & ModeInviteOnly) s += 'i';
+	if (_chanMode & ModeProtectedTopic) s += 't';
+	if (_chanMode & ModeKeyOn) s += 'k';
+	return s;
 }
 
 void	Channel::addMode(int mask) {_chanMode |= mask;}
 void	Channel::removeMode(int mask) {_chanMode &= ~mask;}
 bool	Channel::hasMode(int mask) const {return (_chanMode & mask);}
+/*
 const std::string	Channel::getChanModeParams() const {
-	std::string s = "+";//change apropriately
-	if (_chanMode & ModeInviteOnly) s += 'i';
-	if (_chanMode & ModeProtectedTopic) s += 't';
-	if (_chanMode & ModeKeyOn) s += 'k';
-	if (_chanMode & ModeOperator) s += 'o';
+	
+	
+	std::string s;//change apropriately
+	//invite limit num to string
 	if (_chanMode & ModeClientLim) s += 'l';
+	if (_chanMode & ModeInviteOnly) s += ;
+//	if (_chanMode & ModeProtectedTopic) s += 't';
+//	if (_chanMode & ModeKeyOn) s += 'k';
 	return s;
 }
+*/

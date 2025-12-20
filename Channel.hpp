@@ -59,12 +59,11 @@ class Channel
 
 	public:
 		enum mode {
-		ModeNone			= 0,
-		ModeInviteOnly		= 1 << 0,
-		ModeProtectedTopic	= 1 << 1,
-		ModeKeyOn			= 1 << 2,
-		ModeOperator		= 1 << 3,
-		ModeClientLim		= 1 << 4
+			ModeNone		= 0,
+			ModeInviteOnly		= 1 << 0,
+			ModeProtectedTopic	= 1 << 1,
+			ModeKeyOn		= 1 << 2,
+			ModeClientLim		= 1 << 3
 		};
 		Channel(const std::string &name);
 		~Channel() = default;
@@ -79,6 +78,7 @@ class Channel
 		bool getClientLimitMode() const ;
 		bool getKeyMode() const;
 		bool getProtectedTopicMode() const;
+		size_t getClientLimit() const;
 		std::set<Client *> &getChannelUsers();
 		std::set<std::string> &getInviteList();
 		
@@ -101,7 +101,7 @@ class Channel
 		void	removeMode(int mask);
 		bool	hasMode(int mask) const;
 		const 	std::string	getChanMode() const;
-		const	std::string	getChanModeParams() const;
+//		const	std::string	getChanModeParams() const;
 };
 
 #endif
