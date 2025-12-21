@@ -6,8 +6,6 @@ vpath %.cpp cmds botsrcs
 #SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp \
 		Msg.cpp ServerRunCmd.cpp Channel.cpp Pass.cpp Join.cpp Pong.cpp
 
-#<<<<<<< HEAD
-#=======
 SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRunCmd.cpp Channel.cpp \
 	Pass.cpp \
 	Join.cpp \
@@ -20,7 +18,6 @@ SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRun
 	Pong.cpp \
 	Msg.cpp \
 
-#>>>>>>> feat/Channels
 OBJS = $(SRCS:.cpp=.o)
 
 SRCS_B = bot.cpp Buffer.cpp
