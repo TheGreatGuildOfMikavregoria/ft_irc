@@ -76,4 +76,7 @@ class Client{
 		void	addMode(int mode);
 		void	removeMode(int mode);
 
+		std::string getSource() const;
+		void who(Client &source);
+		void who(Client &source, Channel *channelPtr);
 };

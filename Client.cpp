@@ -59,3 +59,37 @@ const 	std::string	Client::getUserMode() const {
 	if (_userMode & ModeNotice) s += 'n';
 	return s;
 }
+std::string Client::getSource() const
+{
+	std::string source;
+	if (getNickNameStatus())
+		source += getNickName();
+	if (getUserNameStatus())
+		source += "!" + getUserName();
+	source += "@" + getHostName();
+	return (source);
+}
+
+void Client::who(Client &source)
+{
+	std::string rpl;
+	std::string resolvedChannelName;
+	auto userChannelsIt = _userChannels.begin();
+	if (userChannelsIt != _userChannels.end())
+		resolvedChannelName = (*userChannelsIt)->getName();
+	else
+		resolvedChannelName = "*";
+	rpl = numericRPL(RPL_WHOREPLY, source.getNickName(), resolvedChannelName, getHostName(), SERVER_NAME, getNickName(), "H", 0, getRealName());
+	std::cout << rpl << std::endl;
+	source.getOutBuf().append(rpl.c_str(), rpl.length());
+
+}
+
+void Client::who(Client &source, Channel *channelPtr)
+{
+	std::string rpl;
+	std::string resolvedChannelName;
+	if (channelPtr != nullptr && _userChannels.count(channelPtr))
+		rpl = numericRPL(RPL_WHOREPLY, source.getNickName(), channelPtr->getName(), getHostName(), SERVER_NAME, getNickName(), "H", 0, getRealName());
+	source.getOutBuf().append(rpl.c_str(), rpl.length());
+}

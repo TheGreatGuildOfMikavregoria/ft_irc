@@ -32,6 +32,7 @@
 #include <list>
 #define MAX_CLIENTS 512
 #define CLIENT_TIMEOUT 600
+#define SERVER_NAME "ircserv"
 #define OPER_NAME   "ircAdmin"
 #define OPER_PASS	"admin@IRC42"
 
@@ -79,6 +80,7 @@ private:
 		{"INVITE", &Server::invite},
 		{"MODE", &Server::mode},
 		{"KICK", &Server::kick},
+		{"WHO", &Server::who},
 	};
 	int status; //I believed i needed at somepoint now i dont remember
 	std::string password; 
@@ -127,6 +129,7 @@ public:
 	void	invite(Client &c, Command &cmd);
 	void	mode(Client& c, Command& cmd);
 	void	kick(Client& c, Command& cmd);
+	void	who(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);

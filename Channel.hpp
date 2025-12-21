@@ -90,6 +90,7 @@ class Channel
 		void names(Client &);
 		void topic(Client &source, bool);
 		void topic(Client &source, std::string &newTopic);
+		void who(Client &);
 		void chanBroadcast(std::string &);
 		void chanBroadcast(Client &, std::string &);
 		void userAdd(Client *);
