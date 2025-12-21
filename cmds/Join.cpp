@@ -1,25 +1,5 @@
 #include "../Server.hpp"
 
-std::vector<std::string> getSeparatedParams(std::string param)
-{
-	std::vector<std::string> params;
-	
-	size_t index =  param.find(',');
-	if (index == std::string::npos)
-	{
-		params.push_back(param);
-		return (params);
-	}
-	while (index != std::string::npos)
-	{
-		params.push_back(param.substr(0, index));
-		param = param.substr(index + 1);
-		index = param.find(',');
-	}
-	params.push_back(param.substr(0, index));
-	return params;
-}
-
 void Server::join(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
 	std::string rpl;
@@ -32,21 +12,24 @@ void Server::join(Client& c, Command& cmd) {
 	}
 	if (cmd.getTokens().size() == 1)
 	{
-		//some error
-		//ERR_NEEDMOREPARAMS (461)
 		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens()[0]);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
 	if (cmd.getTokens().size() == 2 && cmd.getTokens()[1] == "0")
 	{
+		std::string reason;
 		//TODO: PART all user joined channels
+		for (Channel &channel : _channels)
+		{
+			channel.part(c, reason);
+		}
 		return ;
 	}
-	std::vector <std::string> channels = getSeparatedParams(cmd.getTokens()[1]);
+	std::vector <std::string> channels = Utils::ft_split(cmd.getTokens()[1], ',');
 	std::vector <std::string> keys;
 	if (cmd.getTokens().size() == 3)
-		keys = getSeparatedParams(cmd.getTokens()[2]);
+		keys = Utils::ft_split(cmd.getTokens()[2], ',');
 
 	auto chanIterStart = channels.begin();
 	auto keyIterStart = keys.begin();

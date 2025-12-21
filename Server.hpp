@@ -33,6 +33,7 @@
 #define MAX_CLIENTS 512
 #define CLIENT_TIMEOUT 60
 #define CLIENT_PONG_WAITTIME CLIENT_TIMEOUT / 10 * 9
+#define SERVER_NAME "ircserv"
 #define OPER_NAME   "ircAdmin"
 #define OPER_PASS	"admin@IRC42"
 
@@ -56,6 +57,12 @@ private:
 		{"OPER", &Server::oper},
 		{"QUIT", &Server::quit},
 		{"JOIN", &Server::join},
+		{"PART", &Server::part},
+		{"TOPIC", &Server::topic},
+		{"INVITE", &Server::invite},
+		{"MODE", &Server::mode},
+		{"KICK", &Server::kick},
+		{"WHO", &Server::who},
 		{"PRIVMSG", &Server::privmsg},
 		{"PONG", &Server::pong},
 	};
@@ -102,6 +109,12 @@ public:
 	void	quit(Client& c, Command& cmd);
 	void	error(Client& c, const std::string& msg);
 	void	join(Client& c, Command& cmd);
+	void	part(Client& c, Command& cmd);
+	void	topic(Client &c, Command &cmd);
+	void	invite(Client &c, Command &cmd);
+	void	mode(Client& c, Command& cmd);
+	void	kick(Client& c, Command& cmd);
+	void	who(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);

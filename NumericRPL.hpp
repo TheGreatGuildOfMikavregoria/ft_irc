@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Server.hpp"
+#include "Utils.hpp"
 
 #include <string>
 #include <iostream>
@@ -31,6 +32,14 @@ void buildResponse(std::string& reply, const char* format, T value, Args... args
 		}
 		reply += *format++;
 	}
+}
+
+template<typename... Args>
+std::string ft_stringf(const std::string& format, Args... args)
+{
+	std::string result;
+	buildResponse(result, format.c_str(), args...);
+	return result;
 }
 
 template<typename... Args>
@@ -103,7 +112,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_CREATED				" 003 %s :This server was created <datetime>" //in_use //Add params
 #define RPL_MYINFO				" 004 %s <servername> <version> <available user modes> <available channel modes> [<channel modes with a parameter>]" //in_use //Add params
 #define RPL_ISUPPORT			" 005 %s <1-13 tokens> :are supported by this server" //in_use //Add params
-#define RPL_UMODEIS				" 221 %s <user modes>"
+#define RPL_UMODEIS				" 221 %s <user modes>" //in_use 
 #define RPL_WHOISCERTFP			" 276 %s <nick> :has client certificate fingerprint <fingerprint>" //what is fingerprint
 #define RPL_AWAY				" 301 %s <nick> :<message>"
 #define RPL_USERHOST			" 302 %s :[<reply>{ <reply>}]" 
@@ -113,7 +122,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_WHOISUSER			" 311 %s <nick> <username> <host> * :<realname>"
 #define RPL_WHOISSERVER			" 312 %s <nick> <server> :<server info>"
 #define RPL_WHOISOPERATOR		" 313 %s <nick> :is an IRC operator"
-#define RPL_ENDOFWHO			" 315 %s <mask> :End of WHO list"
+#define RPL_ENDOFWHO			" 315 %s %s :End of WHO list" // in_use
 #define RPL_WHOISIDLE			" 317 %s <nick> <secs> <signon> :seconds idle, signon time"
 #define RPL_ENDOFWHOIS			" 318 %s <nick> :End of /WHOIS list"
 #define RPL_WHOISCHANNELS		" 319 %s <nick> :[prefix]<channel>{ [prefix]<channel>}" //read more on format
@@ -126,14 +135,15 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_WHOISACCOUNT		" 330 %s <nick> <account> :is logged in as"
 #define RPL_NOTOPIC				" 331 %s %s :No topic is set" //in_use
 #define RPL_TOPIC				" 332 %s %s :%s" // in_use
-#define RPL_TOPICWHOTIME		" 333 %s <channel> <nick> <setat>"
+#define RPL_TOPICWHOTIME		" 333 %s %s %s %s" //in_use
 #define RPL_INVITELIST			" 336 %s <channel>"
 #define RPL_ENDOFINVITELIST		" 337 %s :End of /INVITE list"
 #define RPL_WHOISACTUALLY (338) //read more on format
-#define RPL_INVITING			" 341 %s <nick> <channel>"
+#define RPL_INVITING			" 341 %s %s %s" //in_use
 #define RPL_EXCEPTLIST			" 348 %s <channel> <mask>"
 #define RPL_ENDOFEXCEPTLIST		" 349 %s <channel> :End of channel exception list"
-#define RPL_WHOREPLY			" 352 %s <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
+//#define RPL_WHOREPLY			" 352 %s <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
+#define RPL_WHOREPLY			" 352 %s %s %s %s %s %s :%s %s" //in_use
 #define RPL_NAMREPLY			" 353 %s %s %s :%s" // in_use
 #define RPL_ENDOFNAMES			" 366 %s %s :End of /NAMES list" //in_use
 #define RPL_BANLIST				" 367 %s <channel> <mask> [<who> <set-ts>]"
@@ -143,7 +153,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_YOUREOPER			" 381 %s :You are now an IRC operator" //in_use
 #define ERR_NOSUCHNICK			" 401 %s <nickname> :No such nick/channel"
 #define ERR_NOSUCHSERVER		" 402 %s <server name> :No such server" //PING:Deprecated Numeric Reply
-#define ERR_NOSUCHCHANNEL		" 403 %s <channel> :No such channel"
+#define ERR_NOSUCHCHANNEL		" 403 %s %s :No such channel" //in_use
 #define ERR_CANNOTSENDTOCHAN	" 404 %s <channel> :Cannot send to channel"
 #define ERR_TOOMANYCHANNELS		" 405 %s <channel> :You have joined too many channels"
 #define ERR_TOOMANYTARGETS (407)//no message?
@@ -156,9 +166,9 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_ERRONEUSNICKNAME	" 432 %s %s :Erroneus nickname" //in_use
 #define ERR_NICKNAMEINUSE		" 433 %s :Nickname is already in use" //in_use
 //#define ERR_NICKCOLLISION		" 436 %s <nick> :Nickname collision KILL from <user>@<host>" //out of scope. Involves another server
-#define ERR_USERNOTINCHANNEL	" 441 %s <nick> <channel> :They aren't on that channel"
-#define ERR_NOTONCHANNEL		" 442 %s <channel> :You're not on that channel"
-#define ERR_USERONCHANNEL		" 443 %s <nick> <channel> :is already on channel"
+#define ERR_USERNOTINCHANNEL	" 441 %s %s %s :They aren't on that channel" // in_use
+#define ERR_NOTONCHANNEL		" 442 %s %s :You're not on that channel" //in_use
+#define ERR_USERONCHANNEL		" 443 %s %s %s :is already on channel" //in_use
 #define ERR_NOTREGISTERED 	" 451 %s :You have not registered" //in_use
 #define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters" //in_use
 #define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister" //in_use
@@ -169,7 +179,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_BADCHANNELKEY		" 475 %s %s :Cannot join channel (+k)" //in_use
 #define ERR_BADCHANMASK			" 476 %s %s :Bad Channel Mask" //in_use
 #define ERR_NOPRIVILEGES		" 481 %s :Permission Denied- You're not an IRC operator"
-#define ERR_CHANOPRIVSNEEDED	" 482 %s <channel> :You're not channel operator"
+#define ERR_CHANOPRIVSNEEDED	" 482 %s %s :You're not channel operator" // in_use
 #define ERR_NOOPERHOST			" 491 %s :No O-lines for your host" //in_use
 #define ERR_UMODEUNKNOWNFLAG	" 501 %s :Unknown MODE flag"
 #define ERR_USERSDONTMATCH		" 502 %s :Cant change mode for other users"

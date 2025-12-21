@@ -7,12 +7,14 @@
 */
 
 // TODO: modify to work with pointers
+// TODO: change
 void Channel::userAdd(Client *user)
 {
 	_channelUsers.insert(user);
 	user->getUserChannels().insert(this);
 }
 
+// TODO change
 void Channel::userRemove(Client &user)
 {
 	std::set<Channel *>	&userChannels = user.getUserChannels();
@@ -87,22 +89,27 @@ const std::string &Channel::getName() const
 
 bool Channel::getInviteOnlyMode() const
 {
-	return _inviteOnlyMode;
+	return hasMode(ModeInviteOnly);
 }
 
 bool Channel::getClientLimitMode() const
 {
-	return _clientLimitMode;
+	return hasMode(ModeClientLim);
+}
+
+size_t Channel::getClientLimit() const
+{
+	return _clientLimit;
 }
 
 bool Channel::getKeyMode() const
 {
-	return _keyMode;
+	return hasMode(ModeKeyOn);
 }
 
 bool Channel::getProtectedTopicMode() const
 {
-	return _protectedTopicMode;
+	return hasMode(ModeProtectedTopic);
 }
 
 std::set<Client *> &Channel::getChannelUsers()
@@ -117,39 +124,43 @@ std::set<std::string> &Channel::getInviteList()
 
 void Channel::join(Client &client, bool keyValidated)
 {
+	std::time_t topicChange;
 	std::string rpl;
 	Buffer &outBuf = client.getOutBuf();
+	std::string nickname = client.getNickName();
 	//TODO: think through repeated join
-	if (!keyValidated && _keyMode)
+	if (!keyValidated && getKeyMode())
 	{
-		rpl = numericRPL(ERR_BADCHANNELKEY, client.getNickName(), _name);
+		rpl = numericRPL(ERR_BADCHANNELKEY, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	if (_clientLimitMode && _channelUsers.size() == _clientLimit)
+	if (getClientLimitMode() && _channelUsers.size() == _clientLimit)
 	{
-		rpl = numericRPL(ERR_CHANNELISFULL, client.getNickName(), _name);
+		rpl = numericRPL(ERR_CHANNELISFULL, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	if (_inviteOnlyMode && !_channelUsers.count(&client))
+	if (getInviteOnlyMode() && !_channelUsers.count(&client))
 	{
-		rpl = numericRPL(ERR_INVITEONLYCHAN, client.getNickName(), _name);
+		rpl = numericRPL(ERR_INVITEONLYCHAN, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
 	userAdd(&client);
+	_inviteListRemove(nickname);
 	if (_operators.size() == 0)
-		_operators.insert(client.getNickName());
-	std::string prefix = ":" + client.getNickName();
+	{
+		_operators.insert(nickname);
+		_topicUpdatedWho = nickname;
+	}
+	std::string prefix = ":" + nickname;
 	std::string message = prefix + " JOIN " + _name + "\r\n";
 	this->chanBroadcast(message);
-//TODO: errcode for internal error?
-	if (_topic.size())
-		rpl = numericRPL(RPL_TOPIC, client.getNickName(), _name, _topic);
-	else
-		rpl = numericRPL(RPL_NOTOPIC, client.getNickName(), _name);
-	outBuf.append(rpl.c_str(), rpl.length());
+	topicChange = std::time(nullptr);
+	if (topicChange != static_cast<time_t>(-1))
+		_topicUpdatedTime = topicChange;
+	topic(client, false);
 	names(client);
 }
 
@@ -163,27 +174,119 @@ void Channel::join(Client &client, std::string &key)
 	join(client, true);
 }
 
-int Channel::part(Client &client)
+void Channel::part(Client &client, std::string &reason)
 {
-	(void)client;
-	return 0;
+	std::string response;
+	if (reason.length())
+		response = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName()  + " PART " + _name + " :" + reason +  "\r\n";
+	else
+		response = ":" + client.getNickName() + "!" + client.getUserName()  + "@" + client.getHostName() + " PART " + _name + "\r\n";
+	chanBroadcast(response);
+	userRemove(client);
 }
 
-int Channel::kick(Client &source, std::string &nick)
+void Channel::topic(Client &c, bool broadcast)
 {
-	(void)source;
-	(void)nick;
-	return 0;
+	std::string rpl;
+	Buffer &outBuff = c.getOutBuf();
+	if (_topic.size())
+		rpl = numericRPL(RPL_TOPIC, c.getNickName(), _name, _topic);
+	else
+		rpl = numericRPL(RPL_NOTOPIC, c.getNickName(), _name);
+	rpl += numericRPL(RPL_TOPICWHOTIME, c.getNickName(), _name, _topicUpdatedWho, Utils::longToString(_topicUpdatedTime));
+	if (broadcast)
+		chanBroadcast(rpl);
+	else
+		outBuff.append(rpl.c_str(), rpl.length());
+	
+// RPL_TOPICWHOTIME
 }
 
-int Channel::invite(Client &source, std::string &nick)
+void Channel::topic(Client &c, std::string &newTopic)
 {
-	(void)source;
-	(void)nick;
-	return (0);
+	std::string rpl;
+	Buffer &outBuff = c.getOutBuf();
+	std::time_t topicChange;
+	if (getProtectedTopicMode() && !_operators.count(c.getNickName()))
+	{
+		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, c.getNickName(), _name);
+		outBuff.append(rpl.c_str(), rpl.length());
+		return;
+	}
+//		it->topic(c, );
+	topicChange = std::time(nullptr);
+	if (topicChange != static_cast<time_t>(-1))
+		_topicUpdatedTime = topicChange;
+	_topicUpdatedWho = c.getNickName();
+	_topic = newTopic;
+	topic(c, true);
+// try set new topic, reply??
 }
 
-int Channel::names(Client &source)
+void Channel::kick(Client &source, std::string &nick, std::string &reason)
+{
+	std::string rpl;
+	Buffer &outBuf = source.getOutBuf();
+	if (!_channelUsers.count(&source))
+	{
+		rpl = numericRPL(ERR_NOTONCHANNEL, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+	if  (!_operators.count(source.getNickName()))
+	{
+		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+	auto userIt = std::find_if(_channelUsers.begin(), _channelUsers.end(), [&nick](Client *client){ return client->getNickName() == nick; });
+	if (userIt == _channelUsers.end())
+	{
+		rpl = numericRPL(ERR_USERNOTINCHANNEL, source.getNickName(), nick, _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+	rpl = ":" + source.getSource() + " KICK " + _name +  " " + nick;
+	if (reason.length())
+		rpl += " :" + reason;
+	rpl += "\r\n";
+	chanBroadcast(rpl);
+	userRemove(**userIt);
+	return ;
+}
+
+bool Channel::invite(Client &source, std::string &nick)
+{
+	std::string rpl;
+	Buffer &outBuf = source.getOutBuf();
+	if (!_channelUsers.count(&source))
+	{
+		rpl = numericRPL(ERR_NOTONCHANNEL, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return false;
+	}
+//TODO : new mode considerations
+	if (getInviteOnlyMode() && !_operators.count(source.getNickName()))
+	{
+		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return false;
+	}
+	auto userIt = std::find_if(_channelUsers.begin(), _channelUsers.end(), [&nick](Client *client){ return client->getNickName() == nick; });
+	if (userIt != _channelUsers.end())
+	{
+		rpl = numericRPL(ERR_USERONCHANNEL, source.getNickName(), nick, _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return false;
+	}
+//TODO: somehow not shown for the inviter
+	rpl = numericRPL(RPL_INVITING, source.getNickName(), nick, _name);
+	outBuf.append(rpl.c_str(), rpl.length());
+	_inviteListAdd(nick);
+	return (true);
+}
+
+void Channel::names(Client &source)
 {
 	std::string rpl;
 	Buffer &outBuf = source.getOutBuf();
@@ -196,7 +299,13 @@ int Channel::names(Client &source)
 	rpl = numericRPL(RPL_NAMREPLY, source.getNickName(), "=", _name, namesToList);
 	rpl += numericRPL(RPL_ENDOFNAMES, source.getNickName(), _name);
 	outBuf.append(rpl.c_str(), rpl.length());
-	return 1;
+}
+void Channel::who(Client &source)
+{
+	for (Client *client : _channelUsers)
+	{
+		client->who(source, this);
+	}
 }
 /*
 const std::string &Channel::getTopic() const
@@ -204,11 +313,17 @@ const std::string &Channel::getTopic() const
 	return _topic;
 }
 */
+bool Channel::hasChanPrefix(std::string &name)
+{
+	if (name[0] != '#' && name[0] != '&' && name[0] != '!' && name[0] != '+' )
+		return (false);
+	return true;
+}
 bool Channel::validateName(std::string &name)
 {
 	if (name.length() < 2 || name.length() > 50)
 		return (false);
-	if (name[0] != '#' && name[0] != '&' && name[0] != '+' && name[0] != '!')
+	if (!hasChanPrefix(name))
 		return (false);
 	for (size_t i = 1; i < name.length(); ++i)
 	{
@@ -239,5 +354,31 @@ void Channel::chanBroadcast(Client &client, std::string &message)
 bool Channel::validateModes(std::string &mode)
 {
 	
+}
+*/
+
+const std::string	Channel::getChanMode() const {
+	std::string s = "+";//change apropriately
+	if (_chanMode & ModeClientLim) s += 'l';
+	if (_chanMode & ModeInviteOnly) s += 'i';
+	if (_chanMode & ModeProtectedTopic) s += 't';
+	if (_chanMode & ModeKeyOn) s += 'k';
+	return s;
+}
+
+void	Channel::addMode(int mask) {_chanMode |= mask;}
+void	Channel::removeMode(int mask) {_chanMode &= ~mask;}
+bool	Channel::hasMode(int mask) const {return (_chanMode & mask);}
+/*
+const std::string	Channel::getChanModeParams() const {
+	
+	
+	std::string s;//change apropriately
+	//invite limit num to string
+	if (_chanMode & ModeClientLim) s += 'l';
+	if (_chanMode & ModeInviteOnly) s += ;
+//	if (_chanMode & ModeProtectedTopic) s += 't';
+//	if (_chanMode & ModeKeyOn) s += 'k';
+	return s;
 }
 */

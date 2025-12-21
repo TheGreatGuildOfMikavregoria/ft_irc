@@ -5,7 +5,7 @@
 void Server::_runCmd(Client &currentClient, Command &message)
 {
 // TODO: all cmds in uppercase?
-	auto cmd = _commandMap.find(message.getCommand());
+	auto cmd = _commandMap.find(Utils::stringToUppercase(message.getCommand()));
 	if (cmd == _commandMap.end())
 	{
 // TODO:  appropriate response?

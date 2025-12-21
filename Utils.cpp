@@ -2,11 +2,47 @@
 
 std::string Utils::stringToLowercase(std::string text)
 {
-	int i = 0;
 	for (char &c : text)
-		c = std::tolower(text[i]);
+		c = std::tolower(c);
 	return text;
 }
+
+std::string Utils::stringToUppercase(std::string text)
+{
+	for (char &c : text)
+		c = std::toupper(c);
+	return text;
+}
+
+
+std::vector<std::string> Utils::ft_split(std::string param, char sep)
+{
+	std::vector<std::string> params;
+	
+	size_t index =  param.find(sep);
+	if (index == std::string::npos)
+	{
+		params.push_back(param);
+		return (params);
+	}
+	while (index != std::string::npos)
+	{
+		params.push_back(param.substr(0, index));
+		param = param.substr(index + 1);
+		index = param.find(sep);
+	}
+	params.push_back(param.substr(0, index));
+	return params;
+}
+
+std::string Utils::longToString(long someLong)
+{
+	std::ostringstream stream;
+	stream << someLong;
+	return stream.str();
+}
+
+
 // TODO: add one to work with pointers
 std::vector<Client *>::iterator Utils::getUserIteratorByNickName(std::vector<Client *> &clientVector, const std::string &nickname)
 {

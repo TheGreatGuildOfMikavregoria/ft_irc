@@ -1,5 +1,7 @@
 ircserv
+bot
 .vscode
+*.swp
 
 # Prerequisites
 *.d

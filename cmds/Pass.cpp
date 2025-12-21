@@ -1,7 +1,6 @@
 #include "../Server.hpp"
 
 #define USERLEN 8
-#define SERVER_NAME "ircserv"
 #define NETWORK_NAME "42Net"
 #define VERSION "1.0"
 

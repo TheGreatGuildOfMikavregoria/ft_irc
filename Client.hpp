@@ -31,13 +31,13 @@ class Client{
 		std::set<Channel*> _userChannels;
 	
 	public:
-	    enum mode {
-        ModeNone	= 0,
-        ModeInvi	= 1 << 0,
-        ModeOper	= 1 << 1,
-        ModeWallop	= 1 << 2, //remove later
-        ModeNotice	= 1 << 3  //remove later
-    	};
+		enum mode {
+		ModeNone	= 0,
+		ModeInvi	= 1 << 0,
+		ModeOper	= 1 << 1,
+		ModeWallop	= 1 << 2, //remove later
+		ModeNotice	= 1 << 3  //remove later
+		};
 
 		Client(int fd);
 		~Client();
@@ -78,4 +78,7 @@ class Client{
 		void	addMode(int mode);
 		void	removeMode(int mode);
 
+		std::string getSource() const;
+		void who(Client &source);
+		void who(Client &source, Channel *channelPtr);
 };
