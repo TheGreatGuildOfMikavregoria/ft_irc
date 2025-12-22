@@ -174,7 +174,7 @@ void Server::user(Client& c, Command& cmd) {
 	else {
 		std::string userName = cmd.getTokens().at(1);
 		for (char c : userName) {
-			if (c == '@')//ignores command silently. decide the behaviour.
+			if (c == '@')//ignores command silently. decide the behaviour.//what happens if user send USER again?
 				return;
 		}
 		userName = "~" + userName.substr(0,USERLEN);//check if ~ should be included in USERLEN
