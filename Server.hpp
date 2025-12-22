@@ -114,7 +114,7 @@ public:
 
 	const std::string &getTimeCreated();
 
-
+	void	pass(Client& c, Command& cmd);
 	void	nick(Client& c, Command& cmd);
 	void	user(Client& c, Command& cmd);
 	void	ping(Client& c, Command& cmd);
