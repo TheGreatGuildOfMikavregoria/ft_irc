@@ -101,6 +101,8 @@ class Channel
 		void	removeMode(int mask);
 		bool	hasMode(int mask) const;
 		const 	std::string	getChanMode() const;
+
+		bool	isOperator(Client &user)
 //		const	std::string	getChanModeParams() const;
 };
 

@@ -336,16 +336,8 @@ const std::string	Channel::getChanMode() const {
 void	Channel::addMode(int mask) {_chanMode |= mask;}
 void	Channel::removeMode(int mask) {_chanMode &= ~mask;}
 bool	Channel::hasMode(int mask) const {return (_chanMode & mask);}
-/*
-const std::string	Channel::getChanModeParams() const {
-	
-	
-	std::string s;//change apropriately
-	//invite limit num to string
-	if (_chanMode & ModeClientLim) s += 'l';
-	if (_chanMode & ModeInviteOnly) s += ;
-//	if (_chanMode & ModeProtectedTopic) s += 't';
-//	if (_chanMode & ModeKeyOn) s += 'k';
-	return s;
+
+bool Channel::isOperator(Client &user)
+{
+	return _operators.count(user.getNickName());
 }
-*/
