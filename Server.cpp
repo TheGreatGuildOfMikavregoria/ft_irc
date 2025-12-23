@@ -16,9 +16,13 @@ Server::Server(std::string port, std::string pw) : status(0), password(pw), port
 // TODO:  protec?
 	_timeCreated = Utils::getCurrentTimeString();
 	_clients.reserve(MAX_CLIENTS);
+	size_t endIdx;
+	int portnum  = std::stoi(port, &endIdx);
 	try
 	{
-		if (std::stoi(port) < 0 || std::stoi(port) > 65535)
+		if (port[endIdx] != '\0')
+			throw std::runtime_error("Invalid port character");
+		if (portnum < 0 || portnum > 65535)
 			throw std::runtime_error("Port out of range");
 		_spareFd = open("/dev/null", O_RDONLY);
 		if (_spareFd < 0)
