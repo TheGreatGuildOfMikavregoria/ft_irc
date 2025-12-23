@@ -125,6 +125,7 @@ public:
 	void	privmsg(Client &c, Command &cmd);
 	Channel* getChannelByName(std::string &ch);
 	void pong(Client &c, Command &cmd);
+	void removeEmptyChannels();
 
 
 };

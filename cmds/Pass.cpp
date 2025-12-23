@@ -265,6 +265,7 @@ void Server::quit(Client& c, Command& cmd) {
 		chan->userRemove(c);
 		chan->chanBroadcast(c, rpl);
  	}
+	c.getUserChannels().clear();
 	c.setDisconnectFlag(true);
 }
 
@@ -274,7 +275,7 @@ void Server::error(Client& c, const std::string& msg) {
 	err_msg = "ERROR :" + msg + "\r\n";
 	outBuf.append(err_msg.c_str(), err_msg.length());
 }
-
+/*
 void Server::dropClient(Client& c)
 {
 	if (c.getFd() >= 0) //is this check needed? it is contructed with valid fd right?
@@ -287,3 +288,4 @@ void Server::dropClient(Client& c)
 		}),
 		_clients.end());
 }
+*/

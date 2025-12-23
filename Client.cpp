@@ -96,3 +96,13 @@ void Client::who(Client &source, Channel *channelPtr)
 		rpl = numericRPL(RPL_WHOREPLY, source.getNickName(), channelPtr->getName(), getHostName(), SERVER_NAME, getNickName(), "H", 0, getRealName());
 	source.getOutBuf().append(rpl.c_str(), rpl.length());
 }
+
+void Client::channelAdd(Channel &channel)
+{
+	_userChannels.insert(&channel);
+}
+
+void Client::channelRemove(Channel &channel)
+{
+	_userChannels.erase(&channel);
+}

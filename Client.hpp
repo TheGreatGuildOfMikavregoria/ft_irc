@@ -81,4 +81,6 @@ class Client{
 		std::string getSource() const;
 		void who(Client &source);
 		void who(Client &source, Channel *channelPtr);
+		void channelAdd(Channel &);
+		void channelRemove(Channel &);
 };

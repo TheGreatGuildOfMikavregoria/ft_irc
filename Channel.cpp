@@ -11,17 +11,11 @@
 void Channel::userAdd(Client *user)
 {
 	_channelUsers.insert(user);
-	user->getUserChannels().insert(this);
 }
 
-// TODO change
+
 void Channel::userRemove(Client &user)
 {
-	std::set<Channel *>	&userChannels = user.getUserChannels();
-	auto			usChanIt = userChannels.find(this);
-
-	if (usChanIt != userChannels.end())
-		userChannels.erase(usChanIt);
 	_channelUsers.erase(&user);
 }
 
@@ -148,6 +142,7 @@ void Channel::join(Client &client, bool keyValidated)
 		return ;
 	}
 	userAdd(&client);
+	client.channelAdd(*this);
 	_inviteListRemove(nickname);
 	if (_operators.size() == 0)
 	{
@@ -183,6 +178,7 @@ void Channel::part(Client &client, std::string &reason)
 		response = ":" + client.getNickName() + "!" + client.getUserName()  + "@" + client.getHostName() + " PART " + _name + "\r\n";
 	chanBroadcast(response);
 	userRemove(client);
+	client.channelRemove(*this);
 }
 
 void Channel::topic(Client &c, bool broadcast)
@@ -252,6 +248,7 @@ void Channel::kick(Client &source, std::string &nick, std::string &reason)
 	rpl += "\r\n";
 	chanBroadcast(rpl);
 	userRemove(**userIt);
+	(**userIt).channelRemove(*this);
 	return ;
 }
 
@@ -350,6 +347,12 @@ void Channel::chanBroadcast(Client &client, std::string &message)
 			userPtr->getOutBuf().append(message.c_str(), message.length());
 	}
 }
+
+bool Channel::isEmpty() const
+{
+	return (_channelUsers.size() == 0);
+}
+
 /*
 bool Channel::validateModes(std::string &mode)
 {

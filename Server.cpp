@@ -45,6 +45,7 @@ void Server::dropClient(std::size_t index, const std::string &reason)
 	auto channels = c.getUserChannels();
 	for (Channel* channel : channels)
 	{
+// TODO: check if client->channelRemove needed
 		if (channel)
 			channel->userRemove(c);
 	}
