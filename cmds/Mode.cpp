@@ -77,41 +77,48 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 	std::string target = cmd.getTokens().at(1);
 	unsigned long argID = cmd.getTokens().size() >= 4 ? 3 : 0;
 	std::string rpl;
-	std::string validModes;
+	std::string validModeAdd;
+	std::string validModeRem;
+	std::string validArgAdd;
+	std::string validArgRem;
+	std::string defaultKey = "*";
 	bool action = REMOVE_MODE;
 	std::string modeString = cmd.getTokens().at(2);
 	for (char ch : modeString) {
 		if (ch == '+' || ch == '-') {
 			action = (ch == '+') ? ADD_MODE : REMOVE_MODE;
-			validModes += ch;//this will add all the consecutive signs
+			// validModes += ch;//this will add all the consecutive signs
 			continue;
 		}
 		else if (action == ADD_MODE) {
 			switch (ch) {
 				case 'i' :
 					chan->addMode(Channel::ModeInviteOnly);
-					validModes += ch;
+					validModeAdd += ch;
 					break;
 				case 't' :
 					chan->addMode(Channel::ModeProtectedTopic);
-					validModes += ch;
+					validModeAdd += ch;
 					break;
 				case 'k' :
 					if (argID < cmd.getTokens().size() && this->updateChanKey(chan, cmd.getTokens().at(argID++))) {
 						chan->addMode(Channel::ModeKeyOn);
-						validModes += ch;
+						validModeAdd += ch;
+						validArgAdd += cmd.getTokens().at(argID - 1) + " ";
 					}
 					break;
 				case 'o' :
 					if (argID < cmd.getTokens().size() && this->updateChanOper(c, chan, cmd.getTokens().at(argID++))) {
 						chan->addMode(Channel::ModeOper);
-						validModes += ch;
+						validModeAdd += ch;
+						validArgAdd += cmd.getTokens().at(argID - 1) + " ";
 					}
 					break;
 				case 'l' :
 					if (argID < cmd.getTokens().size() && this->updateChanULimit(chan, cmd.getTokens().at(argID++))) {
 						chan->addMode(Channel::ModeClientLim);
-						validModes += ch;
+						validModeAdd += ch;
+						validArgAdd += cmd.getTokens().at(argID - 1) + " ";
 					}
 					break;
 				default:
@@ -123,27 +130,29 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 			switch (ch) {
 				case 'i' :
 					chan->removeMode(Channel::ModeInviteOnly);
-					validModes += ch;
+					validModeRem += ch;
 					break;
 				case 't' :
 					chan->removeMode(Channel::ModeProtectedTopic);
-					validModes += ch;
+					validModeRem += ch;
 					break;
 				case 'k' :
-					if (argID < cmd.getTokens().size() && chan->getKeyMode() && chan->getKey() == cmd.getTokens().at(argID++)) {
+					if (argID++ < cmd.getTokens().size() && chan->getKeyMode() && this->updateChanKey(chan, defaultKey)) {
 						chan->removeMode(Channel::ModeKeyOn);
-						validModes += ch;
+						validModeRem += ch;
+						validArgRem += defaultKey + " ";
 					}
 					break;
 				case 'o' :
 					if (argID < cmd.getTokens().size() && chan->chanOperatorRemove(cmd.getTokens().at(argID++))) {
 						chan->removeMode(Channel::ModeOper);
-						validModes += ch;
+						validModeRem += ch;
+						validArgAdd += cmd.getTokens().at(argID - 1) + " ";
 					}
 					break;
 				case 'l' :
 					chan->removeMode(Channel::ModeClientLim);//do I have to set clientlim to 0?
-					validModes += ch;
+					validModeRem += ch;
 					break;
 				default:
 					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);
@@ -151,8 +160,13 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 			}
 		}
 	}
-	if(!validModes.empty()) //not the correct condition
-		rpl = ":" + nickName + " MODE " + chan->getName() + " " + validModes + "\r\n"; //do I have to add # prefix to chanName?
+	if(!validModeAdd.empty())
+		validModeAdd = "+" + validModeAdd;
+	if (!validModeRem.empty())
+		validModeRem = "-" + validModeRem;
+	std::string validModeArg = !(validArgAdd.empty() && validArgRem.empty())? validArgAdd + validArgRem : "";
+	if (!(validModeAdd.empty() && validModeRem.empty()))
+		rpl = ":" + nickName + " MODE " + chan->getName() + " " + validModeAdd + validModeRem + " " + validModeArg + "\r\n"; //do I have to add # prefix to chanName? //add the parameters here as well
 	return rpl;
 }
 

@@ -38,7 +38,8 @@ class Channel
 		std::time_t _topicUpdatedTime;
 		std::string _topicUpdatedWho;
 		std::string _key;
-		std::string _timeCreated;
+		std::time_t _timeCreated;
+//		std::time_t _creationTime;
 
 		std::set<Client *>		_channelUsers;
 		std::set<std::string>	_inviteList;
@@ -74,7 +75,7 @@ class Channel
 		const std::string &getTopic() const;
 		const std::string &getName() const;
 		
-		const std::string &getTimeCreated();
+		const std::string getTimeCreated();
 		bool getInviteOnlyMode() const;
 		bool getClientLimitMode() const ;
 		bool getKeyMode() const;

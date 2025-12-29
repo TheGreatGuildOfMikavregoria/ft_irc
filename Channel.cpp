@@ -59,7 +59,7 @@ void Channel::_inviteListRemove(std::string &toRemove)
 Channel::Channel(const std::string &name)
 {
 	_name = name;
-	_timeCreated = Utils::getCurrentTimeString();
+	_timeCreated = std::time(nullptr);// Utils::getCurrentTimeString();
 }
 
 void Channel::setKey(std::string &key)
@@ -92,9 +92,9 @@ const std::string &Channel::getName() const
 	return _name;
 }
 
-const std::string &Channel::getTimeCreated()
+const std::string Channel::getTimeCreated()
 {
-	return _timeCreated;
+	return Utils::longToString(_timeCreated);
 }
 
 bool Channel::getInviteOnlyMode() const
@@ -330,11 +330,13 @@ bool Channel::validateModes(std::string &mode)
 */
 
 const std::string	Channel::getChanMode() const {
-	std::string s = "+";//change apropriately
+	std::string s;
+	if (_chanMode) s += "+";
+	if (_chanMode & ModeKeyOn) s += 'k';
 	if (_chanMode & ModeClientLim) s += 'l';
 	if (_chanMode & ModeInviteOnly) s += 'i';
 	if (_chanMode & ModeProtectedTopic) s += 't';
-	if (_chanMode & ModeKeyOn) s += 'k';
+	
 	return s;
 }
 
