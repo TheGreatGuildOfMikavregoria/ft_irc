@@ -134,6 +134,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 						chan->removeMode(Channel::ModeKeyOn);
 						validModes += ch;
 					}
+					break;
 				case 'o' :
 					if (argID < cmd.getTokens().size() && chan->chanOperatorRemove(cmd.getTokens().at(argID++))) {
 						chan->removeMode(Channel::ModeOper);
