@@ -30,6 +30,7 @@
 #include <csignal>
 #include <ctime>
 #include <list>
+#include <cstdlib> //INT_MAx
 #define MAX_CLIENTS 512
 #define CLIENT_TIMEOUT 600
 #define OPER_NAME   "ircAdmin"
@@ -136,4 +137,6 @@ public:
 	std::string	applyChanMode(Client& c, Channel* chan, Command& cmd);
 	bool	isValidModeString(const std::string& modeString, bool whichMode);
 	bool 	updateChanKey(Channel* chan, std::string& key);
+	bool	updateChanOper(Client& c, Channel* chan, std::string& nickName);
+	bool	updateChanULimit(Channel* chan, const std::string& strLim);
 };

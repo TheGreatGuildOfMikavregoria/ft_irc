@@ -25,15 +25,15 @@ void Channel::userRemove(Client &user)
 	_channelUsers.erase(&user);
 }
 
-void Channel::_chanOperatorAdd(Client &futureOperator)
+void Channel::chanOperatorAdd(std::string &nick)
 {
 	//_operators.push_back(futureOperator.getNickName());
-	_operators.insert(futureOperator.getNickName());
+	_operators.insert(nick);
 }
 
-void Channel::_chanOperatorRemove(Client &client)
+bool Channel::chanOperatorRemove(std::string &nick)
 {
-	_operators.erase(client.getNickName());
+	return _operators.erase(nick);
 /*
 	auto it = Utils::getStringIteratorByString(_operators, client.getNickName());
 	if (it != _operators.end())
@@ -70,6 +70,11 @@ void Channel::setKey(std::string &key)
 void Channel::setTopic(std::string &topic)
 {
 	_topic = topic;
+}
+
+void Channel::setClientLimit(size_t clientLimit)
+{
+	_clientLimit = clientLimit;
 }
 
 const std::string &Channel::getKey() const

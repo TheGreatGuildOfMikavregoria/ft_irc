@@ -1,16 +1,16 @@
 #include "../Server.hpp"
-#define VALID_USER_MODES "iows"
-#define VALID_CHAN_MODES "itkol"
+// #define VALID_USER_MODES "iows"
+// #define VALID_CHAN_MODES "itkol"
 #define MODE_CHAN 1
 #define MODE_USER 0
 #define ADD_MODE 1
 #define REMOVE_MODE 0
 
-bool	isValidModeString(const std::string& modeString, bool whichMode){
+bool	Server::isValidModeString(const std::string& modeString, bool whichMode){
 	if (modeString.size() < 2 || !(modeString[0] == '+' || modeString[0] == '-'))
 		return false;
 	// int  signCount = 1;
-	std::string validModeSet = whichMode ? VALID_CHAN_MODES : VALID_USER_MODES;
+	// std::string validModeSet = whichMode ? VALID_CHAN_MODES : VALID_USER_MODES; //this might be extra. remove it.
 		for (size_t i = 1; i < modeString.size(); ++i) {
 			char ch = modeString[i];
 			if (ch == '+' || ch == '-') {
@@ -19,9 +19,9 @@ bool	isValidModeString(const std::string& modeString, bool whichMode){
 				continue;
 			}
 			// signCount = 0;
-			if (validModeSet.find(ch) == std::string::npos) {
-				return false;
-		}
+			// if (validModeSet.find(ch) == std::string::npos) {
+		// 	// 	return false;
+		// }
 	}
 	return true;
 }
@@ -35,64 +35,125 @@ bool 	Server::updateChanKey(Channel* chan, std::string& key) {
 	return true;	
 }
 
+bool	Server::updateChanOper(Client& c, Channel* chan, std::string& newOperName) {
+	const std::string nickName = c.getNickName();
+	std::string rpl;
+	Buffer &outBuf = c.getOutBuf();
+	Client* newOper = clientLookUp(newOperName);
+	if (!newOper) {
+		rpl = numericRPL(ERR_NOSUCHNICK, nickName, newOperName);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return false;
+	}
+	else if (!chan->getChannelUsers().count(newOper)) {
+		rpl = numericRPL(ERR_USERNOTINCHANNEL, nickName, newOperName, chan->getName());
+		outBuf.append(rpl.c_str(), rpl.length());
+		return false;
+	}
+	chan->chanOperatorAdd(newOperName);
+	return true;
+}
+
+bool Server::updateChanULimit(Channel* chan, const std::string& strLim)
+{
+    char* endPtr;
+    long val = std::strtol(strLim.c_str(), &endPtr, 10);
+
+    if (*endPtr != '\0') return false;
+    if (val <= 0) return false;
+    if (val > INT32_MAX) return false; //change the macro to INT_MAX if it's available on school computer. hpp has the library
+
+    chan->setClientLimit(static_cast<size_t>(val));
+    return true;
+}
+
+
 //if mode arguments are not enough still the valid modes should be processes.
 //liberschat writes channels modes fore MODE command even if the client is not a member. but shouldn't let client change the modes.
 std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 	const std::string nickName = c.getNickName();
+	Buffer &outBuf = c.getOutBuf();
 	std::string target = cmd.getTokens().at(1);
 	int argID = cmd.getTokens().size() >= 4 ? 3 : 0;
 	std::string rpl;
+	std::string validModes;
 	bool action = REMOVE_MODE;
 	std::string modeString = cmd.getTokens().at(2);
 	for (char ch : modeString) {
 		if (ch == '+' || ch == '-') {
 			action = (ch == '+') ? ADD_MODE : REMOVE_MODE;
+			validModes += ch;//this will add all the consecutive signs
 			continue;
 		}
 		else if (action == ADD_MODE) {
 			switch (ch) {
 				case 'i' :
 					chan->addMode(Channel::ModeInviteOnly);
+					validModes += ch;
 					break;
 				case 't' :
 					chan->addMode(Channel::ModeProtectedTopic);
+					validModes += ch;
 					break;
 				case 'k' :
-					if (argID < cmd.getTokens().size() && this->updateChanKey(chan, cmd.getTokens().at(argID)))
+					if (argID < cmd.getTokens().size() && this->updateChanKey(chan, cmd.getTokens().at(argID++))) {
 						chan->addMode(Channel::ModeKeyOn);
+						validModes += ch;
+					}
 					break;
 				case 'o' :
-
-					chan->addMode(Channel::ModeKeyOn);
+					if (argID < cmd.getTokens().size() && this->updateChanOper(c, chan, cmd.getTokens().at(argID++))) {
+						chan->addMode(Channel::ModeOper);
+						validModes += ch;
+					}
 					break;
 				case 'l' :
-					chan->addMode(Channel::ModeKeyOn);
+					if (argID < cmd.getTokens().size() && this->updateChanULimit(chan, cmd.getTokens().at(argID++))) {
+						chan->addMode(Channel::ModeClientLim);
+						validModes += ch;
+					}
 					break;
-				
+				default:
+					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);
+					outBuf.append(rpl.c_str(), rpl.length());
 			}
 		}
 		else if (action == REMOVE_MODE) {
 			switch (ch) {
 				case 'i' :
 					chan->removeMode(Channel::ModeInviteOnly);
+					validModes += ch;
 					break;
 				case 't' :
 					chan->removeMode(Channel::ModeProtectedTopic);
+					validModes += ch;
 					break;
 				case 'k' :
-					chan->removeMode(Channel::ModeKeyOn);
-					break;
+					if (argID < cmd.getTokens().size() && chan->getKeyMode() && chan->getKey() == cmd.getTokens().at(argID++)) {
+						chan->removeMode(Channel::ModeKeyOn);
+						validModes += ch;
+					}
 				case 'o' :
-					chan->removeMode(Channel::ModeKeyOn);
+					if (argID < cmd.getTokens().size() && chan->chanOperatorRemove(cmd.getTokens().at(argID++))) {
+						chan->removeMode(Channel::ModeOper);
+						validModes += ch;
+					}
 					break;
 				case 'l' :
-					chan->removeMode(Channel::ModeKeyOn);
+					chan->removeMode(Channel::ModeClientLim);//do I have to set clientlim to 0?
+					validModes += ch;
 					break;
+				default:
+					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);
+					outBuf.append(rpl.c_str(), rpl.length());
 			}
 		}
 	}
+	rpl = ":" + nickName + " MODE " + chan->getName() + " " + validModes + "\r\n"; //do I have to add # prefix to chanName?
 }
 
+//test cases: when chan limit is there but no key
+//when key is there but no limit and also when user is a part of the channel and not a part of the channel
 void	Server::mode(Client& c, Command& cmd)
 {
 	const std::string nickName = c.getNickName();
@@ -105,17 +166,26 @@ void	Server::mode(Client& c, Command& cmd)
 		auto it = Utils::getChannelIteratorByChannelName( _channels, target);
 		if (it == _channels.end())
 			rpl = numericRPL(ERR_NOSUCHCHANNEL, nickName, target);
-		// else if (!(*it).getChannelUsers().count(&c))
-		// 	rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);
-		else if (!(*it).isOperator(c))
-			rpl = numericRPL(ERR_CHANOPRIVSNEEDED, nickName, target);
 		else if (cmd.getTokens().size() < 3) {
-			rpl = numericRPL(RPL_CHANNELMODEIS, nickName, target, (*it).getChanMode(), (*it).getClientLimit());
+			std::string modeParam = "";
+			if ((*it).hasMode(Channel::ModeKeyOn) && (*it).getChannelUsers().count(&c))
+				modeParam = (*it).getKey();
+			if ((*it).hasMode(Channel::ModeClientLim)) {
+				if (!modeParam.empty())
+					modeParam += " ";
+				modeParam += std::to_string((*it).getClientLimit());
+			}
+			rpl = numericRPL(RPL_CHANNELMODEIS, nickName, target, (*it).getChanMode(), modeParam);
 			rpl += numericRPL(RPL_CREATIONTIME, nickName, target, (*it).getTimeCreated());
 		}
+		else if (!(*it).isOperator(c))
+			rpl = numericRPL(ERR_CHANOPRIVSNEEDED, nickName, target);
 		else {
-			if (this->isValidModeString(cmd.getTokens().at(2), MODE_CHAN))
+			if (this->isValidModeString(cmd.getTokens().at(2), MODE_CHAN)) {
 				rpl = applyChanMode(c, &(*it), cmd);
+				if (!rpl.empty())
+					(*it).chanBroadcast(rpl);
+			}	
 		}
 	}
 }

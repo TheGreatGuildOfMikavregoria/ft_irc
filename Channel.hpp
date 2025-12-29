@@ -21,11 +21,11 @@ Indirectly associated Commands
 	QUIT
 
 must have modes:
-	i   --- only users from the invite list can join the channel
-	t   --- topic can be set only by an operator
-	k   --- check key when joining the channel
-	o   --- user mode to set to operator
-	l   --- client limit - if on
+	i   --- only users from the invite list can join the channel (D)
+	t   --- topic can be set only by an operator (D)
+	k   --- check key when joining the channel (B)
+	o   --- user mode to set to operator (B)
+	l   --- client limit - if on (C)
 */
 
 class Client;
@@ -52,23 +52,24 @@ class Channel
 		int		_chanMode		= 0;
 		size_t	_clientLimit	= 0;
 
-		void _chanOperatorAdd(Client &);
-		void _chanOperatorRemove(Client &);
+
 		void _inviteListAdd(std::string &);
 		void _inviteListRemove(std::string &);
 
 	public:
 		enum mode {
-			ModeNone		= 0,
+			ModeNone			= 0,
 			ModeInviteOnly		= 1 << 0,
 			ModeProtectedTopic	= 1 << 1,
-			ModeKeyOn		= 1 << 2,
-			ModeClientLim		= 1 << 3
+			ModeKeyOn			= 1 << 2,
+			ModeClientLim		= 1 << 3,
+			ModeOper			= 1 << 4
 		};
 		Channel(const std::string &name);
 		~Channel() = default;
 		void setKey(std::string &);
 		void setTopic(std::string &);
+		void setClientLimit(size_t);
 		const std::string &getKey() const;
 		const std::string &getTopic() const;
 		const std::string &getName() const;
@@ -101,8 +102,10 @@ class Channel
 		void	removeMode(int mask);
 		bool	hasMode(int mask) const;
 		const 	std::string	getChanMode() const;
+		void 	chanOperatorAdd(std::string &nick);
+		bool 	chanOperatorRemove(std::string &nick);
 
-		bool	isOperator(Client &user)
+		bool	isOperator(Client &user);
 //		const	std::string	getChanModeParams() const;
 };
 

@@ -141,7 +141,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_WHOISHOST			" 378 %s <nick> :is connecting from *@localhost 127.0.0.1"
 #define RPL_WHOISMODES			" 379 %s <nick> :is using modes +ailosw"
 #define RPL_YOUREOPER			" 381 %s :You are now an IRC operator" //in_use
-#define ERR_NOSUCHNICK			" 401 %s <nickname> :No such nick/channel"
+#define ERR_NOSUCHNICK			" 401 %s %s :No such nick/channel" //in_use
 #define ERR_NOSUCHSERVER		" 402 %s <server name> :No such server" //PING:Deprecated Numeric Reply
 #define ERR_NOSUCHCHANNEL		" 403 %s %s :No such channel" //in_use
 #define ERR_CANNOTSENDTOCHAN	" 404 %s <channel> :Cannot send to channel"
@@ -156,7 +156,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_ERRONEUSNICKNAME	" 432 %s %s :Erroneus nickname" //in_use
 #define ERR_NICKNAMEINUSE		" 433 %s :Nickname is already in use" //in_use
 //#define ERR_NICKCOLLISION		" 436 %s <nick> :Nickname collision KILL from <user>@<host>" //out of scope. Involves another server
-#define ERR_USERNOTINCHANNEL	" 441 %s <nick> <channel> :They aren't on that channel"
+#define ERR_USERNOTINCHANNEL	" 441 %s %s %s :They aren't on that channel" //in_use
 #define ERR_NOTONCHANNEL		" 442 %s %s :You're not on that channel" //in_use
 #define ERR_USERONCHANNEL		" 443 %s %s %s :is already on channel" //in_use
 #define ERR_NOTREGISTERED 	" 451 %s :You have not registered" //in_use
