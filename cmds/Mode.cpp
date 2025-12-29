@@ -7,17 +7,18 @@
 #define REMOVE_MODE 0
 
 bool	Server::isValidModeString(const std::string& modeString, bool whichMode){
+	(void) whichMode;//remove when logic is refined
 	if (modeString.size() < 2 || !(modeString[0] == '+' || modeString[0] == '-'))
 		return false;
 	// int  signCount = 1;
 	// std::string validModeSet = whichMode ? VALID_CHAN_MODES : VALID_USER_MODES; //this might be extra. remove it.
-		for (size_t i = 1; i < modeString.size(); ++i) {
-			char ch = modeString[i];
-			if (ch == '+' || ch == '-') {
-				// if (++signCount > 1 || i == modeString.size() - 1)
-				// 	return false;
-				continue;
-			}
+	for (size_t i = 1; i < modeString.size(); ++i) {
+		char ch = modeString[i];
+		if (ch == '+' || ch == '-') {
+			// if (++signCount > 1 || i == modeString.size() - 1)
+			// 	return false;
+			continue;
+		}
 			// signCount = 0;
 			// if (validModeSet.find(ch) == std::string::npos) {
 		// 	// 	return false;
@@ -74,7 +75,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 	const std::string nickName = c.getNickName();
 	Buffer &outBuf = c.getOutBuf();
 	std::string target = cmd.getTokens().at(1);
-	int argID = cmd.getTokens().size() >= 4 ? 3 : 0;
+	unsigned long argID = cmd.getTokens().size() >= 4 ? 3 : 0;
 	std::string rpl;
 	std::string validModes;
 	bool action = REMOVE_MODE;
@@ -149,7 +150,9 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 			}
 		}
 	}
-	rpl = ":" + nickName + " MODE " + chan->getName() + " " + validModes + "\r\n"; //do I have to add # prefix to chanName?
+	if(!validModes.empty()) //not the correct condition
+		rpl = ":" + nickName + " MODE " + chan->getName() + " " + validModes + "\r\n"; //do I have to add # prefix to chanName?
+	return rpl;
 }
 
 //test cases: when chan limit is there but no key
@@ -188,4 +191,5 @@ void	Server::mode(Client& c, Command& cmd)
 			}	
 		}
 	}
+	outBuf.append(rpl.c_str(), rpl.length());
 }
