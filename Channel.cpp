@@ -147,9 +147,11 @@ void Channel::join(Client &client, bool keyValidated)
 	if (_operators.size() == 0)
 	{
 		_operators.insert(nickname);
-		_topicUpdatedWho = nickname;
+//		_topicUpdatedWho = nickname;
+		_topicUpdatedWho = client.getSource();
+
 	}
-	std::string prefix = ":" + nickname;
+	std::string prefix = ":" + client.getSource();
 	std::string message = prefix + " JOIN " + _name + "\r\n";
 	this->chanBroadcast(message);
 	topicChange = std::time(nullptr);
@@ -173,9 +175,9 @@ void Channel::part(Client &client, std::string &reason)
 {
 	std::string response;
 	if (reason.length())
-		response = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName()  + " PART " + _name + " :" + reason +  "\r\n";
+		response = ":" + client.getSource() + " PART " + _name + " :" + reason +  "\r\n";
 	else
-		response = ":" + client.getNickName() + "!" + client.getUserName()  + "@" + client.getHostName() + " PART " + _name + "\r\n";
+		response = ":" + client.getSource() + " PART " + _name + "\r\n";
 	chanBroadcast(response);
 	userRemove(client);
 	client.channelRemove(*this);
@@ -213,7 +215,7 @@ void Channel::topic(Client &c, std::string &newTopic)
 	topicChange = std::time(nullptr);
 	if (topicChange != static_cast<time_t>(-1))
 		_topicUpdatedTime = topicChange;
-	_topicUpdatedWho = c.getNickName();
+	_topicUpdatedWho = c.getSource();
 	_topic = newTopic;
 	topic(c, true);
 // try set new topic, reply??
