@@ -123,7 +123,7 @@ public:
 	void	registerClient(Client& c);
 	void	serverBroadcast(const std::string& msg);
 	bool	isValidOperHost(const std::string &clientIP, int clientFD);
-	void	dropClient(Client& c);
+	// void	dropClient(Client& c);
 	std::string	applyChanMode(Client& c, Channel* chan, Command& cmd);
 	bool	isValidModeString(const std::string& modeString, bool whichMode);
 	bool 	updateChanKey(Channel* chan, std::string& key);
