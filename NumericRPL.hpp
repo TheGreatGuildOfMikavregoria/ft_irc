@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Server.hpp"
+#include "Utils.hpp"
 
 #include <string>
 #include <iostream>
@@ -31,6 +32,14 @@ void buildResponse(std::string& reply, const char* format, T value, Args... args
 		}
 		reply += *format++;
 	}
+}
+
+template<typename... Args>
+std::string ft_stringf(const std::string& format, Args... args)
+{
+	std::string result;
+	buildResponse(result, format.c_str(), args...);
+	return result;
 }
 
 template<typename... Args>
@@ -113,7 +122,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_WHOISUSER			" 311 %s <nick> <username> <host> * :<realname>"
 #define RPL_WHOISSERVER			" 312 %s <nick> <server> :<server info>"
 #define RPL_WHOISOPERATOR		" 313 %s <nick> :is an IRC operator"
-#define RPL_ENDOFWHO			" 315 %s <mask> :End of WHO list"
+#define RPL_ENDOFWHO			" 315 %s %s :End of WHO list" // in_use
 #define RPL_WHOISIDLE			" 317 %s <nick> <secs> <signon> :seconds idle, signon time"
 #define RPL_ENDOFWHOIS			" 318 %s <nick> :End of /WHOIS list"
 #define RPL_WHOISCHANNELS		" 319 %s <nick> :[prefix]<channel>{ [prefix]<channel>}" //read more on format
@@ -133,7 +142,8 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_INVITING			" 341 %s %s %s" //in_use
 #define RPL_EXCEPTLIST			" 348 %s <channel> <mask>"
 #define RPL_ENDOFEXCEPTLIST		" 349 %s <channel> :End of channel exception list"
-#define RPL_WHOREPLY			" 352 %s <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
+//#define RPL_WHOREPLY			" 352 %s <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>"
+#define RPL_WHOREPLY			" 352 %s %s %s %s %s %s :%s %s" //in_use
 #define RPL_NAMREPLY			" 353 %s %s %s :%s" // in_use
 #define RPL_ENDOFNAMES			" 366 %s %s :End of /NAMES list" //in_use
 #define RPL_BANLIST				" 367 %s <channel> <mask> [<who> <set-ts>]"
@@ -156,7 +166,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_ERRONEUSNICKNAME	" 432 %s %s :Erroneus nickname" //in_use
 #define ERR_NICKNAMEINUSE		" 433 %s :Nickname is already in use" //in_use
 //#define ERR_NICKCOLLISION		" 436 %s <nick> :Nickname collision KILL from <user>@<host>" //out of scope. Involves another server
-#define ERR_USERNOTINCHANNEL	" 441 %s %s %s :They aren't on that channel" //in_use
+#define ERR_USERNOTINCHANNEL	" 441 %s %s %s :They aren't on that channel" // in_use
 #define ERR_NOTONCHANNEL		" 442 %s %s :You're not on that channel" //in_use
 #define ERR_USERONCHANNEL		" 443 %s %s %s :is already on channel" //in_use
 #define ERR_NOTREGISTERED 	" 451 %s :You have not registered" //in_use

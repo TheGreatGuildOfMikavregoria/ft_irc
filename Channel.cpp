@@ -11,17 +11,11 @@
 void Channel::userAdd(Client *user)
 {
 	_channelUsers.insert(user);
-	user->getUserChannels().insert(this);
 }
 
-// TODO change
+
 void Channel::userRemove(Client &user)
 {
-	std::set<Channel *>	&userChannels = user.getUserChannels();
-	auto			usChanIt = userChannels.find(this);
-
-	if (usChanIt != userChannels.end())
-		userChannels.erase(usChanIt);
 	_channelUsers.erase(&user);
 }
 
@@ -158,6 +152,7 @@ void Channel::join(Client &client, bool keyValidated)
 		return ;
 	}
 	userAdd(&client);
+	client.channelAdd(*this);
 	_inviteListRemove(nickname);
 	if (_operators.size() == 0)
 	{
@@ -193,6 +188,7 @@ void Channel::part(Client &client, std::string &reason)
 		response = ":" + client.getNickName() + "!" + client.getUserName()  + "@" + client.getHostName() + " PART " + _name + "\r\n";
 	chanBroadcast(response);
 	userRemove(client);
+	client.channelRemove(*this);
 }
 
 void Channel::topic(Client &c, bool broadcast)
@@ -233,11 +229,37 @@ void Channel::topic(Client &c, std::string &newTopic)
 // try set new topic, reply??
 }
 
-int Channel::kick(Client &source, std::string &nick)
+void Channel::kick(Client &source, std::string &nick, std::string &reason)
 {
-	(void)source;
-	(void)nick;
-	return 0;
+	std::string rpl;
+	Buffer &outBuf = source.getOutBuf();
+	if (!_channelUsers.count(&source))
+	{
+		rpl = numericRPL(ERR_NOTONCHANNEL, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+	if  (!_operators.count(source.getNickName()))
+	{
+		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, source.getNickName(), _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+	auto userIt = std::find_if(_channelUsers.begin(), _channelUsers.end(), [&nick](Client *client){ return client->getNickName() == nick; });
+	if (userIt == _channelUsers.end())
+	{
+		rpl = numericRPL(ERR_USERNOTINCHANNEL, source.getNickName(), nick, _name);
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
+	rpl = ":" + source.getSource() + " KICK " + _name +  " " + nick;
+	if (reason.length())
+		rpl += " :" + reason;
+	rpl += "\r\n";
+	chanBroadcast(rpl);
+	userRemove(**userIt);
+	(**userIt).channelRemove(*this);
+	return ;
 }
 
 bool Channel::invite(Client &source, std::string &nick)
@@ -285,6 +307,13 @@ void Channel::names(Client &source)
 	rpl += numericRPL(RPL_ENDOFNAMES, source.getNickName(), _name);
 	outBuf.append(rpl.c_str(), rpl.length());
 }
+void Channel::who(Client &source)
+{
+	for (Client *client : _channelUsers)
+	{
+		client->who(source, this);
+	}
+}
 /*
 const std::string &Channel::getTopic() const
 {
@@ -299,11 +328,17 @@ bool Channel::hasChanPrefix(std::string &name)
 }
 bool Channel::validateName(std::string &name)
 {
-	if (!name.length())
+	if (name.length() < 2 || name.length() > 50)
 		return (false);
 	if (!hasChanPrefix(name))
 		return (false);
-	return (name.length() >= 2);
+	for (size_t i = 1; i < name.length(); ++i)
+	{
+		unsigned char c = name[i];
+		if (c == ' ' || c == ',' || c == '\a')
+			return false;
+	}
+	return true;
 }
 
 void Channel::chanBroadcast(std::string &message)
@@ -322,6 +357,12 @@ void Channel::chanBroadcast(Client &client, std::string &message)
 			userPtr->getOutBuf().append(message.c_str(), message.length());
 	}
 }
+
+bool Channel::isEmpty() const
+{
+	return (_channelUsers.size() == 0);
+}
+
 /*
 bool Channel::validateModes(std::string &mode)
 {

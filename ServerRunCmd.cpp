@@ -4,7 +4,8 @@
 
 void Server::_runCmd(Client &currentClient, Command &message)
 {
-// TODO: all cmds in uppercase?
+//	//lazy
+	removeEmptyChannels();
 	auto cmd = _commandMap.find(Utils::stringToUppercase(message.getCommand()));
 	if (cmd == _commandMap.end())
 	{
@@ -12,8 +13,14 @@ void Server::_runCmd(Client &currentClient, Command &message)
 		std::cout << "Command not found" << std::endl;
 		return;
 	}
-//	else
 	(this->*(cmd->second))(currentClient, message);
+	removeEmptyChannels();
+}
+
+void Server::removeEmptyChannels()
+{
+	_channels.erase(remove_if(_channels.begin(), _channels.end(), [](Channel &channel)
+		{ return (channel.isEmpty()); } ), _channels.end());
 }
 
 void Server::_testComm(Client &c, Command &message)

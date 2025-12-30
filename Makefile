@@ -1,8 +1,27 @@
 CXX = c++
 NAME = ircserv
+BOT = bot
+vpath %.cpp cmds botsrcs
 
-SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRunCmd.cpp Channel.cpp cmds/Pass.cpp cmds/Join.cpp cmds/Part.cpp cmds/Topic.cpp cmds/Invite.cpp cmds/Mode.cpp
+#SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp \
+		Msg.cpp ServerRunCmd.cpp Channel.cpp Pass.cpp Join.cpp Pong.cpp
+
+SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRunCmd.cpp Channel.cpp \
+	Pass.cpp \
+	Join.cpp \
+	Part.cpp \
+	Topic.cpp \
+	Invite.cpp \
+	Mode.cpp \
+	Kick.cpp \
+	Who.cpp \
+	Pong.cpp \
+	Msg.cpp \
+
 OBJS = $(SRCS:.cpp=.o)
+
+SRCS_B = bot.cpp Buffer.cpp
+OBJS_B = $(SRCS_B:.cpp=.o)
 
 INCLUDES =
 LDFLAGS =
@@ -16,10 +35,13 @@ else
 	CXXFLAGS += -O2 -DNDEBUG -Wall -Wextra -Werror
 endif
 
-all: $(NAME)
+all: $(NAME) $(BOT)
 
 $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
+
+$(BOT): $(OBJS_B)
+	$(CXX) $(CXXFLAGS) $(OBJS_B) -o $(BOT) $(LDFLAGS)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -31,11 +53,12 @@ release:
 	$(MAKE) clean
 	$(MAKE) DEBUG=0 all
 
+
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(OBJS_B)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME) $(BOT)
 
 re: fclean all
 

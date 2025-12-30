@@ -1,7 +1,6 @@
 #include "../Server.hpp"
 
 #define USERLEN 8
-#define SERVER_NAME "ircserv"
 #define NETWORK_NAME "42Net"
 #define VERSION "1.0"
 
@@ -196,6 +195,9 @@ void Server::ping(Client& c, Command& cmd) {
 	else
 		rpl = ":" SERVER_NAME " PONG "  SERVER_NAME  " :" +  cmd.getTokens().at(1) + "\r\n";
 	outBuf.append(rpl.c_str(), rpl.length());
+	std::cout << "----Ping RPL ----" << std::endl;
+	std::cout << c.getNickName() << " "<< rpl;
+	std::cout << "----Ping RPL END----" << std::endl;
 }
 
 // void Server::oper(Client& c, Command& cmd) {
@@ -257,11 +259,13 @@ void Server::quit(Client& c, Command& cmd) {
  	this -> error(c,rpl);
  	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
  	std::set<Channel*>::iterator it;
- 	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end(); ++it) {
+ 	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end();) {
 		Channel* chan = *it;
+ 		it++;
 		chan->userRemove(c);
- 		chan->chanBroadcast(c, rpl);
+		chan->chanBroadcast(c, rpl);
  	}
+	c.getUserChannels().clear();
 	c.setDisconnectFlag(true);
 }
 
@@ -271,7 +275,7 @@ void Server::error(Client& c, const std::string& msg) {
 	err_msg = "ERROR :" + msg + "\r\n";
 	outBuf.append(err_msg.c_str(), err_msg.length());
 }
-
+/*
 void Server::dropClient(Client& c)
 {
 	if (c.getFd() >= 0) //is this check needed? it is contructed with valid fd right?
@@ -284,3 +288,4 @@ void Server::dropClient(Client& c)
 		}),
 		_clients.end());
 }
+*/

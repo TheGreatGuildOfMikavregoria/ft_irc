@@ -151,8 +151,10 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 					}
 					break;
 				case 'l' :
-					chan->removeMode(Channel::ModeClientLim);//do I have to set clientlim to 0?
-					validModeRem += ch;
+					if (chan->getClientLimitMode()) {
+						chan->removeMode(Channel::ModeClientLim);//do I have to set clientlim to 0? No I guess
+						validModeRem += ch;
+					}
 					break;
 				default:
 					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);
@@ -200,9 +202,9 @@ void	Server::mode(Client& c, Command& cmd)
 			rpl = numericRPL(ERR_CHANOPRIVSNEEDED, nickName, target);
 		else {
 			if (this->isValidModeString(cmd.getTokens().at(2), MODE_CHAN)) {
-				rpl = applyChanMode(c, &(*it), cmd);
-				if (!rpl.empty())
-					(*it).chanBroadcast(rpl);
+				std::string  msgBroadcast= applyChanMode(c, &(*it), cmd);
+				if (!msgBroadcast.empty())
+					(*it).chanBroadcast(msgBroadcast);
 			}	
 		}
 	}
