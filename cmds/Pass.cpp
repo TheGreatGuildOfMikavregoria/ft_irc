@@ -195,7 +195,7 @@ void Server::ping(Client& c, Command& cmd) {
 	else
 		rpl = ":" SERVER_NAME " PONG "  SERVER_NAME  " :" +  cmd.getTokens().at(1) + "\r\n";
 	outBuf.append(rpl.c_str(), rpl.length());
-	std::cout << "----Ping RPL ----" << std::endl;
+	std::cout << "----Ping RPL ----" << std::endl; //is this required?
 	std::cout << c.getNickName() << " "<< rpl;
 	std::cout << "----Ping RPL END----" << std::endl;
 }

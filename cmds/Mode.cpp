@@ -207,6 +207,16 @@ void	Server::mode(Client& c, Command& cmd)
 					(*it).chanBroadcast(msgBroadcast);
 			}	
 		}
-	}
+	} 
+	else {
+		if (!this->clientLookUp(target))
+			rpl = numericRPL(ERR_NOSUCHNICK, nickName, target);
+		else if (nickName != target)
+			rpl = numericRPL(ERR_USERSDONTMATCH, nickName);
+		else if (cmd.getTokens().size() < 3)
+			rpl = numericRPL(RPL_UMODEIS, target, c.getUserMode());
+		else
+			
+	} 
 	outBuf.append(rpl.c_str(), rpl.length());
 }

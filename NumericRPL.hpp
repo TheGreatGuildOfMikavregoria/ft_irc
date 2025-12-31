@@ -34,7 +34,7 @@ void buildResponse(std::string& reply, const char* format, T value, Args... args
 	}
 }
 
-template<typename... Args>
+template<typename... Args> //what is this?
 std::string ft_stringf(const std::string& format, Args... args)
 {
 	std::string result;
@@ -182,6 +182,6 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_CHANOPRIVSNEEDED	" 482 %s %s :You're not channel operator" // in_use
 #define ERR_NOOPERHOST			" 491 %s :No O-lines for your host" //in_use
 #define ERR_UMODEUNKNOWNFLAG	" 501 %s :Unknown MODE flag"
-#define ERR_USERSDONTMATCH		" 502 %s :Cant change mode for other users"
+#define ERR_USERSDONTMATCH		" 502 %s :Cant change mode for other users" //in_use
 #define RPL_WHOISSECURE			" 671 %s <nick> :is using a secure connection"
 #define ERR_NOPRIVS				" 723 %s <priv> :Insufficient oper privileges."
