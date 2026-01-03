@@ -112,7 +112,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define RPL_CREATED				" 003 %s :This server was created <datetime>" //in_use //Add params
 #define RPL_MYINFO				" 004 %s <servername> <version> <available user modes> <available channel modes> [<channel modes with a parameter>]" //in_use //Add params
 #define RPL_ISUPPORT			" 005 %s <1-13 tokens> :are supported by this server" //in_use //Add params
-#define RPL_UMODEIS				" 221 %s <user modes>" //in_use 
+#define RPL_UMODEIS				" 221 %s %s" //in_use 
 #define RPL_WHOISCERTFP			" 276 %s <nick> :has client certificate fingerprint <fingerprint>" //what is fingerprint
 #define RPL_AWAY				" 301 %s <nick> :<message>"
 #define RPL_USERHOST			" 302 %s :[<reply>{ <reply>}]" 

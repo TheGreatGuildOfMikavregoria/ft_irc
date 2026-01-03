@@ -35,8 +35,8 @@ class Client{
 		ModeNone	= 0,
 		ModeInvi	= 1 << 0,
 		ModeOper	= 1 << 1,
-		ModeWallop	= 1 << 2, //remove later
-		ModeNotice	= 1 << 3  //remove later
+		// ModeWallop	= 1 << 2, //remove later
+		// ModeNotice	= 1 << 3  //remove later
 		};
 
 		Client(int fd);

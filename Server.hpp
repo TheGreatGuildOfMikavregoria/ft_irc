@@ -125,7 +125,8 @@ public:
 	bool	isValidOperHost(const std::string &clientIP, int clientFD);
 	// void	dropClient(Client& c);
 	std::string	applyChanMode(Client& c, Channel* chan, Command& cmd);
-	bool	isValidModeString(const std::string& modeString, bool whichMode);
+	std::string applyUserMode(Client& c, Command& cmd);
+	bool	isValidModeString(const std::string& modeString);
 	bool 	updateChanKey(Channel* chan, std::string& key);
 	bool	updateChanOper(Client& c, Channel* chan, std::string& nickName);
 	bool	updateChanULimit(Channel* chan, const std::string& strLim);

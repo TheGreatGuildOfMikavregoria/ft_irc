@@ -1,13 +1,12 @@
 #include "../Server.hpp"
 // #define VALID_USER_MODES "iows"
 // #define VALID_CHAN_MODES "itkol"
-#define MODE_CHAN 1
-#define MODE_USER 0
+// #define MODE_CHAN 1
+// #define MODE_USER 0
 #define ADD_MODE 1
 #define REMOVE_MODE 0
 
-bool	Server::isValidModeString(const std::string& modeString, bool whichMode){
-	(void) whichMode;//remove when logic is refined
+bool	Server::isValidModeString(const std::string& modeString){
 	if (modeString.size() < 2 || !(modeString[0] == '+' || modeString[0] == '-'))
 		return false;
 	// int  signCount = 1;
@@ -77,6 +76,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 	std::string target = cmd.getTokens().at(1);
 	unsigned long argID = cmd.getTokens().size() >= 4 ? 3 : 0;
 	std::string rpl;
+	std::string rplRet;
 	std::string validModeAdd;
 	std::string validModeRem;
 	std::string validArgAdd;
@@ -87,7 +87,6 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 	for (char ch : modeString) {
 		if (ch == '+' || ch == '-') {
 			action = (ch == '+') ? ADD_MODE : REMOVE_MODE;
-			// validModes += ch;//this will add all the consecutive signs
 			continue;
 		}
 		else if (action == ADD_MODE) {
@@ -122,7 +121,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 					}
 					break;
 				default:
-					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);
+					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);//is this corrects message
 					outBuf.append(rpl.c_str(), rpl.length());
 			}
 		}
@@ -157,7 +156,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 					}
 					break;
 				default:
-					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);
+					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);//is this correct message
 					outBuf.append(rpl.c_str(), rpl.length());
 			}
 		}
@@ -168,8 +167,62 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 		validModeRem = "-" + validModeRem;
 	std::string validModeArg = !(validArgAdd.empty() && validArgRem.empty())? validArgAdd + validArgRem : "";
 	if (!(validModeAdd.empty() && validModeRem.empty()))
-		rpl = ":" + nickName + " MODE " + chan->getName() + " " + validModeAdd + validModeRem + " " + validModeArg + "\r\n"; //do I have to add # prefix to chanName? //add the parameters here as well
-	return rpl;
+		rplRet = ":" + nickName + " MODE " + chan->getName() + " " + validModeAdd + validModeRem + " " + validModeArg + "\r\n"; //do I have to add # prefix to chanName? //add the parameters here as well
+	return rplRet;//should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
+}
+
+std::string	Server::applyUserMode(Client& c, Command& cmd) {
+	const std::string nickName = c.getNickName();
+	Buffer &outBuf = c.getOutBuf();
+	std::string rpl;
+	std::string rplRet;
+	std::string validModeAdd;
+	std::string validModeRem;
+	bool action = REMOVE_MODE;
+	std::string modeString = cmd.getTokens().at(2);
+	for (char ch : modeString) {
+		if (ch == '+' || ch == '-') {
+			action = (ch == '+') ? ADD_MODE : REMOVE_MODE;
+			continue;
+		}
+		else if (action == ADD_MODE) {		
+			switch (ch) {
+				case 'i' :
+					c.addMode(Client::ModeInvi);
+					validModeAdd += ch;
+					break;
+				case 'o' :
+					// c.addMode(Client::ModeOper);
+					// validModeAdd += ch;
+					break;//operator is added through OPER message not from this //should i neglect this silently or take action?
+				default:
+					rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
+					outBuf.append(rpl.c_str(), rpl.length());
+			}
+		}
+		else if (action == REMOVE_MODE) {
+			switch (ch) {
+				case 'i' :
+					c.removeMode(Client::ModeInvi);
+					validModeRem += ch;
+					break;
+				case 'o' :
+					c.removeMode(Client::ModeOper);
+					validModeRem += ch;
+					break;
+				default:
+					rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
+					outBuf.append(rpl.c_str(), rpl.length());
+			}
+		}
+	}
+	if(!validModeAdd.empty())
+		validModeAdd = "+" + validModeAdd;
+	if (!validModeRem.empty())
+		validModeRem = "-" + validModeRem;
+	if (!(validModeAdd.empty() && validModeRem.empty()))
+		rplRet = ":" + nickName + " MODE " + validModeAdd + validModeRem + "\r\n"; //do I have to add # prefix to chanName? //add the parameters here as well
+	return rplRet; //should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
 }
 
 //test cases: when chan limit is there but no key
@@ -177,12 +230,15 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 void	Server::mode(Client& c, Command& cmd)
 {
 	const std::string nickName = c.getNickName();
-	std::string target = cmd.getTokens().at(1);
 	Buffer& outBuf = c.getOutBuf();
 	std::string rpl;
-	if (cmd.getTokens().size() < 2)
+	if (cmd.getTokens().size() < 2) {
 		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
-	else if (Channel::hasChanPrefix(target)) {
+		outBuf.append(rpl.c_str(), rpl.length());
+		return;
+	}
+	std::string target = cmd.getTokens().at(1);
+	if (Channel::hasChanPrefix(target)) {
 		auto it = Utils::getChannelIteratorByChannelName( _channels, target);
 		if (it == _channels.end())
 			rpl = numericRPL(ERR_NOSUCHCHANNEL, nickName, target);
@@ -201,7 +257,7 @@ void	Server::mode(Client& c, Command& cmd)
 		else if (!(*it).isOperator(c))
 			rpl = numericRPL(ERR_CHANOPRIVSNEEDED, nickName, target);
 		else {
-			if (this->isValidModeString(cmd.getTokens().at(2), MODE_CHAN)) {
+			if (this->isValidModeString(cmd.getTokens().at(2))) { //think about thie line and fix the isvalid modeString
 				std::string  msgBroadcast= applyChanMode(c, &(*it), cmd);
 				if (!msgBroadcast.empty())
 					(*it).chanBroadcast(msgBroadcast);
@@ -216,7 +272,7 @@ void	Server::mode(Client& c, Command& cmd)
 		else if (cmd.getTokens().size() < 3)
 			rpl = numericRPL(RPL_UMODEIS, target, c.getUserMode());
 		else
-			
+			rpl = applyUserMode(c, cmd);
 	} 
 	outBuf.append(rpl.c_str(), rpl.length());
 }
