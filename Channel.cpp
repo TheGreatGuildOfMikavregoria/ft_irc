@@ -2,10 +2,6 @@
 #include "Utils.hpp"
 #include "Channel.hpp"
 
-/*
-	TODO:	list of clients in channel or list of channels in user
-*/
-
 // TODO: modify to work with pointers
 // TODO: change
 void Channel::userAdd(Client *user)
@@ -21,18 +17,12 @@ void Channel::userRemove(Client &user)
 
 void Channel::_chanOperatorAdd(Client &futureOperator)
 {
-	//_operators.push_back(futureOperator.getNickName());
 	_operators.insert(futureOperator.getNickName());
 }
 
 void Channel::_chanOperatorRemove(Client &client)
 {
 	_operators.erase(client.getNickName());
-/*
-	auto it = Utils::getStringIteratorByString(_operators, client.getNickName());
-	if (it != _operators.end())
-		_operators.erase(it);
-*/
 }
 
 void Channel::_inviteListAdd(std::string &toAdd)
@@ -43,11 +33,6 @@ void Channel::_inviteListAdd(std::string &toAdd)
 void Channel::_inviteListRemove(std::string &toRemove)
 {
 	_inviteList.erase(toRemove);
-/*
-	auto it = Utils::getStringIteratorByString(_inviteList, toRemove);
-	if (it != _inviteList.end())
-		_inviteList.erase(it);
-*/
 }
 
 Channel::Channel(const std::string &name)
@@ -264,7 +249,6 @@ bool Channel::invite(Client &source, std::string &nick)
 		outBuf.append(rpl.c_str(), rpl.length());
 		return false;
 	}
-//TODO : new mode considerations
 	if (getInviteOnlyMode() && !_operators.count(source.getNickName()))
 	{
 		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, source.getNickName(), _name);
