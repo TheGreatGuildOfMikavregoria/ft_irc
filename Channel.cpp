@@ -129,7 +129,7 @@ void Channel::join(Client &client, bool keyValidated)
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	if (getClientLimitMode() && _channelUsers.size() == _clientLimit)
+	if (getClientLimitMode() && _channelUsers.size() >= _clientLimit)
 	{
 		rpl = numericRPL(ERR_CHANNELISFULL, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
