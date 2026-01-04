@@ -45,11 +45,6 @@ class Server
 private:
 	
 	const std::unordered_map<std::string, void (Server::*)(Client &, Command &)> _commandMap = {
-	/*	{"SOME", &Server::_some},
-		{"ASD", &Server::_asd},
-		{"WASD", &Server::_wasd},
-*/
-		{"TEST", &Server::_testComm},
 		{"PASS", &Server::pass},
 		{"NICK", &Server::nick},
 		{"USER", &Server::user},

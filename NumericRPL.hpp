@@ -162,6 +162,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_NOTEXTTOSEND		" 412 %s :No text to send"
 #define ERR_NOTOPLEVEL (413)	//no message?
 #define ERR_WILDTOPLEVEL (414)	//no message?
+#define ERR_UNKNOWNCOMMAND		" 421 %s %s :Unknown command" // in_use
 #define ERR_NONICKNAMEGIVEN		" 431 %s :No nickname given" //in_use
 #define ERR_ERRONEUSNICKNAME	" 432 %s %s :Erroneus nickname" //in_use
 #define ERR_NICKNAMEINUSE		" 433 %s %s :Nickname is already in use" //in_use
