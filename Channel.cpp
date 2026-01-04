@@ -374,7 +374,7 @@ bool Channel::validateModes(std::string &mode)
 
 const std::string	Channel::getChanMode() const {
 	std::string s;
-	if (_chanMode) s += "+";
+	if (_chanMode && _chanMode != ModeOper) s += "+";
 	if (_chanMode & ModeKeyOn) s += 'k';
 	if (_chanMode & ModeClientLim) s += 'l';
 	if (_chanMode & ModeInviteOnly) s += 'i';

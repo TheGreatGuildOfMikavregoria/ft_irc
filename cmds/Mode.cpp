@@ -121,7 +121,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 					}
 					break;
 				default:
-					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);//is this corrects message
+					rpl = numericRPL(ERR_UNKNOWNMODE, nickName, ch);
 					outBuf.append(rpl.c_str(), rpl.length());
 			}
 		}
@@ -156,7 +156,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 					}
 					break;
 				default:
-					rpl = numericRPL(ERR_NOTONCHANNEL, nickName, target);//is this correct message
+					rpl = numericRPL(ERR_UNKNOWNMODE, nickName, ch);
 					outBuf.append(rpl.c_str(), rpl.length());
 			}
 		}
@@ -179,6 +179,7 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 	std::string validModeAdd;
 	std::string validModeRem;
 	bool action = REMOVE_MODE;
+	bool unknownFlagFound = false;
 	std::string modeString = cmd.getTokens().at(2);
 	for (char ch : modeString) {
 		if (ch == '+' || ch == '-') {
@@ -196,8 +197,11 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 					// validModeAdd += ch;
 					break;//operator is added through OPER message not from this //should i neglect this silently or take action?
 				default:
-					rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
-					outBuf.append(rpl.c_str(), rpl.length());
+					if (!unknownFlagFound) {
+						unknownFlagFound = true;
+						rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
+						outBuf.append(rpl.c_str(), rpl.length());
+					}
 			}
 		}
 		else if (action == REMOVE_MODE) {
@@ -211,8 +215,11 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 					validModeRem += ch;
 					break;
 				default:
-					rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
-					outBuf.append(rpl.c_str(), rpl.length());
+					if (!unknownFlagFound) {
+						unknownFlagFound = true;
+						rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
+						outBuf.append(rpl.c_str(), rpl.length());
+					}
 			}
 		}
 	}

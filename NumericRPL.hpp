@@ -174,6 +174,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister" //in_use
 #define ERR_PASSWDMISMATCH		" 464 %s :Password incorrect" //in_use
 #define ERR_CHANNELISFULL		" 471 %s %s :Cannot join channel (+l)" // in_use
+#define ERR_UNKNOWNMODE			" 472 %s %s :is unknown mode char to me" //in_use
 #define ERR_INVITEONLYCHAN		" 473 %s %s :Cannot join channel (+i)" //in_use
 #define ERR_BANNEDFROMCHAN		" 474 %s <channel> :Cannot join channel (+b)"
 #define ERR_BADCHANNELKEY		" 475 %s %s :Cannot join channel (+k)" //in_use
@@ -181,7 +182,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_NOPRIVILEGES		" 481 %s :Permission Denied- You're not an IRC operator"
 #define ERR_CHANOPRIVSNEEDED	" 482 %s %s :You're not channel operator" // in_use
 #define ERR_NOOPERHOST			" 491 %s :No O-lines for your host" //in_use
-#define ERR_UMODEUNKNOWNFLAG	" 501 %s :Unknown MODE flag"
+#define ERR_UMODEUNKNOWNFLAG	" 501 %s :Unknown MODE flag" //in_use
 #define ERR_USERSDONTMATCH		" 502 %s :Cant change mode for other users" //in_use
 #define RPL_WHOISSECURE			" 671 %s <nick> :is using a secure connection"
 #define ERR_NOPRIVS				" 723 %s <priv> :Insufficient oper privileges."
