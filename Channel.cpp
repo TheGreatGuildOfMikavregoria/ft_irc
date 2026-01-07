@@ -299,7 +299,7 @@ const std::string &Channel::getTopic() const
 */
 bool Channel::hasChanPrefix(std::string &name)
 {
-	if (name[0] != '#' && name[0] != '&' && name[0] != '!' && name[0] != '+' )
+	if (name[0] != '#') //&& name[0] != '&' && name[0] != '!' && name[0] != '+' )
 		return (false);
 	return true;
 }
