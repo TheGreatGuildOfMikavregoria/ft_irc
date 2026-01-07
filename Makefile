@@ -3,9 +3,6 @@ NAME = ircserv
 BOT = bot
 vpath %.cpp cmds botsrcs
 
-#SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp \
-		Msg.cpp ServerRunCmd.cpp Channel.cpp Pass.cpp Join.cpp Pong.cpp
-
 SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRunCmd.cpp Channel.cpp \
 	PassNickUser.cpp \
 	Join.cpp \
@@ -18,7 +15,7 @@ SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRun
 	PingPong.cpp \
 	Msg.cpp \
 	Oper.cpp \
-	Quit.cpp
+	Quit.cpp \
 	Names.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
