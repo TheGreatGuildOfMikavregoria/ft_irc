@@ -36,7 +36,12 @@
 #define CLIENT_PONG_WAITTIME CLIENT_TIMEOUT / 10 * 9
 #define NICKLEN 			10
 #define USERLEN				8
-#define CHANNELLEN			50 //TODO: implement
+
+#define CHANNELLEN			50 //implemented
+#define CHANLIMIT			5	//TODO: implement
+#define KICKLEN				500	//TODO: implement
+#define TOPICLEN			500	//TODO: implement
+
 #define NETWORK_NAME		"42Net"
 #define VERSION				"1.0"
 #define INFO_USERMODES		"io"

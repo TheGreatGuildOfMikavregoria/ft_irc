@@ -319,6 +319,8 @@ bool Channel::validateName(std::string &name)
 		return (false);
 	if (!hasChanPrefix(name))
 		return (false);
+	if (name.length() > CHANNELLEN)
+		return (false);
 	for (size_t i = 1; i < name.length(); ++i)
 	{
 		unsigned char c = name[i];
