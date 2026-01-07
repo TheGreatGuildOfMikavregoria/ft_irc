@@ -15,6 +15,12 @@ void Server::privmsg(Client &c, Command &cmd)
 {
 	auto tokens = cmd.getTokens();
 	Buffer &outBuf = c.getOutBuf();
+	if (!c.getRegiStatus())
+	{
+		std::string rpl = numericRPL(ERR_NOTREGISTERED, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
+	}
 
 	if (tokens.size() < 2)
 	{

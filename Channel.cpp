@@ -276,7 +276,8 @@ void Channel::names(Client &source)
 	std::string namesToList;
 	for (Client *client : _channelUsers)
 	{
-		namesToList += client->getNickName() + " ";
+		if (_channelUsers.count(&source) || !client->hasMode(Client::ModeInvi))
+			namesToList += client->getNickName() + " ";
 	}
 	// TODO: check mode??
 	rpl = numericRPL(RPL_NAMREPLY, source.getNickName(), "=", _name, namesToList);

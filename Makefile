@@ -17,6 +17,7 @@ SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRun
 	Who.cpp \
 	Pong.cpp \
 	Msg.cpp \
+	Names.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 
