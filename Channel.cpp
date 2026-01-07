@@ -2,10 +2,6 @@
 #include "Utils.hpp"
 #include "Channel.hpp"
 
-/*
-	TODO:	list of clients in channel or list of channels in user
-*/
-
 // TODO: modify to work with pointers
 // TODO: change
 void Channel::userAdd(Client *user)
@@ -21,18 +17,12 @@ void Channel::userRemove(Client &user)
 
 void Channel::chanOperatorAdd(std::string &nick)
 {
-	//_operators.push_back(futureOperator.getNickName());
 	_operators.insert(nick);
 }
 
 bool Channel::chanOperatorRemove(std::string &nick)
 {
 	return _operators.erase(nick);
-/*
-	auto it = Utils::getStringIteratorByString(_operators, client.getNickName());
-	if (it != _operators.end())
-		_operators.erase(it);
-*/
 }
 
 void Channel::_inviteListAdd(std::string &toAdd)
@@ -43,11 +33,6 @@ void Channel::_inviteListAdd(std::string &toAdd)
 void Channel::_inviteListRemove(std::string &toRemove)
 {
 	_inviteList.erase(toRemove);
-/*
-	auto it = Utils::getStringIteratorByString(_inviteList, toRemove);
-	if (it != _inviteList.end())
-		_inviteList.erase(it);
-*/
 }
 
 Channel::Channel(const std::string &name)
@@ -139,7 +124,7 @@ void Channel::join(Client &client, bool keyValidated)
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	if (getClientLimitMode() && _channelUsers.size() == _clientLimit)
+	if (getClientLimitMode() && _channelUsers.size() >= _clientLimit)
 	{
 		rpl = numericRPL(ERR_CHANNELISFULL, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
@@ -274,7 +259,6 @@ bool Channel::invite(Client &source, std::string &nick)
 		outBuf.append(rpl.c_str(), rpl.length());
 		return false;
 	}
-//TODO : new mode considerations
 	if (getInviteOnlyMode() && !_operators.count(source.getNickName()))
 	{
 		rpl = numericRPL(ERR_CHANOPRIVSNEEDED, source.getNickName(), _name);
@@ -302,7 +286,8 @@ void Channel::names(Client &source)
 	std::string namesToList;
 	for (Client *client : _channelUsers)
 	{
-		namesToList += client->getNickName() + " ";
+		if (_channelUsers.count(&source) || !client->hasMode(Client::ModeInvi))
+			namesToList += client->getNickName() + " ";
 	}
 	// TODO: check mode??
 	rpl = numericRPL(RPL_NAMREPLY, source.getNickName(), "=", _name, namesToList);
@@ -324,7 +309,7 @@ const std::string &Channel::getTopic() const
 */
 bool Channel::hasChanPrefix(std::string &name)
 {
-	if (name[0] != '#' && name[0] != '&' && name[0] != '!' && name[0] != '+' )
+	if (name[0] != '#') //&& name[0] != '&' && name[0] != '!' && name[0] != '+' )
 		return (false);
 	return true;
 }

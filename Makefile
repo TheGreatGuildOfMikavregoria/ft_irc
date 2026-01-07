@@ -19,6 +19,7 @@ SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRun
 	Msg.cpp \
 	Oper.cpp \
 	Quit.cpp
+	Names.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 

@@ -56,11 +56,6 @@ class Server
 private:
 	
 	const std::unordered_map<std::string, void (Server::*)(Client &, Command &)> _commandMap = {
-	/*	{"SOME", &Server::_some},
-		{"ASD", &Server::_asd},
-		{"WASD", &Server::_wasd},
-*/
-		{"TEST", &Server::_testComm},
 		{"PASS", &Server::pass},
 		{"NICK", &Server::nick},
 		{"USER", &Server::user},
@@ -76,6 +71,7 @@ private:
 		{"WHO", &Server::who},
 		{"PRIVMSG", &Server::privmsg},
 		{"PONG", &Server::pong},
+		{"NAMES", &Server::names},
 	};
 
 	int status; //I believed i needed at somepoint now i dont remember
@@ -127,6 +123,7 @@ public:
 	void	mode(Client& c, Command& cmd);
 	void	kick(Client& c, Command& cmd);
 	void	who(Client& c, Command& cmd);
+	void	names(Client& c, Command& cmd);
 
 	Client*	clientLookUp(const std::string& nickName);
 	bool	isValidNickName(const std::string& nickName);
