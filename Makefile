@@ -7,7 +7,7 @@ vpath %.cpp cmds botsrcs
 		Msg.cpp ServerRunCmd.cpp Channel.cpp Pass.cpp Join.cpp Pong.cpp
 
 SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRunCmd.cpp Channel.cpp \
-	Pass.cpp \
+	PassNickUser.cpp \
 	Join.cpp \
 	Part.cpp \
 	Topic.cpp \
@@ -15,8 +15,10 @@ SRCS = main.cpp Server.cpp Buffer.cpp Command.cpp Utils.cpp Client.cpp ServerRun
 	Mode.cpp \
 	Kick.cpp \
 	Who.cpp \
-	Pong.cpp \
+	PingPong.cpp \
 	Msg.cpp \
+	Oper.cpp \
+	Quit.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

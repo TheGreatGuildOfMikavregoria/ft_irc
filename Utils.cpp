@@ -81,6 +81,7 @@ std::string Utils::getCurrentTimeString()
 	struct tm *localTime = localtime(&currentTime);
 	try {
 		std::string result(asctime(localTime));
+		result = result.substr(0, result.size() - 1);
 		return (result);
 	}
 	catch (...)

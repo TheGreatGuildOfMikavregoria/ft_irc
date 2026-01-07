@@ -1,8 +1,6 @@
 #include "../Server.hpp"
 
-#define USERLEN 8
-#define NETWORK_NAME "42Net"
-#define VERSION "1.0"
+
 
 // void	Server::numericRPL(Client& c, const char* format,  ...) {
 // 	std::string result = "ircserv";
@@ -46,7 +44,7 @@ Client* Server::clientLookUp(const std::string& nickName) {
 }
 
 bool Server::isValidNickName(const std::string& nickName) {
-	if (nickName.empty()) {
+	if (nickName.empty() || nickName.length() > 10) {
 		return false;
 	}
 	if (std::isdigit(nickName[0])) {
@@ -88,7 +86,7 @@ void Server::registerClient(Client& c) {
 	Buffer& outBuf = c.getOutBuf();
 	std::string rpl;
 	if (!c.getNickNameStatus() || !c.getUserNameStatus())
-		return ;//Asuming ther's time out for registration
+		return ;
 	else {
 		if (!c.getPasswordStatus()) {
 			rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
@@ -102,22 +100,15 @@ void Server::registerClient(Client& c) {
 			c.setRegiStatus(true);
 			rpl = numericRPL(RPL_WELCOME, nickName, NETWORK_NAME, nickName, c.getUserName(), c.getHostName()) //change macros later
 			+ numericRPL(RPL_YOURHOST, nickName, SERVER_NAME, VERSION) //change macros later 
-			+ numericRPL(RPL_CREATED, nickName) //add datetime
-			+ numericRPL(RPL_MYINFO, nickName) //add other params
-			+ numericRPL(RPL_ISUPPORT, nickName); //add other params
+			+ numericRPL(RPL_CREATED, nickName, getTimeCreated())
+			+ numericRPL(RPL_MYINFO, nickName, SERVER_NAME, VERSION, INFO_USERMODES, INFO_CHANMODES, INFO_CHANMODEPARAM)
+			+ numericRPL(RPL_ISUPPORT, nickName, ISUPPORT_TOKEN_LIST) //add other params
+			+ numericRPL(ERR_NOMOTD, nickName);
 		}
 		outBuf.append(rpl.c_str(), rpl.length());
 	}	
 }
 
-bool Server::isValidOperHost(const std::string &clientIP, int clientFD)
-{
-	struct sockaddr_in local_addr;
-	socklen_t len = sizeof(local_addr);
-	getsockname(clientFD, (struct sockaddr *)&local_addr, &len);
-	std::string serverIP = inet_ntoa(local_addr.sin_addr);
-	return (clientIP == "127.0.0.1" || clientIP == serverIP);
-}
 
 void Server::pass(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
@@ -172,11 +163,15 @@ void Server::user(Client& c, Command& cmd) {
 		rpl = numericRPL(ERR_ALREADYREGISTERED, nickName);
 	else {
 		std::string userName = cmd.getTokens().at(1);
-		for (char c : userName) {
-			if (c == '@')//ignores command silently. decide the behaviour.//what happens if user send USER again?
+		for (char ch : userName) {
+			if (!std::isalnum(static_cast<unsigned char>(ch))) {
+				rpl = numericRPL(NTC_INVALIDUSRNAME, nickName);
+				outBuf.append(rpl.c_str(), rpl.length());
+				c.setDisconnectFlag(true);
 				return;
+			}
 		}
-		userName = "~" + userName.substr(0,USERLEN);//check if ~ should be included in USERLEN
+		userName = "~" + userName.substr(0,USERLEN);
 		c.setUserName(userName);
 		c.setUserNameStatus(true);
 		c.setRealName(cmd.getTokens().at(4));
@@ -185,20 +180,16 @@ void Server::user(Client& c, Command& cmd) {
 	}
 	outBuf.append(rpl.c_str(), rpl.length());
 }
+// wweerasi@c2r2p11 ~ % nc irc.libera.chat 6667
+// :lead.libera.chat NOTICE * :*** Checking Ident
+// :lead.libera.chat NOTICE * :*** Looking up your hostname...
+// :lead.libera.chat NOTICE * :*** Couldn't look up your hostname
+// :lead.libera.chat NOTICE * :*** No Ident response
+// NICK s
+// USER @s * 0 :S
+// :lead.libera.chat NOTICE s :*** Your username is invalid. Please make sure that your username contains only alphanumeric characters.
+// ERROR :Closing Link: 194.136.126.52 (Invalid username [~])
 
-void Server::ping(Client& c, Command& cmd) {
-	const std::string nickName = c.getNickName();
-	Buffer& outBuf = c.getOutBuf();
-	std::string rpl;
-	if (cmd.getTokens().size() < 2)
-		rpl = numericRPL(ERR_NOORIGIN, nickName, cmd.getTokens().at(0));
-	else
-		rpl = ":" SERVER_NAME " PONG "  SERVER_NAME  " :" +  cmd.getTokens().at(1) + "\r\n";
-	outBuf.append(rpl.c_str(), rpl.length());
-	std::cout << "----Ping RPL ----" << std::endl; //is this required?
-	std::cout << c.getNickName() << " "<< rpl;
-	std::cout << "----Ping RPL END----" << std::endl;
-}
 
 // void Server::oper(Client& c, Command& cmd) {
 // 	const std::string nickName = c.getNickName();
@@ -224,57 +215,7 @@ void Server::ping(Client& c, Command& cmd) {
 // 	outBuf.append(rpl.c_str(), rpl.length());
 // }
 
-void Server::oper(Client& c, Command& cmd) {
-	const std::string nickName = c.getNickName();
-	Buffer& outBuf = c.getOutBuf();
-	(void)outBuf;
-	std::string rpl;
-	if (cmd.getTokens().size() < 3)
-		rpl = numericRPL(ERR_NEEDMOREPARAMS, nickName, cmd.getTokens().at(0));
-	else if (cmd.getTokens().at(1) != OPER_NAME || cmd.getTokens().at(2) != OPER_PASS)
-		rpl = numericRPL(ERR_PASSWDMISMATCH, nickName);
-	else if (!this->isValidOperHost(c.getHostName(), c.getFd()))
-		rpl = numericRPL(ERR_NOOPERHOST, nickName);
-	else {
-		rpl = numericRPL(RPL_YOUREOPER, nickName);
-		outBuf.append(rpl.c_str(), rpl.length());
-		if (!c.hasMode(Client::ModeOper)) {
-			c.addMode(Client::ModeOper);
-			rpl = ":" + nickName + " MODE " + nickName + " +o\r\n";
-			serverBroadcast(rpl);
-		}
-		return;
-	}
-	outBuf.append(rpl.c_str(), rpl.length());
-}
 
-void Server::quit(Client& c, Command& cmd) {
-	const std::string nickName = c.getNickName();
-	std::string reason;
-	if (!(cmd.getTokens().size() < 2))
-		reason = cmd.getTokens().at(1);
-	// Buffer& outBuf = c.getOutBuf();
- 	std::string rpl;
- 	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
- 	this -> error(c,rpl);
- 	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
- 	std::set<Channel*>::iterator it;
- 	for (it = c.getUserChannels().begin(); it != c.getUserChannels().end();) {
-		Channel* chan = *it;
- 		it++;
-		chan->userRemove(c);
-		chan->chanBroadcast(c, rpl);
- 	}
-	c.getUserChannels().clear();
-	c.setDisconnectFlag(true);
-}
-
-void Server::error(Client& c, const std::string& msg) {
-	std::string err_msg;
-	Buffer& outBuf = c.getOutBuf();
-	err_msg = "ERROR :" + msg + "\r\n";
-	outBuf.append(err_msg.c_str(), err_msg.length());
-}
 /*
 void Server::dropClient(Client& c)
 {

@@ -31,12 +31,22 @@
 #include <ctime>
 #include <list>
 #include <cstdlib> //INT_MAx
-#define MAX_CLIENTS 512
-#define CLIENT_TIMEOUT 60
+#define MAX_CLIENTS			512
+#define CLIENT_TIMEOUT		60
 #define CLIENT_PONG_WAITTIME CLIENT_TIMEOUT / 10 * 9
-#define SERVER_NAME "ircserv"
-#define OPER_NAME   "ircAdmin"
-#define OPER_PASS	"admin@IRC42"
+#define NICKLEN 			10
+#define USERLEN				8
+#define CHANNELLEN			50 //TODO: implement
+#define NETWORK_NAME		"42Net"
+#define VERSION				"1.0"
+#define INFO_USERMODES		"io"
+#define INFO_CHANMODES		"iklot"
+#define INFO_CHANMODEPARAM	"klo"
+#define SERVER_NAME			"ircserv"
+#define OPER_NAME			"ircAdmin"
+#define OPER_PASS			"admin@IRC42"
+#define ISUPPORT_TOKEN_LIST	"CASEMAPPING=ascii CHANLIMIT=#:5 CHANMODES=,k,l,it CHANNELLEN=50 CHANTYPES=# KICKLEN=500 PREFIX= TOPICLEN=500 USERLEN=8 NICKLEN=10"
+
 
 class Client;
 class Command;

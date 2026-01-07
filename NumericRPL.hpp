@@ -13,6 +13,7 @@ class Client;
 inline std::string stringify(const std::string& s) { return s; }
 inline std::string stringify(const char* s) { return std::string(s); }
 inline std::string stringify(char* s) { return std::string(s); }
+inline std::string stringify(char ch) { return std::string(1, ch); }
 
 template<typename T>
 std::string stringify(T val) { return std::to_string(val); }
@@ -109,9 +110,9 @@ std::string numericRPL(const std::string& format, Args... args) {
 
 #define RPL_WELCOME				" 001 %s :Welcome to the %s Network, %s!%s@%s" //in_use
 #define RPL_YOURHOST			" 002 %s :Your host is %s, running version %s" //in_use
-#define RPL_CREATED				" 003 %s :This server was created <datetime>" //in_use //Add params
-#define RPL_MYINFO				" 004 %s <servername> <version> <available user modes> <available channel modes> [<channel modes with a parameter>]" //in_use //Add params
-#define RPL_ISUPPORT			" 005 %s <1-13 tokens> :are supported by this server" //in_use //Add params
+#define RPL_CREATED				" 003 %s :This server was created %s" //in_use
+#define RPL_MYINFO				" 004 %s %s %s %s %s %s" //in_use
+#define RPL_ISUPPORT			" 005 %s %s :are supported by this server" //in_use
 #define RPL_UMODEIS				" 221 %s %s" //in_use 
 #define RPL_WHOISCERTFP			" 276 %s <nick> :has client certificate fingerprint <fingerprint>" //what is fingerprint
 #define RPL_AWAY				" 301 %s <nick> :<message>"
@@ -162,6 +163,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_NOTEXTTOSEND		" 412 %s :No text to send"
 #define ERR_NOTOPLEVEL (413)	//no message?
 #define ERR_WILDTOPLEVEL (414)	//no message?
+#define ERR_NOMOTD				" 422 %s :MOTD File is missing" //in_use
 #define ERR_NONICKNAMEGIVEN		" 431 %s :No nickname given" //in_use
 #define ERR_ERRONEUSNICKNAME	" 432 %s %s :Erroneus nickname" //in_use
 #define ERR_NICKNAMEINUSE		" 433 %s %s :Nickname is already in use" //in_use
@@ -169,7 +171,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_USERNOTINCHANNEL	" 441 %s %s %s :They aren't on that channel" // in_use
 #define ERR_NOTONCHANNEL		" 442 %s %s :You're not on that channel" //in_use
 #define ERR_USERONCHANNEL		" 443 %s %s %s :is already on channel" //in_use
-#define ERR_NOTREGISTERED 	" 451 %s :You have not registered" //in_use
+#define ERR_NOTREGISTERED		" 451 %s :You have not registered" //in_use
 #define ERR_NEEDMOREPARAMS		" 461 %s %s :Not enough parameters" //in_use
 #define ERR_ALREADYREGISTERED	" 462 %s :You may not reregister" //in_use
 #define ERR_PASSWDMISMATCH		" 464 %s :Password incorrect" //in_use
@@ -186,3 +188,4 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_USERSDONTMATCH		" 502 %s :Cant change mode for other users" //in_use
 #define RPL_WHOISSECURE			" 671 %s <nick> :is using a secure connection"
 #define ERR_NOPRIVS				" 723 %s <priv> :Insufficient oper privileges."
+#define NTC_INVALIDUSRNAME		" NOTICE %s :*** Invalid username. Username must contain only alphanumeric characters"
