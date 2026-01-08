@@ -44,7 +44,7 @@ Client* Server::clientLookUp(const std::string& nickName) {
 }
 
 bool Server::isValidNickName(const std::string& nickName) {
-	if (nickName.empty() || nickName.length() > 10) {
+	if (nickName.empty() || nickName.length() > NICKLEN) {
 		return false;
 	}
 	if (std::isdigit(nickName[0])) {
@@ -135,10 +135,9 @@ void Server::nick(Client& c, Command& cmd) {
 		std::string newNickName = cmd.getTokens().at(1);
 		if (!this -> isValidNickName(newNickName))
 			rpl = numericRPL(ERR_ERRONEUSNICKNAME, nickName, newNickName);
-		else if (this -> clientLookUp(newNickName.substr(0,9)))
+		else if (this -> clientLookUp(newNickName))
 			rpl = numericRPL(ERR_NICKNAMEINUSE, nickName, newNickName);
 		else {
-			newNickName = newNickName.substr(0, NICKLEN);
 			c.setNickName(newNickName);
 			c.setNickNameStatus(true);
 			if (!c.getRegiStatus())
