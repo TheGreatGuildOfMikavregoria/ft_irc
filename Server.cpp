@@ -68,9 +68,21 @@ void Server::sendToClient(int fd,const  std::string &msg)
 	std::string payload = msg;
 	if (payload.size() < 2 || payload.substr(payload.size() - 2) != "\r\n")
 		payload += "\r\n";
-	ssize_t sent = send(fd, payload.c_str(), payload.size(), 0);
-	if (sent < 0)  // SEND check please remember me 
+	size_t total = 0;
+	while (total < payload.size())
+	{
+		ssize_t sent = send(fd, payload.c_str() + total, payload.size() - total, 0);
+		if (sent > 0)
+		{
+			total += static_cast<size_t>(sent);
+			continue;
+		}
+		if (sent < 0 && errno == EINTR)
+			continue;
+		if (sent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
+			return;
 		throw std::runtime_error("send() failed");
+	}
 }
 
 
@@ -81,12 +93,21 @@ bool Server::serviceClientRead(Client &c)
 	char buffer[4096];
 	ssize_t received = recv(c.getFd(), buffer, sizeof(buffer), 0);
 
-	if (received <= 0)
+	if (received > 0)
+	{
+		c.setLastActivity(std::time(nullptr));
+		c.getInBuf().append(buffer, static_cast<std::size_t>(received));
+	}
+	else if (received == 0)
+	{
 		return false;
-
-	c.setLastActivity(std::time(nullptr));
-	c.getInBuf().append(buffer, static_cast<std::size_t>(received));
-
+	}
+	else
+	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
+			return true;
+		return false;
+	}
 	while (1)
 	{
 		Command message(c.getInBuf());
@@ -105,7 +126,13 @@ bool Server::serviceClientWrite(Client &c)
 		return true;
 
 	ssize_t sent = send(c.getFd(), c.getOutBuf().data(), c.getOutBuf().size(), 0);
-	if (sent <= 0)
+	if (sent < 0)
+	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
+			return true;
+		return false;
+	}
+	if (sent == 0)
 		return false;
 
 	c.getOutBuf().discard(static_cast<std::size_t>(sent));

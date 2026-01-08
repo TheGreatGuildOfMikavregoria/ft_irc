@@ -1,12 +1,4 @@
-#include <iostream>
-#include "../Buffer.hpp"
-#include <string>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <cstring>
-#include <stdexcept>
-
+#include "bot.hpp"
 
 static ssize_t findBrk( Buffer &b)
 {
@@ -32,26 +24,11 @@ static std::string pop_line(Buffer &b)
 	return line;
 }
 
-class Bot
-{
-	public:
-		std::string _host;
-		std::string _port;
-		std::string _password;
-		Buffer c;
-		Bot(char **argv);
-		~Bot();
-		void run();
-		void sendToClient(int fd,const  std::string &msg);
-};
-
-Bot::Bot(char **argv) : _host(argv[1]), _port(argv[2]), _password(argv[3]) {
-	//_host = argv[1];
-}
 
 void Bot::sendToClient(int fd,const  std::string &msg)
 {
 	std::string payload = msg;
+	//std::cout << msg;
 	if (payload.size() < 2 || payload.substr(payload.size() - 2) != "\r\n")
 		payload += "\r\n";
 	ssize_t sent = send(fd, payload.c_str(), payload.size(), 0);
@@ -80,8 +57,8 @@ void Bot::run()
 		throw std::runtime_error("connect fail");
 	
 	sendToClient(socket_fd, std::string("PASS ") + _password);
-	sendToClient(socket_fd, std::string("NICK bot"));
-	sendToClient(socket_fd, std::string("USER bot 0 * :bot"));
+	sendToClient(socket_fd, std::string("NICK ") + _nick);
+	sendToClient(socket_fd, std::string("USER ") + _nick + " 0 * :" + _nick);
 
 	for(;;)
 	{
@@ -89,7 +66,7 @@ void Bot::run()
 		ssize_t received = recv(socket_fd, buffer, sizeof(buffer), 0);
 		if (received <= 0)
 			throw std::runtime_error("client recv");
-		std::cout <<"BUFFER: "<< buffer << std::endl;
+		//std::cout <<"BUFFER: "<< buffer << std::endl;
 		c.append(buffer, static_cast<std::size_t>(received));
 
 
@@ -101,7 +78,48 @@ void Bot::run()
 			
 			std::cout << "LINE: " << line << std::endl;
 			if (line.rfind("PING", 0) == 0)
-				sendToClient(socket_fd, "PONG");
+			{
+				std::string token = line.size() > 5 ? line.substr(5) : "";
+				sendToClient(socket_fd, "PONG " + token);
+				continue ;
+			}
+			if (line.find(" PRIVMSG ") != std::string::npos)
+			{
+			
+				size_t targetEnd = line.find(' ', 0) - 1;
+
+				if (targetEnd != std::string::npos)
+				{
+					std::string target = line.substr(1, targetEnd);
+
+					size_t msgPos = line.find(" :", targetEnd);
+					if (msgPos != std::string::npos)
+					{
+						std::string msg = line.substr(msgPos + 2);
+						if (msg == "!help" )
+						{
+							sendToClient(socket_fd, "PRIVMSG " + target + " :Available commands:");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ KICK - Eject a client from the channel");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ INVITE - Invite a client to a channel");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ TOPIC - Change or view the channel topic");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ MODE - Change the channel’s mode:c");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : - i: Set/remove Invite-only channel");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : - t: Set/remove the restrictions of the TOPIC command to channel operators");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : - k: Set/remove the channel key (password)");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : - o: Give/take channel operator privilege");
+						}
+						
+					}
+				}
+			}
+
+			if (line.find(" 433 ") != std::string::npos || line.rfind("433 ", 0) == 0)
+			{
+				++_nick_attempt;
+				_nick = _nick_base + "_" + std::to_string(_nick_attempt);
+				sendToClient(socket_fd, std::string("NICK ") + _nick);
+				continue ;
+			}
 
 		}
 	}
