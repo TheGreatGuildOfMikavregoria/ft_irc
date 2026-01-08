@@ -211,7 +211,7 @@ void Channel::topic(Client &c, std::string &newTopic)
 	if (topicChange != static_cast<time_t>(-1))
 		_topicUpdatedTime = topicChange;
 	_topicUpdatedWho = c.getSource();
-	_topic = newTopic;
+	_topic = newTopic.substr(0, TOPICLEN);
 	topic(c, true);
 // try set new topic, reply??
 }
@@ -241,7 +241,7 @@ void Channel::kick(Client &source, std::string &nick, std::string &reason)
 	}
 	rpl = ":" + source.getSource() + " KICK " + _name +  " " + nick;
 	if (reason.length())
-		rpl += " :" + reason;
+		rpl += " :" + reason.substr(0, KICKLEN);
 	rpl += "\r\n";
 	chanBroadcast(rpl);
 	userRemove(**userIt);
@@ -318,6 +318,8 @@ bool Channel::validateName(std::string &name)
 	if (name.length() < 2 || name.length() > 50)
 		return (false);
 	if (!hasChanPrefix(name))
+		return (false);
+	if (name.length() > CHANNELLEN)
 		return (false);
 	for (size_t i = 1; i < name.length(); ++i)
 	{

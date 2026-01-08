@@ -25,11 +25,11 @@ OBJS_B = $(SRCS_B:.cpp=.o)
 
 INCLUDES =
 LDFLAGS =
-CXXFLAGS = -g $(INCLUDES) -std=c++17
+CXXFLAGS = $(INCLUDES) -std=c++17
 
 DEBUG ?= 0
 ifeq ($(DEBUG),1)
-	CXXFLAGS += -O0 -DDEBUG=1 
+	CXXFLAGS += -g -O0 -DDEBUG=1 
 
 else
 	CXXFLAGS += -O2 -DNDEBUG -Wall -Wextra -Werror
