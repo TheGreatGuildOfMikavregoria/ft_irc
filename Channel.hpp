@@ -4,29 +4,6 @@
 #include <string>
 #include "Client.hpp"
 #include <set>
-//#include "Utils.hpp"
-
-/*
-Directly Associated Commands
-	JOIN 
-	PART
-	TOPIC
-	NAMES
-	LIST
-	INVITE
-	KICK
-
-Indirectly associated Commands
-	PRIVMSG
-	QUIT
-
-must have modes:
-	i   --- only users from the invite list can join the channel (D)
-	t   --- topic can be set only by an operator (D)
-	k   --- check key when joining the channel (B)
-	o   --- user mode to set to operator (B)
-	l   --- client limit - if on (C)
-*/
 
 class Client;
 
@@ -39,21 +16,12 @@ class Channel
 		std::string _topicUpdatedWho;
 		std::string _key;
 		std::time_t _timeCreated;
-//		std::time_t _creationTime;
 
 		std::set<Client *>		_channelUsers;
 		std::set<std::string>	_inviteList;
 		std::set<std::string>	_operators;
-		
-
-		// bool _inviteOnlyMode = false;
-		// bool _keyMode = false;
-		// bool _protectedTopicMode = false;
-		// bool _clientLimitMode = false;
 		int		_chanMode		= 0;
 		size_t	_clientLimit	= 0;
-
-
 		void _inviteListAdd(std::string &);
 		void _inviteListRemove(std::string &);
 
@@ -95,7 +63,7 @@ class Channel
 		void who(Client &);
 		void chanBroadcast(std::string &);
 		void chanBroadcast(Client &, std::string &);
-		void userAdd(Client *);
+		void userAdd(Client &);
 		void userRemove(Client &);
 		static bool hasChanPrefix(std::string &name);
 		static bool validateName(std::string &name);
