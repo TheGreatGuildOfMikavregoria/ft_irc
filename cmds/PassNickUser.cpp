@@ -138,7 +138,7 @@ void Server::nick(Client& c, Command& cmd) {
 		else if (this -> clientLookUp(newNickName.substr(0,9)))
 			rpl = numericRPL(ERR_NICKNAMEINUSE, nickName, newNickName);
 		else {
-			newNickName = newNickName.substr(0,9);
+			newNickName = newNickName.substr(0, NICKLEN);
 			c.setNickName(newNickName);
 			c.setNickNameStatus(true);
 			if (!c.getRegiStatus())
