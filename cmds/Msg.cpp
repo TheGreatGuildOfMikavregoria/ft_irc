@@ -80,7 +80,7 @@ void Server::privmsg(Client &c, Command &cmd)
 		auto target = clientLookUp(receiver);
 		if (!target)
 		{
-			std::string rpl = numericRPL(ERR_NOSUCHNICK, nickName, target->getNickName());
+			std::string rpl = numericRPL(ERR_NOSUCHNICK, nickName, receiver);
 			outBuf.append(rpl.c_str(), rpl.length());
 			return ;
 		}

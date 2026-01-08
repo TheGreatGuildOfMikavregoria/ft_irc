@@ -42,15 +42,15 @@ bool	Server::updateChanOper(Client& c, Channel* chan, std::string& newOperName) 
 
 bool Server::updateChanULimit(Channel* chan, const std::string& strLim)
 {
-    char* endPtr;
-    long val = std::strtol(strLim.c_str(), &endPtr, 10);
+	char* endPtr;
+	long val = std::strtol(strLim.c_str(), &endPtr, 10);
 
-    if (*endPtr != '\0') return false;
-    if (val <= 0) return false;
-    if (val > MAX_CLIENTS) return false;
+	if (*endPtr != '\0') return false;
+	if (val <= 0) return false;
+	if (val > MAX_CLIENTS) return false;
 
-    chan->setClientLimit(static_cast<size_t>(val));
-    return true;
+	chan->setClientLimit(static_cast<size_t>(val));
+	return true;
 }
 
 
@@ -153,9 +153,83 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 		validModeRem = "-" + validModeRem;
 	std::string validModeArg = !(validArgAdd.empty() && validArgRem.empty())? validArgAdd + validArgRem : "";
 	if (!(validModeAdd.empty() && validModeRem.empty()))
-		rplRet = ":" + nickName + " MODE " + chan->getName() + " " + validModeAdd + validModeRem + " " + validModeArg + "\r\n";
+		rplRet = ":" + c.getSource() + " MODE " + chan->getName() + " " + validModeAdd + validModeRem + " " + validModeArg + "\r\n";
 	return rplRet;//should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
 }
+// MODE #testchan +kkkl-k+k key1 key2 key3 10 key3 key4
+// :Kaviii!~weera@194.136.126.52 MODE #testchan +kkkl key3 key3 key3 10
+// MODE #testchan
+// :zirconium.libera.chat 324 Kaviii #testchan +Cnstlk 10 key3
+// :zirconium.libera.chat 329 Kaviii #testchan 1767899971
+
+
+
+
+
+// std::string	Server::applyUserMode(Client& c, Command& cmd) {
+// 	const std::string nickName = c.getNickName();
+// 	Buffer &outBuf = c.getOutBuf();
+// 	std::string rpl;
+// 	std::string rplRet;
+// 	std::string validModeAdd;
+// 	std::string validModeRem;
+// 	bool action = REMOVE_MODE;
+// 	bool unknownFlagFound = false;
+// 	std::string modeString = cmd.getTokens().at(2);
+// 	for (char ch : modeString) {
+// 		if (ch == '+' || ch == '-') {
+// 			action = (ch == '+') ? ADD_MODE : REMOVE_MODE;
+// 			continue;
+// 		}
+// 		else if (action == ADD_MODE) {		
+// 			switch (ch) {
+// 				case 'i' :
+// 					if (!c.hasMode(Client::ModeInvi)) {
+// 						c.addMode(Client::ModeInvi);
+// 						validModeAdd += ch;
+// 					}
+// 					break;
+// 				case 'o' :
+// 					break;
+// 				default:
+// 					if (!unknownFlagFound) {
+// 						unknownFlagFound = true;
+// 						rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
+// 						outBuf.append(rpl.c_str(), rpl.length());
+// 					}
+// 			}
+// 		}
+// 		else if (action == REMOVE_MODE) {
+// 			switch (ch) {
+// 				case 'i' :
+// 					if (c.hasMode(Client::ModeInvi)) {
+// 						c.removeMode(Client::ModeInvi);
+// 						validModeRem += ch;
+// 					}
+// 					break;
+// 				case 'o' :
+// 					if (c.hasMode(Client::ModeOper)) {
+// 						c.removeMode(Client::ModeOper);
+// 						validModeRem += ch;
+// 					}
+// 					break;
+// 				default:
+// 					if (!unknownFlagFound) {
+// 						unknownFlagFound = true;
+// 						rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
+// 						outBuf.append(rpl.c_str(), rpl.length());
+// 					}
+// 			}
+// 		}
+// 	}
+// 	if(!validModeAdd.empty())
+// 		validModeAdd = "+" + validModeAdd;
+// 	if (!validModeRem.empty())
+// 		validModeRem = "-" + validModeRem;
+// 	if (!(validModeAdd.empty() && validModeRem.empty()))
+// 		rplRet = ":" + nickName + " MODE " + nickName + " :" + validModeAdd + validModeRem + "\r\n";
+// 	return rplRet; //should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
+// }
 
 std::string	Server::applyUserMode(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
@@ -164,6 +238,7 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 	std::string rplRet;
 	std::string validModeAdd;
 	std::string validModeRem;
+	std::string modePrev = c.getUserMode();
 	bool action = REMOVE_MODE;
 	bool unknownFlagFound = false;
 	std::string modeString = cmd.getTokens().at(2);
@@ -175,8 +250,8 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 		else if (action == ADD_MODE) {		
 			switch (ch) {
 				case 'i' :
-					c.addMode(Client::ModeInvi);
-					validModeAdd += ch;
+					if (!c.hasMode(Client::ModeInvi)) 
+						c.addMode(Client::ModeInvi);
 					break;
 				case 'o' :
 					break;
@@ -191,12 +266,12 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 		else if (action == REMOVE_MODE) {
 			switch (ch) {
 				case 'i' :
-					c.removeMode(Client::ModeInvi);
-					validModeRem += ch;
+					if (c.hasMode(Client::ModeInvi))
+						c.removeMode(Client::ModeInvi);
 					break;
 				case 'o' :
-					c.removeMode(Client::ModeOper);
-					validModeRem += ch;
+					if (c.hasMode(Client::ModeOper))
+						c.removeMode(Client::ModeOper);
 					break;
 				default:
 					if (!unknownFlagFound) {
@@ -207,15 +282,24 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 			}
 		}
 	}
+	std::string modeNew = c.getUserMode();
+	for (char mode : INFO_USERMODES) {
+		bool hadMode = (modePrev.find(mode) != std::string::npos);
+		bool hasMode = (modeNew.find(mode) != std::string::npos);
+
+		if (!hadMode && hasMode)
+			validModeAdd += mode;
+		else if (hadMode && !hasMode)
+			validModeRem += mode;
+	}
 	if(!validModeAdd.empty())
 		validModeAdd = "+" + validModeAdd;
 	if (!validModeRem.empty())
 		validModeRem = "-" + validModeRem;
 	if (!(validModeAdd.empty() && validModeRem.empty()))
-		rplRet = ":" + nickName + " MODE " + validModeAdd + validModeRem + "\r\n";
+		rplRet = ":" + nickName + " MODE " + nickName + " :" + validModeAdd + validModeRem + "\r\n";
 	return rplRet; //should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
 }
-
 //test cases: when chan limit is there but no key
 //when key is there but no limit and also when user is a part of the channel and not a part of the channel
 void	Server::mode(Client& c, Command& cmd)
@@ -262,7 +346,7 @@ void	Server::mode(Client& c, Command& cmd)
 			rpl = numericRPL(ERR_USERSDONTMATCH, nickName);
 		else if (cmd.getTokens().size() < 3)
 			rpl = numericRPL(RPL_UMODEIS, target, c.getUserMode());
-		else
+		else if (this->isValidModeString(cmd.getTokens().at(2)))
 			rpl = applyUserMode(c, cmd);
 	} 
 	outBuf.append(rpl.c_str(), rpl.length());
