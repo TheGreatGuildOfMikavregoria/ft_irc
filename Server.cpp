@@ -38,6 +38,7 @@ Server::~Server() {}
 
 void Server::dropClient(std::size_t index, const std::string &reason)
 {
+	(void) reason;
 	if (index >= _clients.size())
 		return;
 
@@ -45,12 +46,14 @@ void Server::dropClient(std::size_t index, const std::string &reason)
 	auto channels = c.getUserChannels();
 	for (Channel* channel : channels)
 	{
-// TODO: check if client->channelRemove needed
 		if (channel)
 			channel->userRemove(c);
 	}
+
+	#if DEBUG
 	if (!reason.empty())
 		std::cout << "Dropping client (fd " << c.getFd() << "): " << reason << std::endl;
+	#endif
 
 	if (c.getFd() >= 0)
 		close(c.getFd());
@@ -202,7 +205,7 @@ void Server::serverAcceptClients()
 				break ;
 			if (errno == ECONNABORTED)
 				continue ;
-			if (errno == EMFILE || errno == ENFILE) //Testing some failsafes in case running out of fd's tldr should just keep under os ulimit
+			if (errno == EMFILE || errno == ENFILE)
 			{
 				if (_spareFd >= 0)
 				{
@@ -240,8 +243,9 @@ void Server::serverAcceptClients()
 		std::unique_ptr<Client> newClient(new Client(sock_fd));
 		newClient->setHostName(inet_ntoa(c_addr.sin_addr));
 		_clients.push_back(std::move(newClient));
-
+		#if DEBUG
 		std::cout << "Accepted new client: " << sock_fd << std::endl;
+		#endif
 	}
 }
 
@@ -294,13 +298,14 @@ void Server::_runLoop()
 		}
 		return timeout * 1000;
 	};
-
+	#if DEBUG
 	auto n{0};
-
+	#endif
 	for (;;)
 	{
-		
+		#if DEBUG
 		std::cout <<"------------------------ Loop: " <<n++ << "------------------------" <<std::endl;
+		#endif
 		buildPollList(pfds);
 
 		int pRes = poll(pfds.data(), pfds.size(), nextClientTimeout());
@@ -322,7 +327,9 @@ void Server::_runLoop()
 			{
 				client->setWaitingPong(true);
 				sendToClient(client->getFd(), "PING");
+				#if DEBUG
 				std::cout << "Server has sent a ping request to: "<< client->getNickName() << std::endl;
+				#endif
 			}
 			else if (client->getWaitingPong() == true && std::difftime(std::time(nullptr), client->getLastActivity()) > CLIENT_TIMEOUT)
 			{	
@@ -330,7 +337,6 @@ void Server::_runLoop()
 				dropClient(static_cast<size_t>(i), "Client timeout");
 			}
 
-		//	std::cout << "Client " << client->getFd() << " timediff " << difftime(std::time(nullptr),client->getLastActivity())  << std::endl;
 		}
 		if (pfds[0].revents & POLLIN)
 			serverAcceptClients();
@@ -384,7 +390,9 @@ void Server::_startServerListener()
 	}
 
 	_listenFd = socket_fd;
+	#if DEBUG
 	std::cout << "Server is listening" << std::endl;
+	#endif
 }
 
 void Server::start_server()

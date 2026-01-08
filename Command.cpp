@@ -69,9 +69,11 @@ Command::Command(Buffer &buffer) : _buffer(buffer)
 	_commandStringToVector(commandLine);
 	_removeParsedFromBuffer(nlCrPosition, tempStr);
 	_status = MESSAGE_COMPLETE;
+	#if DEBUG
 	_processVector();
+	#endif
 }
-
+#if DEBUG
 void Command::_processVector()
 {
 	std::cout << "Command Vector:" << std::endl;
@@ -79,8 +81,11 @@ void Command::_processVector()
 	{
 		std::cout << asd << std::endl;
 	}
+	
 	std::cout << "Command Vector END" << std::endl;
+
 }
+#endif
 
 void Command::_commandStringToVector(std::string &buffer)
 {

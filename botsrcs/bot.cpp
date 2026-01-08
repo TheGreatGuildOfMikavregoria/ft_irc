@@ -28,7 +28,6 @@ static std::string pop_line(Buffer &b)
 void Bot::sendToClient(int fd,const  std::string &msg)
 {
 	std::string payload = msg;
-	//std::cout << msg;
 	if (payload.size() < 2 || payload.substr(payload.size() - 2) != "\r\n")
 		payload += "\r\n";
 	ssize_t sent = send(fd, payload.c_str(), payload.size(), 0);
@@ -108,7 +107,6 @@ void Bot::run()
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - k: Set/remove the channel key (password)");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - o: Give/take channel operator privilege");
 						}
-						
 					}
 				}
 			}

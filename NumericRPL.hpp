@@ -155,7 +155,7 @@ std::string numericRPL(const std::string& format, Args... args) {
 #define ERR_NOSUCHNICK			" 401 %s %s :No such nick/channel" //in_use
 #define ERR_NOSUCHSERVER		" 402 %s <server name> :No such server" //PING:Deprecated Numeric Reply
 #define ERR_NOSUCHCHANNEL		" 403 %s %s :No such channel" //in_use
-#define ERR_CANNOTSENDTOCHAN	" 404 %s <channel> :Cannot send to channel"
+#define ERR_CANNOTSENDTOCHAN	" 404 %s %s :Cannot send to channel"
 #define ERR_TOOMANYCHANNELS		" 405 %s <channel> :You have joined too many channels"
 #define ERR_TOOMANYTARGETS (407)//no message?
 #define ERR_NOORIGIN			" 409 %s :No origin specified" //in_use

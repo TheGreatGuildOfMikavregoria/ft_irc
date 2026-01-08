@@ -20,7 +20,9 @@ class Command {
 		unsigned int	_status;
 		bool _validateCommand(std::string &command);
 		void _commandStringToVector(std::string &);
+		#if DEBUG
 		void _processVector();
+		#endif
 		size_t _identifyNlCr(std::string &tempStr);
 		void _removeParsedFromBuffer(size_t, std::string &);
 	public:

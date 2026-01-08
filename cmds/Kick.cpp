@@ -29,15 +29,4 @@ void Server::kick(Client &c, Command &cmd)
 	}
 	std::cout << "kick channel found" << std::endl; 
 	it->kick(c, cmd.getTokens()[2], reason);
-/*
-	std::set<Channel *> &userChannels = c.getUserChannels();
-	Channel &chanRef = *it;
-	if (userChannels.count(&chanRef))
-		it->kick(c, reason);
-	else
-	{
-		std::string rpl = numericRPL(ERR_NOTONCHANNEL, c.getNickName(), *chanIterStart);
-		outBuf.append(rpl.c_str(), rpl.length());
-	}
-*/
 }

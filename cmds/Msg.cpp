@@ -9,8 +9,8 @@ Channel* Server::getChannelByName(std::string &ch)
 	}
 	return NULL;
 }
-//      Command: PRIVMSG
-//   Parameters: <target>{,<target>} <text to be sent>
+
+
 void Server::privmsg(Client &c, Command &cmd)
 {
 	auto tokens = cmd.getTokens();
@@ -26,7 +26,7 @@ void Server::privmsg(Client &c, Command &cmd)
 	{
 		std::string rpl = numericRPL(ERR_NORECIPIENT, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
 		outBuf.append(rpl.c_str(), rpl.length());
-		return ; //411 ERR_NORECIPIENT (411)
+		return ;
 	}
 	auto &receiver = tokens[1];
 	
@@ -34,7 +34,7 @@ void Server::privmsg(Client &c, Command &cmd)
 	{
 		std::string rpl = numericRPL(ERR_NOTEXTTOSEND, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
 		outBuf.append(rpl.c_str(), rpl.length());
-		return ;//412 ERR_NOTEXTTOSEND (412)
+		return ;
 	}
 	auto &msg = tokens[2];
 
@@ -57,7 +57,6 @@ void Server::privmsg(Client &c, Command &cmd)
 	
 	if (receiver.at(0) == '#')
 	{
-		//Send to channel
 		Channel *channelPtr = getChannelByName(receiver);
 		if (!channelPtr)
 		{
@@ -68,10 +67,10 @@ void Server::privmsg(Client &c, Command &cmd)
 		std::set<Channel*> &userChannels = c.getUserChannels();
 		if (userChannels.find(channelPtr) == userChannels.end())
 		{
-			std::string rpl = numericRPL(ERR_CANNOTSENDTOCHAN, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+			std::string rpl = numericRPL(ERR_CANNOTSENDTOCHAN, c.getNickNameStatus() ? c.getNickName() : c.getUserName(), channelPtr->getName());
 			outBuf.append(rpl.c_str(), rpl.length());
 
-			return ;//404; ERR_CANNOTSENDTOCHAN (404)
+			return ;
 		}
 
 		std::string payload = ":" + c.getNickName() + " PRIVMSG " + receiver + " :" + msg + "\r\n";
@@ -84,7 +83,7 @@ void Server::privmsg(Client &c, Command &cmd)
 		{
 			std::string rpl = numericRPL(ERR_NOSUCHNICK, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
 			outBuf.append(rpl.c_str(), rpl.length());
-			return ;//401; ERR_NOSUCHNICK (401)
+			return ;
 		}
 
 		std::string payload = ":" + c.getNickName() + " PRIVMSG " + receiver + " :" + msg + "\r\n";
