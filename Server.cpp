@@ -292,7 +292,7 @@ void Server::_runLoop()
 			int remainingTime = idleTime -  static_cast<int>(std::difftime(now, client->getLastActivity()));;
 
 			if (remainingTime <= 0)
-				return 1000;
+				return 0;
 			if (timeout == -1 || remainingTime < timeout)
 				timeout = remainingTime;
 		}

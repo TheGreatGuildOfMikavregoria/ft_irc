@@ -83,7 +83,9 @@ void Client::who(Client &source)
 		resolvedChannelName = (*userChannelsIt)->getName();
 	else
 		resolvedChannelName = "*";
-	rpl = numericRPL(RPL_WHOREPLY, source.getNickName(), resolvedChannelName, getHostName(), SERVER_NAME, getNickName(), "H", 0, getRealName());
+	
+	rpl = numericRPL(RPL_WHOREPLY, source.getNickName(), resolvedChannelName, source.getUserName(),
+	 getHostName(), SERVER_NAME, getNickName(), "H", 0, getRealName());
 	#if DEBUG
 	std::cout << rpl << std::endl;
 	#endif

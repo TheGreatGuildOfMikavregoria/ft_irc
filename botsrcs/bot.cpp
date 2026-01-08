@@ -101,7 +101,7 @@ void Bot::run()
 							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ KICK - Eject a client from the channel");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ INVITE - Invite a client to a channel");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ TOPIC - Change or view the channel topic");
-							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ MODE - Change the channel’s mode:c");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ MODE - Change the channel’s mode:");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - i: Set/remove Invite-only channel");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - t: Set/remove the restrictions of the TOPIC command to channel operators");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - k: Set/remove the channel key (password)");

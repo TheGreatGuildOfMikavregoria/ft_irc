@@ -32,7 +32,7 @@ ifeq ($(DEBUG),1)
 	CXXFLAGS += -g -O0 -DDEBUG=1 
 
 else
-	CXXFLAGS += -O2 -DNDEBUG -Wall -Wextra -Werror
+	CXXFLAGS += -O2 -DNDEBUG -Wall -Wextra -Werror -pedantic-errors
 endif
 
 all: $(NAME) $(BOT)

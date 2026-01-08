@@ -27,6 +27,8 @@ void Server::kick(Client &c, Command &cmd)
 		outBuf.append(rpl.c_str(), rpl.length());
 		return;
 	}
-	std::cout << "kick channel found" << std::endl; 
+	#if DEBUG
+	std::cout << "kick channel found" << std::endl;
+	#endif
 	it->kick(c, cmd.getTokens()[2], reason);
 }

@@ -130,7 +130,7 @@ void Channel::join(Client &client, bool keyValidated)
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	if (getInviteOnlyMode() && !_channelUsers.count(&client))
+	if (getInviteOnlyMode() && !_inviteList.count(client.getNickName()))
 	{
 		rpl = numericRPL(ERR_INVITEONLYCHAN, nickname, _name);
 		outBuf.append(rpl.c_str(), rpl.length());
