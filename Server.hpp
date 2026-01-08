@@ -145,6 +145,4 @@ public:
 	Channel* getChannelByName(std::string &ch);
 	void pong(Client &c, Command &cmd);
 	void removeEmptyChannels();
-
-
 };
