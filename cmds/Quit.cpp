@@ -5,7 +5,6 @@ void Server::quit(Client& c, Command& cmd) {
 	std::string reason;
 	if (!(cmd.getTokens().size() < 2))
 		reason = cmd.getTokens().at(1);
-	// Buffer& outBuf = c.getOutBuf();
  	std::string rpl;
  	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
  	this -> error(c,rpl);

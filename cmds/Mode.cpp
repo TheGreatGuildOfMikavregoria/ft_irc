@@ -9,20 +9,6 @@
 bool	Server::isValidModeString(const std::string& modeString){
 	if (modeString.size() < 2 || !(modeString[0] == '+' || modeString[0] == '-'))
 		return false;
-	// int  signCount = 1;
-	// std::string validModeSet = whichMode ? VALID_CHAN_MODES : VALID_USER_MODES; //this might be extra. remove it.
-	for (size_t i = 1; i < modeString.size(); ++i) {
-		char ch = modeString[i];
-		if (ch == '+' || ch == '-') {
-			// if (++signCount > 1 || i == modeString.size() - 1)
-			// 	return false;
-			continue;
-		}
-			// signCount = 0;
-			// if (validModeSet.find(ch) == std::string::npos) {
-		// 	// 	return false;
-		// }
-	}
 	return true;
 }
 
@@ -61,7 +47,7 @@ bool Server::updateChanULimit(Channel* chan, const std::string& strLim)
 
     if (*endPtr != '\0') return false;
     if (val <= 0) return false;
-    if (val > INT32_MAX) return false; //change the macro to INT_MAX if it's available on school computer. hpp has the library
+    if (val > MAX_CLIENTS) return false;
 
     chan->setClientLimit(static_cast<size_t>(val));
     return true;
@@ -167,7 +153,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 		validModeRem = "-" + validModeRem;
 	std::string validModeArg = !(validArgAdd.empty() && validArgRem.empty())? validArgAdd + validArgRem : "";
 	if (!(validModeAdd.empty() && validModeRem.empty()))
-		rplRet = ":" + nickName + " MODE " + chan->getName() + " " + validModeAdd + validModeRem + " " + validModeArg + "\r\n"; //do I have to add # prefix to chanName? //add the parameters here as well
+		rplRet = ":" + nickName + " MODE " + chan->getName() + " " + validModeAdd + validModeRem + " " + validModeArg + "\r\n";
 	return rplRet;//should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
 }
 
@@ -193,9 +179,7 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 					validModeAdd += ch;
 					break;
 				case 'o' :
-					// c.addMode(Client::ModeOper);
-					// validModeAdd += ch;
-					break;//operator is added through OPER message not from this //should i neglect this silently or take action?
+					break;
 				default:
 					if (!unknownFlagFound) {
 						unknownFlagFound = true;
@@ -228,7 +212,7 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 	if (!validModeRem.empty())
 		validModeRem = "-" + validModeRem;
 	if (!(validModeAdd.empty() && validModeRem.empty()))
-		rplRet = ":" + nickName + " MODE " + validModeAdd + validModeRem + "\r\n"; //do I have to add # prefix to chanName? //add the parameters here as well
+		rplRet = ":" + nickName + " MODE " + validModeAdd + validModeRem + "\r\n";
 	return rplRet; //should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
 }
 
@@ -264,7 +248,7 @@ void	Server::mode(Client& c, Command& cmd)
 		else if (!(*it).isOperator(c))
 			rpl = numericRPL(ERR_CHANOPRIVSNEEDED, nickName, target);
 		else {
-			if (this->isValidModeString(cmd.getTokens().at(2))) { //think about thie line and fix the isvalid modeString
+			if (this->isValidModeString(cmd.getTokens().at(2))) {
 				std::string  msgBroadcast= applyChanMode(c, &(*it), cmd);
 				if (!msgBroadcast.empty())
 					(*it).chanBroadcast(msgBroadcast);

@@ -9,40 +9,40 @@ Channel* Server::getChannelByName(std::string &ch)
 	}
 	return NULL;
 }
-//      Command: PRIVMSG
-//   Parameters: <target>{,<target>} <text to be sent>
+
 void Server::privmsg(Client &c, Command &cmd)
 {
 	auto tokens = cmd.getTokens();
+	const std::string nickName = c.getNickName();
 	Buffer &outBuf = c.getOutBuf();
 	if (!c.getRegiStatus())
 	{
-		std::string rpl = numericRPL(ERR_NOTREGISTERED, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+		std::string rpl = numericRPL(ERR_NOTREGISTERED, nickName);
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
 
 	if (tokens.size() < 2)
 	{
-		std::string rpl = numericRPL(ERR_NORECIPIENT, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+		std::string rpl = numericRPL(ERR_NORECIPIENT, nickName, "PRIVMSG");
 		outBuf.append(rpl.c_str(), rpl.length());
-		return ; //411 ERR_NORECIPIENT (411)
+		return ;
 	}
 	auto &receiver = tokens[1];
 	
 	if (tokens.size() < 3)
 	{
-		std::string rpl = numericRPL(ERR_NOTEXTTOSEND, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+		std::string rpl = numericRPL(ERR_NOTEXTTOSEND, nickName);
 		outBuf.append(rpl.c_str(), rpl.length());
-		return ;//412 ERR_NOTEXTTOSEND (412)
+		return ;
 	}
 	auto &msg = tokens[2];
 
 	if (tokens[1].find(',') != std::string::npos)
 	{
-		//std::string rpl = numericRPL(ERR_TOOMANYTARGETS, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
-//				outBuf.append(rpl.c_str(), rpl.length());
-		return ;//407 ERR_TOOMANYTARGETS (407)
+		std::string rpl = numericRPL(ERR_TOOMANYTARGETS, nickName, "PRIVMSG");
+		outBuf.append(rpl.c_str(), rpl.length());
+		return ;
 	}
 
 	#if DEBUG
@@ -57,21 +57,19 @@ void Server::privmsg(Client &c, Command &cmd)
 	
 	if (receiver.at(0) == '#')
 	{
-		//Send to channel
 		Channel *channelPtr = getChannelByName(receiver);
 		if (!channelPtr)
 		{
-			std::string rpl = numericRPL(ERR_NOSUCHCHANNEL, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+			std::string rpl = numericRPL(ERR_NOSUCHCHANNEL, nickName, receiver);
 			outBuf.append(rpl.c_str(), rpl.length());
-			return ; //403
+			return ;
 		}
 		std::set<Channel*> &userChannels = c.getUserChannels();
 		if (userChannels.find(channelPtr) == userChannels.end())
 		{
-			std::string rpl = numericRPL(ERR_CANNOTSENDTOCHAN, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+			std::string rpl = numericRPL(ERR_CANNOTSENDTOCHAN, nickName, receiver);
 			outBuf.append(rpl.c_str(), rpl.length());
-
-			return ;//404; ERR_CANNOTSENDTOCHAN (404)
+			return ;
 		}
 
 		std::string payload = ":" + c.getNickName() + " PRIVMSG " + receiver + " :" + msg + "\r\n";
@@ -82,12 +80,12 @@ void Server::privmsg(Client &c, Command &cmd)
 		auto target = clientLookUp(receiver);
 		if (!target)
 		{
-			std::string rpl = numericRPL(ERR_NOSUCHNICK, c.getNickNameStatus() ? c.getNickName() : c.getUserName());
+			std::string rpl = numericRPL(ERR_NOSUCHNICK, nickName, target->getNickName());
 			outBuf.append(rpl.c_str(), rpl.length());
-			return ;//401; ERR_NOSUCHNICK (401)
+			return ;
 		}
 
-		std::string payload = ":" + c.getNickName() + " PRIVMSG " + receiver + " :" + msg + "\r\n";
+		std::string payload = ":" + nickName + " PRIVMSG " + receiver + " :" + msg + "\r\n";
 		target->getOutBuf().append(payload.c_str(), payload.size());
 	}
 	return ;
