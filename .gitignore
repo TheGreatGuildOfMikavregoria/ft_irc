@@ -2,6 +2,7 @@ ircserv
 bot
 .vscode
 *.swp
+*.log
 
 # Prerequisites
 *.d
