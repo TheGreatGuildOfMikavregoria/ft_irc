@@ -236,8 +236,8 @@ void Channel::kick(Client &source, std::string &nick, std::string &reason)
 		rpl += " :" + reason.substr(0, KICKLEN);
 	rpl += "\r\n";
 	chanBroadcast(rpl);
-	userRemove(**userIt);
 	(**userIt).channelRemove(*this);
+	userRemove(**userIt);
 	return ;
 }
 
