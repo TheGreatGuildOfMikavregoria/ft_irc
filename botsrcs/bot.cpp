@@ -75,8 +75,9 @@ void Bot::run()
 			std::string line = pop_line(c);
 			if (line.empty())
 				break ;
-			
+			#if DEBUG
 			std::cout << "LINE: " << line << std::endl;
+			#endif
 			if (line.rfind("PING", 0) == 0)
 			{
 				std::string token = line.size() > 5 ? line.substr(5) : "";
