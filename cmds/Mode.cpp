@@ -1,8 +1,4 @@
 #include "../Server.hpp"
-// #define VALID_USER_MODES "iows"
-// #define VALID_CHAN_MODES "itkol"
-// #define MODE_CHAN 1
-// #define MODE_USER 0
 #define ADD_MODE 1
 #define REMOVE_MODE 0
 
@@ -53,14 +49,11 @@ bool Server::updateChanULimit(Channel* chan, const std::string& strLim)
 	return true;
 }
 
-
-//if mode arguments are not enough still the valid modes should be processes.
-//liberschat writes channels modes fore MODE command even if the client is not a member. but shouldn't let client change the modes.
 std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 	const std::string nickName = c.getNickName();
 	Buffer &outBuf = c.getOutBuf();
 	std::string target = cmd.getTokens().at(1);
-	unsigned long argID = cmd.getTokens().size() >= 4 ? 3 : 0;
+	unsigned long argID = cmd.getTokens().size() >= 4 ? 3 : -1;
 	std::string rpl;
 	std::string rplRet;
 	std::string validModeAdd;
@@ -122,7 +115,8 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 					validModeRem += ch;
 					break;
 				case 'k' :
-					if (argID++ < cmd.getTokens().size() && chan->getKeyMode() && this->updateChanKey(chan, defaultKey)) {
+					if (argID < cmd.getTokens().size() && chan->getKeyMode() && chan->getKey() == cmd.getTokens().at(argID++)
+					&& this->updateChanKey(chan, defaultKey)) {
 						chan->removeMode(Channel::ModeKeyOn);
 						validModeRem += ch;
 						validArgRem += defaultKey + " ";
@@ -137,7 +131,7 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 					break;
 				case 'l' :
 					if (chan->getClientLimitMode()) {
-						chan->removeMode(Channel::ModeClientLim);//do I have to set clientlim to 0? No I guess
+						chan->removeMode(Channel::ModeClientLim);
 						validModeRem += ch;
 					}
 					break;
@@ -154,82 +148,8 @@ std::string	Server::applyChanMode(Client& c, Channel* chan, Command& cmd) {
 	std::string validModeArg = !(validArgAdd.empty() && validArgRem.empty())? validArgAdd + validArgRem : "";
 	if (!(validModeAdd.empty() && validModeRem.empty()))
 		rplRet = ":" + c.getSource() + " MODE " + chan->getName() + " " + validModeAdd + validModeRem + " " + validModeArg + "\r\n";
-	return rplRet;//should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
+	return rplRet;
 }
-// MODE #testchan +kkkl-k+k key1 key2 key3 10 key3 key4
-// :Kaviii!~weera@194.136.126.52 MODE #testchan +kkkl key3 key3 key3 10
-// MODE #testchan
-// :zirconium.libera.chat 324 Kaviii #testchan +Cnstlk 10 key3
-// :zirconium.libera.chat 329 Kaviii #testchan 1767899971
-
-
-
-
-
-// std::string	Server::applyUserMode(Client& c, Command& cmd) {
-// 	const std::string nickName = c.getNickName();
-// 	Buffer &outBuf = c.getOutBuf();
-// 	std::string rpl;
-// 	std::string rplRet;
-// 	std::string validModeAdd;
-// 	std::string validModeRem;
-// 	bool action = REMOVE_MODE;
-// 	bool unknownFlagFound = false;
-// 	std::string modeString = cmd.getTokens().at(2);
-// 	for (char ch : modeString) {
-// 		if (ch == '+' || ch == '-') {
-// 			action = (ch == '+') ? ADD_MODE : REMOVE_MODE;
-// 			continue;
-// 		}
-// 		else if (action == ADD_MODE) {		
-// 			switch (ch) {
-// 				case 'i' :
-// 					if (!c.hasMode(Client::ModeInvi)) {
-// 						c.addMode(Client::ModeInvi);
-// 						validModeAdd += ch;
-// 					}
-// 					break;
-// 				case 'o' :
-// 					break;
-// 				default:
-// 					if (!unknownFlagFound) {
-// 						unknownFlagFound = true;
-// 						rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
-// 						outBuf.append(rpl.c_str(), rpl.length());
-// 					}
-// 			}
-// 		}
-// 		else if (action == REMOVE_MODE) {
-// 			switch (ch) {
-// 				case 'i' :
-// 					if (c.hasMode(Client::ModeInvi)) {
-// 						c.removeMode(Client::ModeInvi);
-// 						validModeRem += ch;
-// 					}
-// 					break;
-// 				case 'o' :
-// 					if (c.hasMode(Client::ModeOper)) {
-// 						c.removeMode(Client::ModeOper);
-// 						validModeRem += ch;
-// 					}
-// 					break;
-// 				default:
-// 					if (!unknownFlagFound) {
-// 						unknownFlagFound = true;
-// 						rpl = numericRPL(ERR_UMODEUNKNOWNFLAG, nickName);
-// 						outBuf.append(rpl.c_str(), rpl.length());
-// 					}
-// 			}
-// 		}
-// 	}
-// 	if(!validModeAdd.empty())
-// 		validModeAdd = "+" + validModeAdd;
-// 	if (!validModeRem.empty())
-// 		validModeRem = "-" + validModeRem;
-// 	if (!(validModeAdd.empty() && validModeRem.empty()))
-// 		rplRet = ":" + nickName + " MODE " + nickName + " :" + validModeAdd + validModeRem + "\r\n";
-// 	return rplRet; //should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
-// }
 
 std::string	Server::applyUserMode(Client& c, Command& cmd) {
 	const std::string nickName = c.getNickName();
@@ -298,10 +218,9 @@ std::string	Server::applyUserMode(Client& c, Command& cmd) {
 		validModeRem = "-" + validModeRem;
 	if (!(validModeAdd.empty() && validModeRem.empty()))
 		rplRet = ":" + nickName + " MODE " + nickName + " :" + validModeAdd + validModeRem + "\r\n";
-	return rplRet; //should rpl be reset to zero if no valid modes are applied. otherwie it will print twice //fixed the isue. should be tested for chan
+	return rplRet;
 }
-//test cases: when chan limit is there but no key
-//when key is there but no limit and also when user is a part of the channel and not a part of the channel
+
 void	Server::mode(Client& c, Command& cmd)
 {
 	const std::string nickName = c.getNickName();
