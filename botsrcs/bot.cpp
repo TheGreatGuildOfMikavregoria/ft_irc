@@ -44,6 +44,7 @@ void Bot::run()
 		throw std::runtime_error("socket() failed");
 
 	sockaddr_in c_addr;
+	std::memset(&c_addr, 0, sizeof(c_addr));
 	c_addr.sin_family = AF_INET;
 	c_addr.sin_port = htons(std::stoi(_port));
 
