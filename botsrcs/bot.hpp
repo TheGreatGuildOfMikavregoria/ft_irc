@@ -9,6 +9,8 @@
 #include <sys/socket.h>
 #include <cstring>
 #include <stdexcept>
+#include <cerrno>
+#include <csignal>
 
 class Bot
 {

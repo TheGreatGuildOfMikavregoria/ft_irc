@@ -1,5 +1,12 @@
 #include "bot.hpp"
 
+static volatile std::sig_atomic_t g_quit = 0;
+
+static void SignalHandler(int)
+{
+	g_quit = 1;
+}
+
 static ssize_t findBrk( Buffer &b)
 {
 	const char *data = b.data();
@@ -39,6 +46,13 @@ Bot::~Bot() {}
 
 void Bot::run()
 {
+	struct sigaction sa;
+	std::memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SignalHandler;
+	sigaction(SIGINT, &sa, nullptr);
+	sigaction(SIGQUIT, &sa, nullptr);
+
+
 	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd < 0)
 		throw std::runtime_error("socket() failed");
@@ -65,13 +79,21 @@ void Bot::run()
 		char buffer[4096];
 		ssize_t received = recv(socket_fd, buffer, sizeof(buffer), 0);
 		if (received <= 0)
+		{
+			if (g_quit)
+				break;
+			if (errno == EINTR)
+				continue;
 			throw std::runtime_error("client recv");
-		//std::cout <<"BUFFER: "<< buffer << std::endl;
+		}
+
 		c.append(buffer, static_cast<std::size_t>(received));
 
 
 		while (1)
 		{
+			if (g_quit)
+				break;
 			std::string line = pop_line(c);
 			if (line.empty())
 				break ;
@@ -122,7 +144,9 @@ void Bot::run()
 			}
 
 		}
+		
 	}
+	close(socket_fd);
 }
 
 int main(int ac, char **av)
