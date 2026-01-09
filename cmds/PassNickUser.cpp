@@ -143,7 +143,8 @@ void Server::nick(Client& c, Command& cmd) {
 			if (!c.getRegiStatus())
 					this -> registerClient(c);
 			else {
-				rpl = ":" + nickName + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
+				//rpl = ":" + nickName + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
+				rpl = ":" + c.getSource() + " NICK " + newNickName + "\r\n";//might have to change  the format of this later
 				serverBroadcast(rpl);
 			}
 			return;

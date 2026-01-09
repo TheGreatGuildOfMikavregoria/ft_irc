@@ -2,11 +2,9 @@
 #include "Utils.hpp"
 #include "Channel.hpp"
 
-// TODO: modify to work with pointers
-// TODO: change
-void Channel::userAdd(Client *user)
+void Channel::userAdd(Client &user)
 {
-	_channelUsers.insert(user);
+	_channelUsers.insert(&user);
 }
 
 
@@ -28,7 +26,6 @@ bool Channel::chanOperatorRemove(std::string &nick)
 void Channel::_inviteListAdd(std::string &toAdd)
 {
 	_inviteList.insert(toAdd);
-//	_inviteList.push_back(toAdd);
 }
 void Channel::_inviteListRemove(std::string &toRemove)
 {
@@ -38,7 +35,7 @@ void Channel::_inviteListRemove(std::string &toRemove)
 Channel::Channel(const std::string &name)
 {
 	_name = name;
-	_timeCreated = std::time(nullptr);// Utils::getCurrentTimeString();
+	_timeCreated = std::time(nullptr);
 }
 
 void Channel::setKey(std::string &key)
@@ -117,7 +114,8 @@ void Channel::join(Client &client, bool keyValidated)
 	std::string rpl;
 	Buffer &outBuf = client.getOutBuf();
 	std::string nickname = client.getNickName();
-	//TODO: think through repeated join
+	if (_channelUsers.count(&client))
+		return ;
 	if (!keyValidated && getKeyMode())
 	{
 		rpl = numericRPL(ERR_BADCHANNELKEY, nickname, _name);
@@ -136,7 +134,7 @@ void Channel::join(Client &client, bool keyValidated)
 		outBuf.append(rpl.c_str(), rpl.length());
 		return ;
 	}
-	userAdd(&client);
+	userAdd(client);
 	client.channelAdd(*this);
 	_inviteListRemove(nickname);
 	if (_operators.size() == 0)

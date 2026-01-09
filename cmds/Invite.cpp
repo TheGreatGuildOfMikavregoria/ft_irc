@@ -34,8 +34,7 @@ void Server::invite(Client& c, Command& cmd) {
 		if (invitee != nullptr)
 		{
 			Buffer &invBuf = invitee->getOutBuf();
-			rpl = ":" + c.getNickName() + " INVITE " + cmd.getTokens()[1] + " " + cmd.getTokens()[2] + "\r\n";
-			
+			rpl = ":" + c.getSource() + " INVITE " + cmd.getTokens()[1] + " " + cmd.getTokens()[2] + "\r\n";
 			invBuf.append(rpl.c_str(), rpl.length());
 			return;
 		}
