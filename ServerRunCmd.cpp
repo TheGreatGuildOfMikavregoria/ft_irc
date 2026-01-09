@@ -20,7 +20,9 @@ void Server::_runCmd(Client &currentClient, Command &message)
 
 void Server::removeEmptyChannels()
 {
-	_channels.erase(remove_if(_channels.begin(), _channels.end(), [](Channel &channel)
-		{ return (channel.isEmpty()); } ), _channels.end());
+	_channels.remove_if([](const Channel& c)
+	{
+		return c.isEmpty();
+	});
 }
 
