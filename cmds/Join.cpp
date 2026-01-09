@@ -19,7 +19,6 @@ void Server::join(Client& c, Command& cmd) {
 	if (cmd.getTokens().size() == 2 && cmd.getTokens()[1] == "0")
 	{
 		std::string reason;
-		//TODO: PART all user joined channels
 		for (Channel &channel : _channels)
 		{
 			channel.part(c, reason);
@@ -40,16 +39,12 @@ void Server::join(Client& c, Command& cmd) {
 		auto it = Utils::getChannelIteratorByChannelName( _channels, *chanIterStart);
 		if (it == _channels.end())
 		{
-			//create and join
 			if (!Channel::validateName(*chanIterStart))
 			{
-				//ERR_BADCHANMASK (476)
 				rpl = numericRPL(ERR_BADCHANMASK, nickName, *chanIterStart);
 				outBuf.append(rpl.c_str(), rpl.length());
 				continue ;
 			}
-			// TODO: check chan limit
-			//TODO: internall error check
 			Channel newChan(*chanIterStart);
 			_channels.push_back(newChan);
 			it = Utils::getChannelIteratorByChannelName(_channels, *chanIterStart);

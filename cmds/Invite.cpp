@@ -26,8 +26,6 @@ void Server::invite(Client& c, Command& cmd) {
 		outBuf.append(rpl.c_str(), rpl.length());
 		return;
 	}
-// TODO: think through caps
-// invite-notify capability
 	if (it->invite(c, cmd.getTokens()[1]))
 	{
 		invitee = clientLookUp(cmd.getTokens()[1]);
@@ -39,16 +37,4 @@ void Server::invite(Client& c, Command& cmd) {
 			return;
 		}
 	}
-/*	
-	if (cmd.getTokens().size() == 2 && cmd.getTokens()[1] == "0")
-	{
-		std::string reason;
-		//TODO: PART all user joined channels
-		for (Channel &channel : _channels)
-		{
-			channel.part(c, reason);
-		}
-		return ;
-	}
-*/
 }

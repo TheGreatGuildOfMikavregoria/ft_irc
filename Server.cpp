@@ -13,7 +13,6 @@ void Server::SignalHandler(int signum)
 
 Server::Server(std::string port, std::string pw) : status(0), password(pw), port(port), _operName(OPER_NAME), _operPass(OPER_PASS), _clients(), _listenFd(-1)
 {
-// TODO:  protec?
 	_timeCreated = Utils::getCurrentTimeString();
 	_clients.reserve(MAX_CLIENTS);
 	size_t endIdx;

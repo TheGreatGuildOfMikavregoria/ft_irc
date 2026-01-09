@@ -65,7 +65,6 @@ Command::Command(Buffer &buffer) : _buffer(buffer)
 		return ;
 	}
 	std::string commandLine = tempStr.substr(0, nlCrPosition);
-	// TODO: think through the behaviour if the message is invalid
 	_commandStringToVector(commandLine);
 	_removeParsedFromBuffer(nlCrPosition, tempStr);
 	_status = MESSAGE_COMPLETE;
@@ -119,7 +118,6 @@ void Command::_commandStringToVector(std::string &buffer)
 			if (token[0] == ':' && !trailing)
 			{
 				trailing = 1;
-// TODO: consider different token sizes, 
 				token = token.substr(1, token.length() - 1);
 			}
 			if (trailing)

@@ -140,9 +140,7 @@ void Channel::join(Client &client, bool keyValidated)
 	if (_operators.size() == 0)
 	{
 		_operators.insert(nickname);
-//		_topicUpdatedWho = nickname;
 		_topicUpdatedWho = client.getSource();
-
 	}
 	std::string prefix = ":" + client.getSource();
 	std::string message = prefix + " JOIN " + _name + "\r\n";
@@ -189,8 +187,6 @@ void Channel::topic(Client &c, bool broadcast)
 		chanBroadcast(rpl);
 	else
 		outBuff.append(rpl.c_str(), rpl.length());
-	
-// RPL_TOPICWHOTIME
 }
 
 void Channel::topic(Client &c, std::string &newTopic)
@@ -204,14 +200,12 @@ void Channel::topic(Client &c, std::string &newTopic)
 		outBuff.append(rpl.c_str(), rpl.length());
 		return;
 	}
-//		it->topic(c, );
 	topicChange = std::time(nullptr);
 	if (topicChange != static_cast<time_t>(-1))
 		_topicUpdatedTime = topicChange;
 	_topicUpdatedWho = c.getSource();
 	_topic = newTopic.substr(0, TOPICLEN);
 	topic(c, true);
-// try set new topic, reply??
 }
 
 void Channel::kick(Client &source, std::string &nick, std::string &reason)
@@ -287,7 +281,6 @@ void Channel::names(Client &source)
 		if (_channelUsers.count(&source) || !client->hasMode(Client::ModeInvi))
 			namesToList += client->getNickName() + " ";
 	}
-	// TODO: check mode??
 	rpl = numericRPL(RPL_NAMREPLY, source.getNickName(), "=", _name, namesToList);
 	rpl += numericRPL(RPL_ENDOFNAMES, source.getNickName(), _name);
 	outBuf.append(rpl.c_str(), rpl.length());
@@ -299,18 +292,14 @@ void Channel::who(Client &source)
 		client->who(source, this);
 	}
 }
-/*
-const std::string &Channel::getTopic() const
-{
-	return _topic;
-}
-*/
+
 bool Channel::hasChanPrefix(std::string &name)
 {
-	if (name[0] != '#') //&& name[0] != '&' && name[0] != '!' && name[0] != '+' )
+	if (name[0] != '#')
 		return (false);
 	return true;
 }
+
 bool Channel::validateName(std::string &name)
 {
 	if (name.length() < 2 || name.length() > 50)
@@ -349,13 +338,6 @@ bool Channel::isEmpty() const
 {
 	return (_channelUsers.size() == 0);
 }
-
-/*
-bool Channel::validateModes(std::string &mode)
-{
-	
-}
-*/
 
 const std::string	Channel::getChanMode() const {
 	std::string s;

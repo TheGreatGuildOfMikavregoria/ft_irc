@@ -5,10 +5,8 @@
 #include <cctype>
 #include "Buffer.hpp"
 #include "Utils.hpp"
-// TODO: debug purposes, remove later
 #include <iostream>
 
-//TODO: implement bit flags for different states
 #define MESSAGE_COMPLETE 1
 #define MESSAGE_INCOMPLETE 2
 #define MESSAGE_TO_VECTOR_FAIL 3
