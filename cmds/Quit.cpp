@@ -6,7 +6,7 @@ void Server::quit(Client& c, Command& cmd) {
 	if (!(cmd.getTokens().size() < 2))
 		reason = cmd.getTokens().at(1);
  	std::string rpl;
- 	rpl = "Closing Link: " + nickName +  " (Quit: " + reason + "!)";
+ 	rpl = "Closing Link: " + c.getHostName() +  " (Quit: " + reason + "!)";
  	this -> error(c,rpl);
  	rpl = ":" + nickName + " QUIT :" +  reason + "\r\n";
  	std::set<Channel*>::iterator it;
