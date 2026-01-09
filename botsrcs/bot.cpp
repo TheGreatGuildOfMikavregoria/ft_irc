@@ -100,14 +100,25 @@ void Bot::run()
 						if (msg == "!help" )
 						{
 							sendToClient(socket_fd, "PRIVMSG " + target + " :Available commands:");
-							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ KICK - Eject a client from the channel");
-							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ INVITE - Invite a client to a channel");
-							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ TOPIC - Change or view the channel topic");
-							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ MODE - Change the channel’s mode:");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ PING	- Check the other side of the connection is still ON");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ PONG	- Reply to the PING command");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ OPER	- Give a client IRC operator privileges");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ QUIT	- Disconnect a client from the server");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ JOIN	- Join a client to a channel");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ PART	- Remove the client from the channel by client itself");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ TOPIC	- Change or view the channel topic");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ NAMES	- View the nicknames joined to a channel");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ INVITE	- Invite a client to a channel");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ KICK	- Eject a client from the channel");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ MODE	- Change the channel’s mode");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ PRIVMSG	- Send private messages between users");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : ∗ WHO		- Query a list of users who match a mask");
+							sendToClient(socket_fd, "PRIVMSG " + target + " :Available channel modes:");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - i: Set/remove Invite-only channel");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - t: Set/remove the restrictions of the TOPIC command to channel operators");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - k: Set/remove the channel key (password)");
 							sendToClient(socket_fd, "PRIVMSG " + target + " : - o: Give/take channel operator privilege");
+							sendToClient(socket_fd, "PRIVMSG " + target + " : - l: Set/remove channel user limit");
 						}
 					}
 				}
