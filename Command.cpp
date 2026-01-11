@@ -151,16 +151,3 @@ bool Command::stringWithinLength(std::string &str, size_t length)
 {
 	return (str.length() <= length);
 }
-
-bool Command::validateParamNum()
-{
-	if (Utils::stringToLowercase(this->getCommand()) == "nick")
-	{
-		return (_tokens.size() == 2);
-	}
-	if (Utils::stringToLowercase(this->getCommand()) == "ping")
-	{
-		return (_tokens.size() == 2);
-	}
-	return false;
-}

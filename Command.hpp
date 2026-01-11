@@ -28,6 +28,6 @@ class Command {
 		std::vector<std::string> getTokens();
 		unsigned int getStatus();
 		bool stringWithinLength(std::string &, size_t );
-		bool validateParamNum();
+//		bool validateParamNum();
 		std::string getCommand();
 };
