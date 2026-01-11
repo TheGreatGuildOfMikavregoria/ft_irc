@@ -264,7 +264,6 @@ bool Channel::invite(Client &source, std::string &nick)
 		outBuf.append(rpl.c_str(), rpl.length());
 		return false;
 	}
-//TODO: somehow not shown for the inviter
 	rpl = numericRPL(RPL_INVITING, source.getNickName(), nick, _name);
 	outBuf.append(rpl.c_str(), rpl.length());
 	_inviteListAdd(nick);

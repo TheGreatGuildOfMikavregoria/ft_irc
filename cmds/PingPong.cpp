@@ -22,8 +22,8 @@ void Server::ping(Client& c, Command& cmd) {
 		rpl = ":" SERVER_NAME " PONG "  SERVER_NAME  " :" +  cmd.getTokens().at(1) + "\r\n";
 	outBuf.append(rpl.c_str(), rpl.length());
 	#if DEBUG
-	std::cout << "----Ping RPL ----" << std::endl; //is this required? //TODO: debug stuff remove later
-	std::cout << c.getNickName() << " "<< rpl; //TODO: debug stuff remove later
-	std::cout << "----Ping RPL END----" << std::endl; //TODO: debug stuff remove later
+	std::cout << "----Ping RPL ----" << std::endl;
+	std::cout << c.getNickName() << " "<< rpl;
+	std::cout << "----Ping RPL END----" << std::endl;
 	#endif
 }
