@@ -59,8 +59,6 @@ const 	std::string	Client::getUserMode() const {
 	if (_userMode) s += "+";
 	if (_userMode & ModeInvi) s += 'i';
 	if (_userMode & ModeOper) s += 'o';
-	// if (_userMode & ModeWallop) s += 'w';
-	// if (_userMode & ModeNotice) s += 'n';
 	return s;
 }
 std::string Client::getSource() const

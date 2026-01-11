@@ -79,7 +79,6 @@ class Channel
 		bool	isOperator(Client &user);
 
 		bool	isEmpty() const;
-//		const	std::string	getChanModeParams() const;
 };
 
 #endif

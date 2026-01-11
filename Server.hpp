@@ -30,7 +30,7 @@
 #include <csignal>
 #include <ctime>
 #include <list>
-#include <cstdlib> //INT_MAx
+#include <cstdlib>
 #define MAX_CLIENTS			512
 #define CLIENT_TIMEOUT		60
 #define CLIENT_PONG_WAITTIME CLIENT_TIMEOUT / 10 * 9
@@ -78,7 +78,7 @@ private:
 		{"NAMES", &Server::names},
 	};
 
-	int status; //I believed i needed at somepoint now i dont remember
+	int status;
 	std::string password; 
 	std::string port;
 	std::string _operName;
@@ -95,7 +95,6 @@ private:
 	void dropClient(std::size_t index, const std::string &reason);
 	bool serviceClientRead(Client &c);
 	bool serviceClientWrite(Client &c);
-	// void processInput(std::string &buff, Client &conn);
 	void sendToClient(int fd, const std::string &msg);
 	void buildPollList(std::vector<pollfd> &pfds);
 	void serverAcceptClients();
@@ -109,7 +108,6 @@ public:
 	static void SignalHandler(int signum);
 	void start_server();
 	bool set_nonblock(int fd);
-	// void	numericRPL(Client& c, const char* format,  ...);
 
 	const std::string &getTimeCreated();
 
@@ -134,7 +132,6 @@ public:
 	void	registerClient(Client& c);
 	void	serverBroadcast(const std::string& msg);
 	bool	isValidOperHost(const std::string &clientIP, int clientFD);
-	// void	dropClient(Client& c);
 	std::string	applyChanMode(Client& c, Channel* chan, Command& cmd);
 	std::string applyUserMode(Client& c, Command& cmd);
 	bool	isValidModeString(const std::string& modeString);

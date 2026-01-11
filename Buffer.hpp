@@ -1,21 +1,9 @@
 #pragma once
 
-// #include <cstddef>
 #include <vector>
-// #include <cerrno>
-// #include <cstdlib>
 #include <cstring>
-// #include <iostream>
-// #include <stdexcept>
 #include <string>
 #include <string_view>
-// #include <arpa/inet.h>
-// #include <netinet/in.h>
-// #include <poll.h>
-// #include <sys/socket.h>
-// #include <sys/types.h>
-// #include <unistd.h>
-// #include <fcntl.h>
 
  class Buffer
 {

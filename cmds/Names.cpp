@@ -17,8 +17,6 @@ void Server::names(Client& c, Command& cmd) {
 		return ;
 	}
 	std::vector <std::string> channels = Utils::ft_split(cmd.getTokens()[1], ',');
-//	auto chanIterStart = channels.begin();
-//	auto chanIterEnd = channels.end();
 	for (std::string &channelName : channels)
 	{
 		auto it = Utils::getChannelIteratorByChannelName( _channels, channelName);

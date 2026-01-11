@@ -4,7 +4,7 @@ Buffer::Buffer() : _buffer() {}
 
 Buffer::~Buffer() {}
 
-void Buffer::append(const char *data, size_t len)//why not take the len insid the function? 
+void Buffer::append(const char *data, size_t len)
 {
 	if (!data || len == 0)
 		return ;
@@ -12,7 +12,7 @@ void Buffer::append(const char *data, size_t len)//why not take the len insid th
 }
 
 
-void Buffer::append(std::string_view s)//why not take the len insid the function? 
+void Buffer::append(std::string_view s)
 {
 	this->append(s.data(), s.size());
 }

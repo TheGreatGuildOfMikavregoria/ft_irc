@@ -138,16 +138,13 @@ bool Server::serviceClientWrite(Client &c)
 		return false;
 
 	c.getOutBuf().discard(static_cast<std::size_t>(sent));
-	//disconnects the client after clearing the outbuf is discoonect flag is set
 	if (c.getDisconnectFlag() && c.getOutBuf().empty()){
 		return false;
-		//this -> dropClient(c);
 	}
 
 	return true;
 }
 
-//fsf=file status flags, of the file, adds nonblocking into list
 bool Server::set_nonblock(int fd)
 {
 	int fsf = fcntl(fd, F_GETFL, 0);
@@ -164,12 +161,12 @@ void Server::handleClientEvents(std::vector<pollfd> &pfds)
 			continue ;
 		Client *c = _clients[index].get();
 		short retEvent = pfds[i].revents;
-		if (retEvent & (POLLERR | POLLHUP | POLLNVAL)) //Error, Hangup, Invalid req.
+		if (retEvent & (POLLERR | POLLHUP | POLLNVAL))
 		{
 			dropClient(index, "Connection closed");
 			continue;
 		}
-		if (retEvent & POLLIN) //Readale
+		if (retEvent & POLLIN)
 		{
 			if (!serviceClientRead(*c))
 			{
@@ -177,7 +174,7 @@ void Server::handleClientEvents(std::vector<pollfd> &pfds)
 				continue;
 			}
 		}
-		if (retEvent & POLLOUT) //Writable
+		if (retEvent & POLLOUT)
 		{
 			if (!serviceClientWrite(*c))
 			{

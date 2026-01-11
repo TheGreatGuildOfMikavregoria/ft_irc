@@ -21,7 +21,6 @@ void Server::who(Client& c, Command& cmd)
 	mask = cmd.getTokens()[1];
 	if (Channel::hasChanPrefix(cmd.getTokens()[1]))
 	{
-		//std::cout << "who is channel" << std::endl;
 		auto it = std::find_if(_channels.begin(), _channels.end(),
 			[&mask](Channel &chan)
 			{
@@ -41,7 +40,6 @@ void Server::who(Client& c, Command& cmd)
 				found = 1;
 			}
 		}
-//		std::cout << "who is user" << std::endl;
 		if (!found)
 		{
 			for (std::unique_ptr<Client> &client : _clients)
