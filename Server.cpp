@@ -147,8 +147,7 @@ bool Server::serviceClientWrite(Client &c)
 
 bool Server::set_nonblock(int fd)
 {
-	int fsf = fcntl(fd, F_GETFL, 0);
-	return fsf >= 0 && fcntl(fd, F_SETFL, fsf | O_NONBLOCK) == 0;
+	return fcntl(fd, F_SETFL, O_NONBLOCK) == 0;
 }
 
 
